@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'karmakatoro@gmail.com',
             'password' => Hash::make('passwordd'),
             'gender' => 'm',
-            'avatar' => 'avatar-male.png',
+            'photo' => 'avatar-male.png',
             'accred' => '1',
             'type' => 'admin',
             'status' => 'on',
