@@ -15,11 +15,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/', function () {
+    return redirect()->route('login');
+});
 Route::middleware('auth')->group(function () {
     Route::prefix('auth')->controller(AuthController::class)->group(function () {
-        Route::get('/', 'index')->name('login');
-        Route::get('/forgot', 'forgot')->name('auth.forgot');
-        Route::get('/logout', 'AuthController@logout')->name('auth.logout');
+        Route::get('/login', 'index')->name('login')->withoutMiddleware('auth');
+        Route::get('/forgot', 'forgot')->name('auth.forgot')->withoutMiddleware('auth');
+        Route::get('/logout', 'AuthController@logout')->name('auth.logout')->withoutMiddleware('auth');
         Route::post('/get-connected', 'get_connected')->name('auth.get-connected');
         Route::get('/get-logged-out', 'get_logged_out')->name('auth.get-logged-out');
     });
