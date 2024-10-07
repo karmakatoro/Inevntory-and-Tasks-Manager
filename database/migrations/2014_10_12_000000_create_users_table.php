@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 50);
             $table->string('email', 50)->unique();
+            $table->string('phone', 50)->nullable(true);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('photo', 50)->nullable(false);
             $table->enum('gender', ['m', 'f'])->default('m');
