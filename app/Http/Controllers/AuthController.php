@@ -44,12 +44,12 @@ class AuthController extends Controller
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $remember)) {
                 return response()->json([
                     'status' => true,
-                    'redirect' => route('dashboard'),
+                    'redirect' => route('dashboard.sales'),
                 ]);
             } else {
                 return response()->json([
                     'status' => false,
-                    'errors' => ['Identifiants Invalides'],
+                    'errors' => ['Invalids Credentials'],
                 ]);
             }
         }
