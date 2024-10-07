@@ -17,6 +17,8 @@
 
     <!-- App css -->
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css') }}" rel="stylesheet"
+        type="text/css" />
     <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" id="app-stylesheet" />
 
     <!-- icons -->
@@ -84,6 +86,16 @@
 
     <!-- Dashboard init-->
     <script src="{{ asset('assets/js/pages/dashboard-sales.init.js') }}"></script>
+
+    <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.j') }}s"></script>
+    <script src="{{ asset('assets/libs/datatables.net-responsive-bs5/js/responsive.bootstrap5.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/jquery-datatables-checkboxes/js/dataTables.checkboxes.min.js') }}"></script>
+    <!-- third party js ends -->
+
+    <!-- Datatables init -->
+    <script src="assets/js/pages/customers.init.js"></script>
 
     <!-- App js -->
     <script src="{{ asset('assets/js/app.min.js') }}"></script>
