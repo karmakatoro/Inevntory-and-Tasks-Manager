@@ -22,8 +22,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('auth')->controller(AuthController::class)->group(function () {
         Route::get('/login', 'index')->name('login')->withoutMiddleware('auth');
         Route::get('/forgot', 'forgot')->name('auth.forgot')->withoutMiddleware('auth');
-        Route::get('/logout', 'AuthController@logout')->name('auth.logout')->withoutMiddleware('auth');
-        Route::post('/get-connected', 'get_connected')->name('auth.get-connected');
+        Route::get('/logout', 'logout')->name('auth.logout')->withoutMiddleware('auth');
+        Route::post('/get-connected', 'get_connected')->name('auth.get-connected')->withoutMiddleware('auth');
         Route::get('/get-logged-out', 'get_logged_out')->name('auth.get-logged-out');
     });
     Route::prefix('dashboard')->controller(DashboardController::class)->group(function () {

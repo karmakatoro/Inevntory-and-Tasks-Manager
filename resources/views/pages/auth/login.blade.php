@@ -10,13 +10,13 @@
 
                 <div class="text-center w-75 m-auto">
                     <div class="auth-logo">
-                        <a href="index.html" class="logo logo-dark text-center">
+                        <a href="{{ route('login') }}" class="logo logo-dark text-center">
                             <span class="logo-lg">
                                 <img src="{{ asset('assets/images/logo-dark.png') }}" alt="" height="22">
                             </span>
                         </a>
 
-                        <a href="index.html" class="logo logo-light text-center">
+                        <a href="{{ route('login') }}" class="logo logo-light text-center">
                             <span class="logo-lg">
                                 <img src="{{ asset('assets/images/logo-light.png') }}" alt="" height="22">
                             </span>
@@ -25,9 +25,8 @@
                     <p class="text-muted mb-4 mt-3">Enter your email address and password to access admin
                         panel.</p>
                 </div>
-
+                <div id="errors-list"></div>
                 <form action="{{ route('auth.get-connected') }}" method="POST" id="requestLogin">
-                    @csrf
                     <div class="mb-2">
                         <label for="emailaddress" class="form-label">Email address</label>
                         <input class="form-control" type="email" name="email" id="emailaddress" required=""
@@ -48,7 +47,7 @@
 
                     <div class="mb-3">
                         <div class="form-check">
-                            <input class="form-check-input" name="rememberMe" type="checkbox" id="checkbox-signin" checked>
+                            <input class="form-check-input" name="remember" type="checkbox" id="checkbox-signin" checked>
                             <label class="form-check-label" for="checkbox-signin">
                                 Remember me
                             </label>
