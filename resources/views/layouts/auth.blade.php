@@ -5,8 +5,8 @@
     <meta charset="utf-8" />
     <title>@yield('title', env('APP_NAME'))</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Coderthemes" name="author" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
@@ -20,8 +20,7 @@
 
     <!-- Theme Config Js -->
     <script src="{{ asset('assets/js/config.js') }}"></script>
-
-
+    <script src="{{ asset('assets/js/jquery-3.6.3.min.js') }}"></script>
 </head>
 
 <body class="loading">
@@ -41,6 +40,7 @@
 
     <!-- App js -->
     <script src="{{ asset('assets/js/app.min.js') }}"></script>
+    <script src="{{ asset('assets/js/auth.ajax.js') }}"></script>
 
 </body>
 
