@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -38,5 +39,9 @@ Route::middleware('auth')->group(function () {
     Route::controller(UserController::class)->group(function () {
         Route::resource('users', UserController::class);
         Route::delete('dm-users', 'delete_multiples')->name('dm-users');
+    });
+    Route::controller(ProjectController::class)->group(function () {
+        Route::resource('projects', ProjectController::class);
+        Route::delete('dm-projects', 'delete_multiples')->name('dm-projects');
     });
 });
