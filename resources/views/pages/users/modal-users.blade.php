@@ -92,22 +92,6 @@
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
             },
         });
-        // sweete alert compoment 1 response
-        function sweet_alert_toast(icon, message) {
-            Swal.fire({
-                position: "top-right",
-                icon: icon,
-                text: message,
-                toast: true,
-                showConfirmButton: false,
-                timerProgressBar: true,
-                timer: 6000,
-            });
-        }
-        // sweet alert fire
-        function sweet_fire(title, message, state) {
-            Swal.fire(title, message, state);
-        }
         $(document).on("click", "#btnSave", function(e) {
             e.preventDefault();
             var form = $("#requestUsers")
@@ -126,13 +110,23 @@
                 success: function(response) {
 
                     if (response.status == true) {
-                        sweet_alert_toast("success", response.message);
+                        Swal.fire({
+                            title: "Done!",
+                            text: response.message,
+                            icon: "success",
+                            confirmButtonColor: "#1abc9c",
+                        });
                         singleId.val("0");
                         $(form).trigger("reset");
                         $("#users-modal").modal("hide");
                         currentDt.ajax.reload();
                     } else if (response.status == false) {
-                        sweet_alert_toast("warning", response.message);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: response.message,
+                            confirmButtonColor: "#3bafda",
+                        });
                     }
                     submitBtn.html("Save changes");
                     submitBtn.prop("disabled", false);

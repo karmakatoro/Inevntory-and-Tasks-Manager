@@ -23,7 +23,7 @@ class UserController extends Controller
                 ->addIndexColumn()
                 ->addColumn('checkbox', function ($row) {
                     return '<div class="form-check font-16 mb-0">
-                                <input class="form-check-input" value="'.$row->id.'" type="checkbox" id="customerlist'.$row->id.'">
+                                <input class="form-check-input check-row" name="single-row" value="'.$row->id.'" type="checkbox" id="customerlist'.$row->id.'">
                                 <label class="form-check-label" for="customerlist01">&nbsp;</label>
                             </div>';
                 })
@@ -195,5 +195,51 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user) {}
+    public function destroy(User $user)
+    {
+        $id = $user->id;
+        if ($id == auth()->user()->id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Impossible to perform this operation!',
+            ]);
+        }
+
+        $deleted = $user->delete();
+        if ($deleted) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Successful supression',
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred',
+            ]);
+        }
+    }
+
+    public function delete_multiples(Request $request)
+    {
+        $data = $request->all_id;
+
+        for ($i = 0; $i < count($data); $i++) {
+            if ($data[$i] == auth()->user()->id) {
+                unset($data[$i]);
+            }
+        }
+        $rows = User::whereIn('id', $data)->delete();
+
+        if ($rows) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Successful supressions',
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occured',
+            ]);
+        }
+    }
 }

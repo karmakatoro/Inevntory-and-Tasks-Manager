@@ -34,7 +34,8 @@
                         </div>
                         <div class="col-sm-8">
                             <div class="text-sm-end">
-                                <button type="button" class="btn btn-danger mb-2 me-1">
+                                <button data-url="{{ route('dm-users') }}" type="button"
+                                    class="btn btn-danger mb-2 me-1 delete-all">
                                     <i class="mdi mdi-trash-can-outline"></i></button>
                                 <a href="javascript:void(0);" class="btn btn-primary mb-2"><i
                                         class="mdi mdi-printer me-1"></i> Print</a>
@@ -51,7 +52,8 @@
                                 <tr>
                                     <th style="width: 20px;">
                                         <div class="form-check font-16 mb-0">
-                                            <input class="form-check-input" type="checkbox" id="customerlist">
+                                            <input id="checkAllRows" class="form-check-input" type="checkbox"
+                                                id="customerlist">
                                             <label class="form-check-label" for="customerlist">&nbsp;</label>
                                         </div>
                                     </th>
@@ -73,6 +75,11 @@
     <!-- end row -->
     <script>
         $(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+            });
             currentDt = $("#users-dt").DataTable({
                 autoWidth: false,
                 order: [0, "ASC"],
@@ -150,6 +157,146 @@
                         }
                     }
                 });
+            });
+
+            $(document).on('click', '.delete-btn', function(e) {
+                e.preventDefault();
+                let id = $(this).attr('data-id');
+                let url = $(this).attr('data-url');
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: !0,
+                    confirmButtonColor: "#1abc9c",
+                    cancelButtonColor: "#f1556c",
+                    confirmButtonText: "Yes, delete it!",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: url,
+                            method: 'delete',
+                            success: function(response) {
+                                if (response.status == true) {
+                                    Swal.fire({
+                                        title: "Deleted!",
+                                        text: response.message,
+                                        icon: "success",
+                                        confirmButtonColor: "#1abc9c",
+                                    });
+                                    currentDt.ajax.reload();
+                                } else {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Error",
+                                        text: response.message,
+                                        confirmButtonColor: "#3bafda",
+                                    });
+                                }
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+
+                                if (jqXHR.status === 403) {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Oops...",
+                                        text: "Acces Denied!",
+                                        confirmButtonColor: "#3bafda",
+                                        footer: '<strong>Error code :</strong> 403',
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Oops...",
+                                        text: "An error occured",
+                                        confirmButtonColor: "#3bafda",
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+
+            });
+
+            // Select Multiple Records
+            $(document).on('click', '#checkAllRows', function() {
+                $('.check-row').prop('checked', $(this).prop('checked'));
+            });
+
+            // Delete Multiple records
+            $(document).on('click', '.delete-all', function() {
+                var checkedCount = $('.check-row:checked').length;
+                var url = $(this).attr('data-url');
+
+                if (checkedCount < 1) {
+                    Swal.fire(
+                        "Ooops...",
+                        "Vous devez selectionner au minimum 2 enregistrements",
+                        "warning"
+                    );
+                } else {
+                    var all_id = [];
+                    $('input:checkbox[name="single-row"]:checked').each(function() {
+                        all_id.push($(this).val());
+                    });
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: !0,
+                        confirmButtonColor: "#1abc9c",
+                        cancelButtonColor: "#f1556c",
+                        confirmButtonText: "Yes, delete them!",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: url,
+                                method: 'delete',
+                                data: {
+                                    all_id: all_id,
+                                },
+                                success: function(response) {
+                                    if (response.status == true) {
+                                        Swal.fire({
+                                            title: "Deleted!",
+                                            text: response.message,
+                                            icon: "success",
+                                            confirmButtonColor: "#1abc9c",
+                                        });
+                                        currentDt.ajax.reload();
+                                    } else if (response.status == false) {
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Oops...",
+                                            text: response.message,
+                                            confirmButtonColor: "#3bafda",
+                                        });
+                                    }
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+
+                                    if (jqXHR.status === 403) {
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Oops...",
+                                            text: "Acces Denied!",
+                                            confirmButtonColor: "#3bafda",
+                                            footer: '<strong>Error code :</strong> 403',
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Oops...",
+                                            text: "An error occured",
+                                            confirmButtonColor: "#3bafda",
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
             });
         });
     </script>
