@@ -124,6 +124,33 @@
                 ],
                 lengthMenu: [10, 25, 50, 100],
             });
+
+            $(document).on('click', '.edit-btn', function(e) {
+                e.preventDefault();
+                $("#requestUsers")[0].reset();
+                let id = $(this).attr('data-id');
+                let url = $(this).attr('data-url');
+                $.ajax({
+                    url: url,
+                    method: 'get',
+                    success: function(response) {
+                        if (response.status == true) {
+                            $("#userId").val(id);
+                            $("#name").val(response.data.name);
+                            $("#email").val(response.data.email);
+                            $("#phone").val(response.data.phone);
+                            $("#gender").val(response.data.gender);
+                            $("#type").val(response.data.type);
+                            $("#accred").val(response.data.accred);
+                            $("#statusUser").val(response.data.status);
+                            $("#errorsDiv").css("display", "none");
+                            $("#users-modal").modal('show');
+                        } else {
+                            Swal.fire("Erreur", response.message, 'warning');
+                        }
+                    }
+                });
+            });
         });
     </script>
     @include('pages.users.modal-users')

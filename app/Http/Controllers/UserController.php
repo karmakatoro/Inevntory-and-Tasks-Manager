@@ -62,14 +62,16 @@ class UserController extends Controller
                 MMMM YYYY');
                 })
                 ->addColumn('action', function ($row) {
+                    $edit_url = route('users.edit', ['user' => $row->id]);
+                    $delete_url = route('users.destroy', ['user' => $row->id]);
                     $actionBtn = '
                     <ul class="list-inline mb-0">
                         <li class="list-inline-item">
-                            <a href="javascript:void(0);" data-id="'.$row->id.'" class="action-icon edit-bnt"> <i
+                            <a href="#" data-id="'.$row->id.'" data-url="'.$edit_url.'" class="action-icon edit-btn"> <i
                                     class="mdi mdi-square-edit-outline"></i></a>
                         </li>
                         <li class="list-inline-item">
-                            <a href="javascript:void(0);" data-id="'.$row->id.'" class="action-icon delete-btn"> <i
+                            <a href="#" data-id="'.$row->id.'" data-url="'.$delete_url.'" class="action-icon delete-btn"> <i
                                     class="mdi mdi-delete"></i></a>
                         </li>
                     </ul>
@@ -97,43 +99,38 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:50',
-            'email' => 'required|email|max:50',
-            'phone' => 'required|max:50',
-            'gender' => 'required|in:m,f',
-            'type' => 'required|in:user,admin',
-            'accred' => 'required|in:1,2,3',
-            'status' => 'required|in:on,off',
-        ]);
-
-        $user = User::where('email', $request->email)->first();
         $check = User::find($request->id);
-        if ($user && $check) {
-            // update
-            $update = $check->update($request->all());
-
-            if ($update) {
-                return response()->json([
-                    'status' => true,
-                    'message' => 'User '.$request->name.' updated successfully',
-                ]);
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'An error occured',
-                ]);
+        $data = $request->all();
+        if ($check) {
+            $check_email = User::where('email', $request->email)->first();
+            if ($check_email) {
+                if ($check_email->id != $check->id) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Email already taken',
+                    ]);
+                }
             }
-
-        } elseif ($user && ! $check) {
-            // user already exist
-            return response()->json([
-                'status' => false,
-                'message' => 'User '.$request->name.' already exist',
+            $request->validate([
+                'name' => 'sometimes|string|max:50',
+                'email' => 'sometimes|email|max:50',
+                'phone' => 'sometimes|max:50',
+                'gender' => 'sometimes|in:m,f',
+                'type' => 'sometimes|in:user,admin',
+                'accred' => 'sometimes|in:1,2,3',
+                'status' => 'sometimes|in:on,off',
             ]);
+
         } else {
-            // create
-            $data = $request->all();
+            $request->validate([
+                'name' => 'required|string|max:50',
+                'email' => 'required|email|max:50|unique:users,email',
+                'phone' => 'required|max:50',
+                'gender' => 'required|in:m,f',
+                'type' => 'required|in:user,admin',
+                'accred' => 'required|in:1,2,3',
+                'status' => 'required|in:on,off',
+            ]);
             $photo = 'avatar-female.png';
             if ($request->gender == 'm') {
                 $photo = 'avatar-male.png';
@@ -141,19 +138,24 @@ class UserController extends Controller
             $password = Hash::make(1287635);
             $data['photo'] = $photo;
             $data['password'] = $password;
-            $new = User::create($data);
-            if ($new) {
-                return response()->json([
-                    'status' => true,
-                    'message' => 'User '.$request->name.' created successfully',
-                ]);
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'An error occured',
-                ]);
-            }
+
         }
+        $action = User::updateOrCreate(
+            ['id' => $request->id],
+            $data
+        );
+        if ($action) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Action done successfully',
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occured',
+            ]);
+        }
+
     }
 
     /**
@@ -169,7 +171,17 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        //
+        if ($user) {
+            return response()->json([
+                'status' => true,
+                'data' => $user,
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Une erreur est survenue',
+            ]);
+        }
     }
 
     /**
@@ -183,8 +195,5 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
-    {
-        //
-    }
+    public function destroy(User $user) {}
 }
