@@ -121,7 +121,7 @@
                      <div class="collapse" id="sidebarEmail">
                          <ul class="nav-second-level">
                              <li>
-                                 <a href="email-inbox.html">Projects</a>
+                                 <a href="{{ route('projects.index') }}">Projects</a>
                              </li>
                              <li>
                                  <a href="email-read.html">Tasks</a>
