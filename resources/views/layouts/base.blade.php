@@ -93,14 +93,9 @@
 
     <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.j') }}s"></script>
-    <script src="{{ asset('assets/libs/datatables.net-responsive-bs5/js/responsive.bootstrap5.min.js') }}"></script>
     <script src="{{ asset('assets/libs/jquery-datatables-checkboxes/js/dataTables.checkboxes.min.js') }}"></script>
 
     <!-- third party js ends -->
-
-    <!-- Datatables init -->
-    <script src="assets/js/pages/customers.init.js"></script>
 
     <!-- Plugin js-->
     <script src="{{ asset('assets/libs/parsleyjs/parsley.min.js') }}"></script>

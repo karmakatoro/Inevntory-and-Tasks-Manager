@@ -130,7 +130,7 @@
                         singleId.val("0");
                         $(form).trigger("reset");
                         $("#users-modal").modal("hide");
-                        //currentDt.ajax.reload();
+                        currentDt.ajax.reload();
                     } else if (response.status == false) {
                         sweet_alert_toast("warning", response.message);
                     }
