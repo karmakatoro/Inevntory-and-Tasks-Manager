@@ -17,8 +17,8 @@
                     <input type="hidden" name="id" id="userId">
                     <div class="row">
                         <div class="mb-3 col-lg-6 col-sm-12">
-                            <label for="names" class="form-label">Names</label>
-                            <input type="text" class="form-control" name="names" id="names"
+                            <label for="name" class="form-label">Names</label>
+                            <input type="text" class="form-control" name="name" id="name"
                                 placeholder="John Doe" required="">
                             <div class="invalid-feedback">
                                 Names are required
@@ -96,7 +96,7 @@
             e.preventDefault();
             var form = $("#requestUsers")
 
-            var submitBtn = $(this);
+            var submitBtn = $("#btnSave");
             var singleId = $("#userId");
             submitBtn.html(
                 `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Loading...`
@@ -110,15 +110,26 @@
                 success: function(response) {
 
                     if (response.status == true) {
-                        //sweet_alert_toast("success", response.message);
+                        Swal.fire({
+                            title: "Done!",
+                            text: response.message,
+                            icon: "success",
+                            confirmButtonColor: "#1abc9c",
+                        });
                         singleId.val("0");
                         $(form).trigger("reset");
                         $("#users-modal").modal("hide");
-                        //currentDt.ajax.reload();
-                        alert('yes');
+                        currentDt.ajax.reload();
                     } else if (response.status == false) {
-                        alert('no');
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: response.message,
+                            confirmButtonColor: "#3bafda",
+                        });
                     }
+                    submitBtn.html("Save changes");
+                    submitBtn.prop("disabled", false);
                 },
                 error: function(xhr, status, error) {
                     var errors = xhr.responseJSON.errors;
@@ -129,10 +140,11 @@
                     $(".errorsList").html(errorString);
                     $("#errorsDiv").css("display", "");
                     $("#errorsDiv").addClass("show");
+                    submitBtn.html("Save changes");
+                    submitBtn.prop("disabled", false);
                 },
             });
-            submitBtn.html("Save changes");
-            submitBtn.prop("disabled", false);
+
         });
     })
 </script>

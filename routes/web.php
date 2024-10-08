@@ -37,5 +37,6 @@ Route::middleware('auth')->group(function () {
     });
     Route::controller(UserController::class)->group(function () {
         Route::resource('users', UserController::class);
+        Route::delete('dm-users', 'delete_multiples')->name('dm-users');
     });
 });

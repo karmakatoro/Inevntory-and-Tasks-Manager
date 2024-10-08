@@ -21,70 +21,6 @@ $(document).ready(function () {
     function sweet_fire(title, message, state) {
         Swal.fire(title, message, state);
     }
-    // Function which will always initialize datatables with api response data
-    var currentDt = "";
-    function dispay_datatable(dataTableId, columns, custom) {
-        currentDt = $(`#${dataTableId}`).DataTable({
-            autoWidth: false,
-            order: [0, "ASC"],
-            processing: true,
-            serverSide: true,
-            searchDelay: 1000,
-            paging: true,
-            language: {
-                url: $(`#${dataTableId}`).attr("data-lang"),
-            },
-            ajax: {
-                url: $(`#${dataTableId}`).attr("data-api-url"),
-                data: function (data) {
-                    data.custom = custom;
-                },
-            },
-            iDisplayLength: "10",
-            columns: columns,
-            lengthMenu: [10, 25, 50, 100],
-        });
-    }
-
-    dispay_datatable(
-        "usersDt",
-        [
-            {
-                data: "checkbox",
-                name: "checkbox",
-                orderable: false,
-                searchable: false,
-            },
-            {
-                data: "name",
-                name: "name",
-                className: "text-900 sort pe-1 align-middle white-space-nowrap",
-            },
-            {
-                data: "contact",
-                name: "contact",
-                className: "text-900 sort pe-1 align-middle white-space-nowrap",
-            },
-            {
-                data: "address",
-                name: "address",
-                className:
-                    "text-900 sort pe-1 align-middle white-space-nowrap ps-5",
-            },
-            {
-                data: "join",
-                name: "join",
-                className: "text-900 sort pe-1 align-middle white-space-nowrap",
-            },
-            {
-                data: "action",
-                name: "action",
-                orderable: false,
-                searchable: false,
-            },
-        ],
-        ""
-    );
     // Function de delete one row
     function delete_row(btn) {
         let id = btn.attr("data-id");
@@ -130,61 +66,7 @@ $(document).ready(function () {
         e.preventDefault();
         delete_row($(this));
     });
-    // summit create or update
 
-    function updateOrCreate(formId, modalId) {
-        $(`#${formId}`).submit(function (e) {
-            e.preventDefault();
-            const fd = new FormData(this);
-
-            var submitBtn = $(this).find("[type='submit']");
-            var singleId = $(this).find("[name='id']");
-            submitBtn.html("Traitement...");
-            submitBtn.prop("disabled", true);
-
-            $.ajax({
-                url: $(this).attr("action"),
-                method: $(this).attr("method"),
-                data: fd,
-                cache: false,
-                contentType: false,
-                processData: false,
-                dataType: "json",
-                success: function (response) {
-                    submitBtn.html("Sauvegarder");
-                    submitBtn.prop("disabled", false);
-                    if (response.status == true) {
-                        sweet_alert_toast("success", response.message);
-                        singleId.val("0");
-                        $(`#${formId}`).trigger("reset");
-                        $(`#${modalId}`).modal("hide");
-                        currentDt.ajax.reload();
-                    } else if (response.status == false) {
-                        sweet_fire(
-                            "Ooops, erreur!!!",
-                            response.message,
-                            "warning"
-                        );
-                    }
-                },
-                error: function (xhr, status, error) {
-                    submitBtn.html("Sauvegarder");
-                    submitBtn.prop("disabled", false);
-                    var errors = xhr.responseJSON.errors;
-                    var errorString = "";
-                    $.each(errors, function (key, value) {
-                        errorString += value[0] + "<br>";
-                    });
-                    $(".errorsList").html(errorString);
-                    $("#errorsDiv").css("display", "");
-                    $("#errorsDiv").addClass("show");
-                },
-            });
-        });
-    }
-    updateOrCreate("requestUsers", "add-modal");
-
-    // select multiples
     // Select Multiple Records
     $(document).on("click", "#checkbox-bulk-customers-select", function () {
         $(".check-row").prop("checked", $(this).prop("checked"));
@@ -292,27 +174,6 @@ $(document).ready(function () {
                     }
                 });
             }
-        }
-    });
-
-    let isClicked = false;
-
-    $(document).on("click", ".img-preview, .camera-span", function () {
-        if (!isClicked) {
-            isClicked = true;
-            $("#upload-file").click();
-            isClicked = false;
-        }
-    });
-
-    $("#upload-file").on("change", function (event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                $(".img-preview").attr("src", e.target.result).show();
-            };
-            reader.readAsDataURL(file);
         }
     });
 });
