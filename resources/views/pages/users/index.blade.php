@@ -27,8 +27,10 @@
                 <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-sm-4">
-                            <a href="javascript:void(0);" class="btn btn-primary mb-2"><i
-                                    class="mdi mdi-plus-circle me-1"></i> Add Users</a>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#users-modal"
+                                class="btn btn-primary mb-2"><i class="mdi mdi-plus-circle me-1"></i> Add
+                                Users</a>
+
                         </div>
                         <div class="col-sm-8">
                             <div class="text-sm-end">
@@ -636,4 +638,6 @@
         </div>
     </div>
     <!-- end row -->
+    @include('pages.users.modal-users')
+
 @endsection
