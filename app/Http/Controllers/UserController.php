@@ -41,15 +41,23 @@ class UserController extends Controller
 
         $user = User::where('email', $request->email)->first();
         $check = User::find($request->id);
-        if ($user && $check->id == $request->id) {
+        if ($user && $check) {
             // update
             $update = $check->update($request->all());
 
-            return response()->json([
-                'status' => true,
-                'message' => 'User '.$request->name.' updated successfully',
-            ]);
-        } elseif ($user && $check->id != $request->id) {
+            if ($update) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'User '.$request->name.' updated successfully',
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'An error occured',
+                ]);
+            }
+
+        } elseif ($user && ! $check) {
             // user already exist
             return response()->json([
                 'status' => false,

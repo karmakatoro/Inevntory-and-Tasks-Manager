@@ -638,6 +638,10 @@
         </div>
     </div>
     <!-- end row -->
+    <script>
+        
+    </script>
     @include('pages.users.modal-users')
+
 
 @endsection

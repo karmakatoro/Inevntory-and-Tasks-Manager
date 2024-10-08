@@ -17,8 +17,8 @@
                     <input type="hidden" name="id" id="userId">
                     <div class="row">
                         <div class="mb-3 col-lg-6 col-sm-12">
-                            <label for="names" class="form-label">Names</label>
-                            <input type="text" class="form-control" name="names" id="names"
+                            <label for="name" class="form-label">Names</label>
+                            <input type="text" class="form-control" name="name" id="name"
                                 placeholder="John Doe" required="">
                             <div class="invalid-feedback">
                                 Names are required
@@ -92,11 +92,27 @@
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
             },
         });
+        // sweete alert compoment 1 response
+        function sweet_alert_toast(icon, message) {
+            Swal.fire({
+                position: "top-right",
+                icon: icon,
+                text: message,
+                toast: true,
+                showConfirmButton: false,
+                timerProgressBar: true,
+                timer: 6000,
+            });
+        }
+        // sweet alert fire
+        function sweet_fire(title, message, state) {
+            Swal.fire(title, message, state);
+        }
         $(document).on("click", "#btnSave", function(e) {
             e.preventDefault();
             var form = $("#requestUsers")
 
-            var submitBtn = $(this);
+            var submitBtn = $("#btnSave");
             var singleId = $("#userId");
             submitBtn.html(
                 `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Loading...`
@@ -110,15 +126,16 @@
                 success: function(response) {
 
                     if (response.status == true) {
-                        //sweet_alert_toast("success", response.message);
+                        sweet_alert_toast("success", response.message);
                         singleId.val("0");
                         $(form).trigger("reset");
                         $("#users-modal").modal("hide");
                         //currentDt.ajax.reload();
-                        alert('yes');
                     } else if (response.status == false) {
-                        alert('no');
+                        sweet_alert_toast("warning", response.message);
                     }
+                    submitBtn.html("Save changes");
+                    submitBtn.prop("disabled", false);
                 },
                 error: function(xhr, status, error) {
                     var errors = xhr.responseJSON.errors;
@@ -129,10 +146,11 @@
                     $(".errorsList").html(errorString);
                     $("#errorsDiv").css("display", "");
                     $("#errorsDiv").addClass("show");
+                    submitBtn.html("Save changes");
+                    submitBtn.prop("disabled", false);
                 },
             });
-            submitBtn.html("Save changes");
-            submitBtn.prop("disabled", false);
+
         });
     })
 </script>
