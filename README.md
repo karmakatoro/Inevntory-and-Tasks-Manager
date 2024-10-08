@@ -23,20 +23,21 @@ This project is a comprehensive Task and Inventory Management System designed to
    ```bash
    git clone https://github.com/karmakatoro/Inevntory-and-Tasks-Manager.git
 2. Navigate to the project directory:
+    ```bash
    cd Inevntory-and-Tasks-Manager
-3. Install dependencies
+4. Install dependencies
    ```bash
    composer install
-4. Copy the .env.example file to .env and configure your environment variables:
+5. Copy the .env.example file to .env and configure your environment variables:
    ```bash
    cp .env.example .env
-5. Generate an application key:
+6. Generate an application key:
     ```bash
     php artisan key:generate
-6. Run migrations to set up the database
+7. Run migrations to set up the database
    ```bash
    php artisan migrate
-7. Serve the application locally
+8. Serve the application locally
    ```bash
    php artisan serve
 ## Contribution
