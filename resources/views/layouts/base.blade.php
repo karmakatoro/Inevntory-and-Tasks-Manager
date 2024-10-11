@@ -27,6 +27,14 @@
     <!-- Sweet Alert-->
     <link href="{{ asset('assets/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
 
+    <link href="{{ asset('assets/libs/quill/quill.core.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/libs/quill/quill.bubble.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/libs/quill/quill.snow.css') }}" rel="stylesheet" type="text/css" />
+
+    <!-- Plugins css -->
+    <link href="{{ asset('assets/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
+
+
     <!-- Theme Config Js -->
     <script src="{{ asset('assets/js/config.js') }}"></script>
     <script src="{{ asset('assets/js/jquery-3.6.3.min.js') }}"></script>
@@ -102,6 +110,19 @@
     <script src="{{ asset('assets/js/pages/form-validation.init.js') }}"></script>
     <!-- Sweet Alerts js -->
     <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
+
+    <!-- Plugins js -->
+    <script src="{{ asset('assets/libs/quill/quill.min.js') }}"></script>
+
+    <!-- Init js-->
+    <script src="{{ asset('assets/js/pages/form-quilljs.init.js') }}"></script>
+
+    <!-- Plugins js -->
+    <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
+
+    <!-- Init js-->
+    <script src="{{ asset('assets/js/pages/form-fileuploads.init.js') }}"></script>
+
 
     <!-- App js -->
     <script src="{{ asset('assets/js/app.min.js') }}"></script>

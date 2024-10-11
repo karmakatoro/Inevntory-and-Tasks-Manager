@@ -211,13 +211,13 @@
                 </a>
                 <div class="dropdown-menu">
                     <!-- item-->
-                    <a href="javascript:void(0);" class="dropdown-item">
+                    <a href="{{ route('projects.create') }}" class="dropdown-item">
                         <i class="fe-briefcase me-1"></i>
                         <span>New Projects</span>
                     </a>
 
                     <!-- item-->
-                    <a href="javascript:void(0);" class="dropdown-item">
+                    <a href="{{ route('users.index') }}?open=modal" class="dropdown-item">
                         <i class="fe-user me-1"></i>
                         <span>Create Users</span>
                     </a>

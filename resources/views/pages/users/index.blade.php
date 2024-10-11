@@ -80,6 +80,10 @@
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                 },
             });
+            var openModal = "{{ request()->open }}";
+            if (openModal == 'modal') {
+                $("#users-modal").modal('show');
+            }
             currentDt = $("#users-dt").DataTable({
                 autoWidth: false,
                 order: [0, "ASC"],

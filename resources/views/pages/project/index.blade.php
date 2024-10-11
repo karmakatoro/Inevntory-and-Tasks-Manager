@@ -52,8 +52,9 @@
                             <div class="d-flex gap-2 justify-content-lg-end mt-3 mt-lg-0">
                                 <button type="button" class="btn btn-primary waves-effect waves-light"><i
                                         class="mdi mdi-printer me-1"></i> Print</button>
-                                <button type="button" class="btn btn-danger waves-effect waves-light"><i
-                                        class="mdi mdi-plus-circle me-1"></i> Add New</button>
+                                <a href="{{ route('projects.create') }}" class="btn btn-danger waves-effect waves-light"><i
+                                        class="mdi mdi-plus-circle me-1"></i>
+                                    Add New</a>
                             </div>
                         </div><!-- end col-->
                     </div> <!-- end row -->
