@@ -7,6 +7,13 @@ use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
+    private $functions;
+
+    public function __construct()
+    {
+        $this->functions = new FunctionsController;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -28,7 +35,34 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|max:100|unique:projects,title',
+            'description' => 'required|max:500',
+            'details' => 'sometimes',
+            'status' => 'sometimes|in:pending,unlaunched',
+            'start' => 'required|date|after_or_equal:today',
+            'end' => 'sometimes|date|after_or_equal:start',
+            'logo' => 'sometimes',
+        ]);
+        $logo = '';
+        $files = '';
+        if ($request->hasFile('logo')) {
+            $logo = $this->functions->store_file($request->logo, 'projects/logos');
+        }
+        if ($request->hasFile('files')) {
+            $files = $this->functions->store_multiples_file($request->file('files'), 'projects/files');
+        }
+        $data = $request->all();
+        $data['logo'] = $logo;
+        $data['files'] = $files;
+        $new = Project::create($data);
+        if ($new) {
+            return redirect()->route('projects.index')->with('success', 'Project created successfully');
+        } else {
+            return redirect()->back()->with('error', ' An error occured while creating project')
+                ->withInput();
+        }
+
     }
 
     /**
@@ -36,7 +70,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        //
+        return view('pages.project.show', compact('show'));
     }
 
     /**
@@ -44,7 +78,7 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        return view('pages.project.edit');
+        return view('pages.project.edit', compact('project'));
     }
 
     /**
@@ -52,7 +86,44 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        //
+        $request->validate([
+            'title' => 'sometimes|max:100',
+            'description' => 'sometimes|max:500',
+            'details' => 'sometimes',
+            'status' => 'sometimes|in:pending,unlaunched',
+            'start' => 'sometimes|date',
+            'end' => 'sometimes|date',
+            'logo' => 'sometimes',
+            'files' => 'nullable|array',
+            'files.*' => 'nullable',
+        ]);
+        $logo = '';
+        $files = '';
+        if ($request->hasFile('logo')) {
+            $logo = $this->functions->store_file($request->logo, 'projects/logos');
+        }
+        if ($request->hasFile('files')) {
+            $files = $this->functions->store_multiples_file($request->file('files'), 'projects/files');
+        }
+        $data = [
+            'title' => $request->title,
+            'description' => $request->description,
+            'details' => $request->details,
+            'status' => $request->status,
+            'start' => $request->start,
+            'end' => $request->end,
+            'logo' => $logo,
+            'files' => $files,
+        ];
+
+        $update = $project->update($data);
+        if ($update) {
+            return redirect()->route('projects.index')->with('success', 'Project updated successfully');
+        } else {
+            return redirect()->back()->with('error', ' An error occured while updating project')
+                ->withInput();
+        }
+
     }
 
     /**
@@ -60,6 +131,6 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+        $this->functions->delete_row($project);
     }
 }

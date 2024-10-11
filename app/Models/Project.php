@@ -4,8 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+
+    protected $guarded = [];
+
+    public static function boot()
+    {
+        parent::boot();
+        self::creating(function ($project) {
+            $project->user_id = auth()->user()->id;
+        });
+        self::updating(function ($project) {
+            $project->user_id = auth()->user()->id;
+        });
+
+    }
 }
