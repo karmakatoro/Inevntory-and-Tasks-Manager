@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    return redirect()->route('dashboard.sales');
 });
 Route::middleware('auth')->group(function () {
     Route::prefix('auth')->controller(AuthController::class)->group(function () {

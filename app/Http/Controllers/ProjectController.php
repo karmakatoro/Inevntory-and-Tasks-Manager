@@ -19,7 +19,9 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        return view('pages.project.index');
+        $projects = Project::latest()->paginate(10);
+
+        return view('pages.project.index', compact('projects'));
     }
 
     /**
@@ -62,7 +64,6 @@ class ProjectController extends Controller
             return redirect()->back()->with('error', ' An error occured while creating project')
                 ->withInput();
         }
-
     }
 
     /**
@@ -70,7 +71,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        return view('pages.project.show', compact('show'));
+        return view('pages.project.show', compact('project'));
     }
 
     /**
@@ -101,9 +102,13 @@ class ProjectController extends Controller
         $files = '';
         if ($request->hasFile('logo')) {
             $logo = $this->functions->store_file($request->logo, 'projects/logos');
+        } else {
+            $logo = $project->logo;
         }
         if ($request->hasFile('files')) {
             $files = $this->functions->store_multiples_file($request->file('files'), 'projects/files');
+        } else {
+            $files = $project->files;
         }
         $data = [
             'title' => $request->title,
@@ -123,7 +128,6 @@ class ProjectController extends Controller
             return redirect()->back()->with('error', ' An error occured while updating project')
                 ->withInput();
         }
-
     }
 
     /**
@@ -131,6 +135,17 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        $this->functions->delete_row($project);
+        $deleted = $project->delete();
+        if ($deleted) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Successful supression',
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred',
+            ]);
+        }
     }
 }

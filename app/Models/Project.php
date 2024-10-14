@@ -16,11 +16,17 @@ class Project extends Model
     {
         parent::boot();
         self::creating(function ($project) {
-            $project->user_id = auth()->user()->id;
+            $project->user()->associate(auth()->user()->id);
         });
         self::updating(function ($project) {
-            $project->user_id = auth()->user()->id;
+            $project->user()->associate(auth()->user()->id);
+
         });
 
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(Project::class);
     }
 }
