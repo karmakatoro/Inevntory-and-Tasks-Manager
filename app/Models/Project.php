@@ -20,13 +20,11 @@ class Project extends Model
         });
         self::updating(function ($project) {
             $project->user()->associate(auth()->user()->id);
-
         });
-
     }
 
     public function user()
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(User::class);
     }
 }
