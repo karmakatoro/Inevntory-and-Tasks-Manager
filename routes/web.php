@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,5 +44,9 @@ Route::middleware('auth')->group(function () {
     Route::controller(ProjectController::class)->group(function () {
         Route::resource('projects', ProjectController::class);
         Route::delete('dm-projects', 'delete_multiples')->name('dm-projects');
+    });
+    Route::controller(TaskController::class)->group(function () {
+        Route::resource('tasks', TaskController::class);
+        Route::delete('dm-tasks', 'delete_multiples')->name('dm-tasks');
     });
 });
