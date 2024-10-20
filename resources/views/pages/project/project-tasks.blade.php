@@ -7,8 +7,9 @@
                         <!-- cta -->
                         <div class="row">
                             <div class="col-sm-3">
-                                <a href="#" class="btn btn-primary waves-effect waves-light"><i
-                                        class='fe-plus me-1'></i>Add New Task</a>
+                                <a href="{{ route('tasks.create') }}?id={{ $project->id }}&name={{ Str::slug($project->title) }}"
+                                    class="btn btn-primary waves-effect waves-light"><i class='fe-plus me-1'></i>Add New
+                                    Task</a>
                             </div>
                             <div class="col-sm-9">
                                 <div class="float-sm-end mt-3 mt-sm-0">
@@ -99,17 +100,20 @@
                                                             </li>
                                                             <li class="list-inline-item">
                                                                 <div class="dropdown">
-                                                                    <a class="action-icon px-1 dropdown-toggle" href="#"
-                                                                        data-bs-toggle="dropdown" aria-haspopup="true"
-                                                                        aria-expanded="false">
+                                                                    <a class="action-icon px-1 dropdown-toggle"
+                                                                        href="#" data-bs-toggle="dropdown"
+                                                                        aria-haspopup="true" aria-expanded="false">
                                                                         <i class="mdi mdi-dots-vertical"></i>
                                                                     </a>
 
                                                                     <div class="dropdown-menu dropdown-menu-end">
-                                                                        <a class="dropdown-item" href="#">Action</a>
-                                                                        <a class="dropdown-item" href="#">Another
+                                                                        <a class="dropdown-item"
+                                                                            href="#">Action</a>
+                                                                        <a class="dropdown-item"
+                                                                            href="#">Another
                                                                             action</a>
-                                                                        <a class="dropdown-item" href="#">Something else
+                                                                        <a class="dropdown-item"
+                                                                            href="#">Something else
                                                                             here</a>
                                                                     </div>
                                                                 </div>
@@ -125,8 +129,8 @@
 
                             <div class="mt-4">
                                 <h5 class="position-relative mb-0"><a href="#taskcollapse2" class="text-dark d-block"
-                                        data-bs-toggle="collapse">Completed Tasks<span class="text-muted">(05)</span> <i
-                                            class="mdi mdi-chevron-down accordion-arrow"></i></a>
+                                        data-bs-toggle="collapse">Completed Tasks<span class="text-muted">(05)</span>
+                                        <i class="mdi mdi-chevron-down accordion-arrow"></i></a>
                                 </h5>
                                 <div class="collapse show" id="taskcollapse2">
                                     <div class="table-responsive mt-3">
@@ -137,7 +141,8 @@
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox"
                                                                 id="taskupcomingCheck">
-                                                            <label class="form-check-label" for="taskupcomingCheck">Task
+                                                            <label class="form-check-label"
+                                                                for="taskupcomingCheck">Task
                                                                 ID</label>
                                                         </div>
                                                     </th>
@@ -172,22 +177,26 @@
                                                     <td>
                                                         <ul class="list-inline table-action m-0">
                                                             <li class="list-inline-item">
-                                                                <a href="javascript:void(0);" class="action-icon px-1">
+                                                                <a href="javascript:void(0);"
+                                                                    class="action-icon px-1">
                                                                     <i class="mdi mdi-square-edit-outline"></i></a>
                                                             </li>
                                                             <li class="list-inline-item">
                                                                 <div class="dropdown">
-                                                                    <a class="action-icon px-1 dropdown-toggle" href="#"
-                                                                        data-bs-toggle="dropdown" aria-haspopup="true"
-                                                                        aria-expanded="false">
+                                                                    <a class="action-icon px-1 dropdown-toggle"
+                                                                        href="#" data-bs-toggle="dropdown"
+                                                                        aria-haspopup="true" aria-expanded="false">
                                                                         <i class="mdi mdi-dots-vertical"></i>
                                                                     </a>
 
                                                                     <div class="dropdown-menu dropdown-menu-end">
-                                                                        <a class="dropdown-item" href="#">Action</a>
-                                                                        <a class="dropdown-item" href="#">Another
+                                                                        <a class="dropdown-item"
+                                                                            href="#">Action</a>
+                                                                        <a class="dropdown-item"
+                                                                            href="#">Another
                                                                             action</a>
-                                                                        <a class="dropdown-item" href="#">Something else
+                                                                        <a class="dropdown-item"
+                                                                            href="#">Something else
                                                                             here</a>
                                                                     </div>
                                                                 </div>
@@ -250,22 +259,26 @@
                                                     <td>
                                                         <ul class="list-inline table-action m-0">
                                                             <li class="list-inline-item">
-                                                                <a href="javascript:void(0);" class="action-icon px-1">
+                                                                <a href="javascript:void(0);"
+                                                                    class="action-icon px-1">
                                                                     <i class="mdi mdi-square-edit-outline"></i></a>
                                                             </li>
                                                             <li class="list-inline-item">
                                                                 <div class="dropdown">
-                                                                    <a class="action-icon px-1 dropdown-toggle" href="#"
-                                                                        data-bs-toggle="dropdown" aria-haspopup="true"
-                                                                        aria-expanded="false">
+                                                                    <a class="action-icon px-1 dropdown-toggle"
+                                                                        href="#" data-bs-toggle="dropdown"
+                                                                        aria-haspopup="true" aria-expanded="false">
                                                                         <i class="mdi mdi-dots-vertical"></i>
                                                                     </a>
 
                                                                     <div class="dropdown-menu dropdown-menu-end">
-                                                                        <a class="dropdown-item" href="#">Action</a>
-                                                                        <a class="dropdown-item" href="#">Another
+                                                                        <a class="dropdown-item"
+                                                                            href="#">Action</a>
+                                                                        <a class="dropdown-item"
+                                                                            href="#">Another
                                                                             action</a>
-                                                                        <a class="dropdown-item" href="#">Something else
+                                                                        <a class="dropdown-item"
+                                                                            href="#">Something else
                                                                             here</a>
                                                                     </div>
                                                                 </div>
