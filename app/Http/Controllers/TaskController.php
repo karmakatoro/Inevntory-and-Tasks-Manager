@@ -36,13 +36,12 @@ class TaskController extends Controller
                             </div>';
                 })
                 ->addColumn('project', function ($row) {
-                    $url = asset('storage/users/' . $row->photo);
+                    $url = asset('storage/users/' . $row->user->photo);
                     $render = ' <div class="d-flex">
                                     <img src="' . $url . '" alt="table-user"
                                         class="me-3 rounded-circle avatar-sm">
                                     <div class="flex-1">
                                         <h5 class="mt-0 mb-1">
-                                            Owner :
                                             <a href="javascript:void(0);" class="text-dark">
                                                 ' . $row->project->title . '
                                             </a>
@@ -58,7 +57,7 @@ class TaskController extends Controller
                     $deadline = Carbon::parse($row->deadline)->locale('en_EN')->isoFormat('DD
                     MMMM YYYY');
                     $render = ' <span class="badge badge-soft-success">' . $deadline . '</span>';
-                    if (Carbon::parse($row->deadline)->greaterThanOrEqualTo(Carbon::today())) {
+                    if (Carbon::parse($row->deadline)->lt(Carbon::today())) {
                         $render = ' <span class="badge badge-soft-danger">' . $deadline . '</span>';
                     }
                     return $render;
@@ -143,11 +142,11 @@ class TaskController extends Controller
         $request->validate([
             'project_id' => 'required|exists:projects,id',
             'name' => 'required|string|max:255',
-            'description' => 'sometimes|string|max:500',
+            'description' => 'sometimes|max:500',
             'deadline' => 'required|date|after_or_equal:today',
             'depenend' => 'sometimes',
-            'priority' => 'sometimes|in:very high,high,medium,low',
-            'status' => 'sometimes|in:pending,compteted,todo',
+            'priority' => 'required|in:very high,high,medium,low',
+            'status' => 'required|in:pending,compteted,todo',
         ]);
         $files = '';
         if ($request->hasFile('files')) {
@@ -208,6 +207,41 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        //
+        $deleted = $task->delete();
+        if ($deleted) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Successful supression',
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred',
+            ]);
+        }
+    }
+
+    public function delete_multiples(Request $request)
+    {
+        $data = $request->all_id;
+
+        for ($i = 0; $i < count($data); $i++) {
+            if ($data[$i] == auth()->user()->id) {
+                unset($data[$i]);
+            }
+        }
+        $rows = User::whereIn('id', $data)->delete();
+
+        if ($rows) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Successful supressions',
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occured',
+            ]);
+        }
     }
 }

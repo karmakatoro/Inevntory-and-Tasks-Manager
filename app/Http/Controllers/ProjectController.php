@@ -75,8 +75,12 @@ class ProjectController extends Controller
     {
         $tasks = Task::where('project_id', $project->id)
             ->latest()
+            ->with('project_task')
             ->get();
-        return view('pages.project.show', compact('project', 'tasks'));
+        $todos = $tasks->where('status', 'todo')->count();
+        $pendings = $tasks->where('status', 'pending')->count();
+        $completeds = $tasks->where('status', 'compteted')->count();
+        return view('pages.project.show', compact('project', 'tasks', 'todos', 'pendings', 'completeds'));
     }
 
     /**

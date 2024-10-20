@@ -118,8 +118,8 @@
                                         <div class="col-lg-3 col-sm-12 mb-3">
                                             <label for="deadline" class="form-label">Task Deadline</label>
                                             <div class="col-md-12">
-                                                <input type="date" id="deadline" name="deadline"
-                                                    class="form-control" required>
+                                                <input type="date" id="deadline" value="{{ old('deadline') }}"
+                                                    name="deadline" class="form-control" required>
                                                 @if ($errors->has('deadline'))
                                                     <p class="text-pink mt-2">
                                                         {{ $errors->first('deadline') }}

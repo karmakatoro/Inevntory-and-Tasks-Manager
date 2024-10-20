@@ -3,72 +3,72 @@
 @section('title', 'Tasks - ' . env('APP_NAME'))
 
 @section('content')
-<!-- start page title -->
-<div class="row">
-    <div class="col-12">
-        <div class="page-title-box">
-            <h4 class="page-title">Tasks</h4>
-            <div class="page-title-right">
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item">
-                        <a href="{{ route('dashboard.sales') }}">Dashboard</a>
-                    </li>
-                    <li class="breadcrumb-item active">Tasks</li>
-                </ol>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- end page title -->
-
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="row mb-2">
-                    <div class="col-12">
-                        <div class="text-sm-start">
-                            <button data-url="{{ route('dm-users') }}" type="button"
-                                class="btn btn-danger mb-2 me-1 delete-all">
-                                <i class="mdi mdi-trash-can-outline"></i></button>
-                            <a href="javascript:void(0);" class="btn btn-primary mb-2"><i
-                                    class="mdi mdi-printer me-1"></i> Print</a>
-                            <a href="javascript:void(0);" class="btn btn-success mb-2"><i
-                                    class="mdi mdi-database-export me-1"></i> Export</a>
-                        </div>
-                    </div><!-- end col-->
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table table-centered dt-responsive nowrap w-100" id="tasks-dt"
-                        data-api-url="{{ route('tasks.index') }}">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width: 20px;">
-                                    <div class="form-check font-16 mb-0">
-                                        <input id="checkAllRows" class="form-check-input" type="checkbox"
-                                            id="customerlist">
-                                        <label class="form-check-label" for="customerlist">&nbsp;</label>
-                                    </div>
-                                </th>
-                                <th>Project</th>
-                                <th>Task</th>
-                                <th>Deadline</th>
-                                <th>Priority</th>
-                                <th>Status</th>
-                                <th style="width: 75px;">Action</th>
-                            </tr>
-                        </thead>
-                    </table>
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">Tasks</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('dashboard.sales') }}">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item active">Tasks</li>
+                    </ol>
                 </div>
             </div>
         </div>
-        <!-- end row -->
     </div>
-</div>
-<!-- end row -->
-<script>
-    $(document).ready(function() {
+    <!-- end page title -->
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <div class="text-sm-start">
+                                <button data-url="{{ route('dm-users') }}" type="button"
+                                    class="btn btn-danger mb-2 me-1 delete-all">
+                                    <i class="mdi mdi-trash-can-outline"></i></button>
+                                <a href="javascript:void(0);" class="btn btn-primary mb-2"><i
+                                        class="mdi mdi-printer me-1"></i> Print</a>
+                                <a href="javascript:void(0);" class="btn btn-success mb-2"><i
+                                        class="mdi mdi-database-export me-1"></i> Export</a>
+                            </div>
+                        </div><!-- end col-->
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-centered dt-responsive nowrap w-100" id="tasks-dt"
+                            data-api-url="{{ route('tasks.index') }}">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 20px;">
+                                        <div class="form-check font-16 mb-0">
+                                            <input id="checkAllRows" class="form-check-input" type="checkbox"
+                                                id="customerlist">
+                                            <label class="form-check-label" for="customerlist">&nbsp;</label>
+                                        </div>
+                                    </th>
+                                    <th>Project</th>
+                                    <th>Task</th>
+                                    <th>Deadline</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th style="width: 75px;">Action</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- end row -->
+        </div>
+    </div>
+    <!-- end row -->
+    <script>
+        $(document).ready(function() {
             $.ajaxSetup({
                 headers: {
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -101,8 +101,8 @@
                         className: "text-900 sort pe-1 align-middle white-space-nowrap",
                     },
                     {
-                        data: "task",
-                        name: "task",
+                        data: "name",
+                        name: "name",
                         className: "text-900 sort pe-1 align-middle white-space-nowrap",
                     },
                     {
@@ -297,8 +297,8 @@
                 }
             });
         });
-</script>
-@include('pages.users.modal-users')
+    </script>
+    @include('pages.users.modal-users')
 
 
 @endsection
