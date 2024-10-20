@@ -14,6 +14,12 @@
     <!-- plugin css -->
     <link href="{{ asset('assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css') }}"
         rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/libs/mohithg-switchery/switchery.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/libs/multiselect/css/multi-select.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/libs/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/libs/selectize/css/selectize.bootstrap3.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css') }}" rel="stylesheet"
+        type="text/css" />
 
     <!-- App css -->
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
@@ -103,8 +109,6 @@
 
     <!-- third party js ends -->
 
-    <!-- Plugin js-->
-    <script src="{{ asset('assets/libs/parsleyjs/parsley.min.js') }}"></script>
 
     <!-- Validation init js-->
     <script src="{{ asset('assets/js/pages/form-validation.init.js') }}"></script>
@@ -112,15 +116,22 @@
     <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
 
     <!-- Plugins js -->
+    <script src="{{ asset('assets/libs/parsleyjs/parsley.min.js') }}"></script>
     <script src="{{ asset('assets/libs/quill/quill.min.js') }}"></script>
-
-    <!-- Init js-->
-    <script src="{{ asset('assets/js/pages/form-quilljs.init.js') }}"></script>
-
-    <!-- Plugins js -->
     <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/selectize/js/standalone/selectize.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/mohithg-switchery/switchery.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/multiselect/js/jquery.multi-select.js') }}"></script>
+    <script src="{{ asset('assets/libs/jquery.quicksearch/jquery.quicksearch.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/select2/js/select2.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
 
-    <!-- Init js-->
+
+    <!-- init js -->
+
+    <script src="{{ asset('assets/js/pages/form-quilljs.init.js') }}"></script>
+    <script src="{{ asset('') }}assets/js/pages/form-advanced.init.js"></script>
     <script src="{{ asset('assets/js/pages/form-fileuploads.init.js') }}"></script>
 
 

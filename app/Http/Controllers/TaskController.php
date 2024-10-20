@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Task;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -117,7 +118,8 @@ class TaskController extends Controller
             $project_id = $request->id;
             $project = Project::find($project_id);
             if ($project) {
-                return view('pages.tasks.create', compact('project'));
+                $users = User::where('status', 'on')->orderBy('name', 'asc')->get();
+                return view('pages.tasks.create', compact('project', 'users'));
             } else {
                 return redirect()->route('projects.index')->with('error', 'Project not found!');
             }
