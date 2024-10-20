@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\ProjectTask;
 use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
@@ -12,6 +13,12 @@ use Yajra\DataTables\DataTables;
 
 class TaskController extends Controller
 {
+    private $functions;
+
+    public function __construct()
+    {
+        $this->functions = new FunctionsController;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -118,14 +125,60 @@ class TaskController extends Controller
             $project_id = $request->id;
             $project = Project::find($project_id);
             if ($project) {
+                $tasks = Task::where('project_id', $project->id)
+                    ->where("status", "!=", "completed")
+                    ->get();
                 $users = User::where('status', 'on')->orderBy('name', 'asc')->get();
-                return view('pages.tasks.create', compact('project', 'users'));
+                return view('pages.tasks.create', compact('project', 'users', 'tasks'));
             } else {
                 return redirect()->route('projects.index')->with('error', 'Project not found!');
             }
         }
     }
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'name' => 'required|string|max:255',
+            'description' => 'sometimes|string|max:500',
+            'deadline' => 'required|date|after_or_equal:today',
+            'depenend' => 'sometimes',
+            'priority' => 'sometimes|in:very high,high,medium,low',
+            'status' => 'sometimes|in:pending,compteted,todo',
+        ]);
+        $files = '';
+        if ($request->hasFile('files')) {
+            $files = $this->functions->store_multiples_file($request->file('files'), 'projects/tasks/files');
+        }
+        $assigns = '';
+        $data = $request->all();
+        $data['files'] = $files;
+        unset($data['users_assigned']);
 
+        if ($request->users_assigned) {
+            $assigns = $request->users_assigned;
+        }
+
+        $new = Task::create($data);
+        if ($new) {
+            if (count($assigns) > 0) {
+                $task_id = $new->id;
+                for ($i = 0; $i < count($assigns); $i++) {
+                    ProjectTask::create([
+                        'task_id' => $task_id,
+                        'user_id' => $assigns[$i]
+                    ]);
+                }
+            }
+            return redirect()->back()->with('success', 'Task created successfully');
+        } else {
+            return redirect()->back()->with('error', ' An error occured while creating task')
+                ->withInput();
+        }
+    }
     /**
      * Display the specified resource.
      */

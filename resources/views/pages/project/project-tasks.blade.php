@@ -47,9 +47,89 @@
 
                         <div class="custom-accordion">
                             <div class="mt-4">
-                                <h5 class="position-relative mb-0"><a href="#taskcollapse1" class="text-dark d-block"
-                                        data-bs-toggle="collapse">Pending Tasks <span class="text-muted">(08)</span> <i
+                                <h5 class="position-relative mb-0"><a href="#taskcollapse3" class="text-dark d-block"
+                                        data-bs-toggle="collapse">Tasks To Do<span class="text-muted">(03)</span> <i
                                             class="mdi mdi-chevron-down accordion-arrow"></i></a>
+                                </h5>
+                                <div class="collapse show" id="taskcollapse3">
+                                    <div class="table-responsive mt-3">
+                                        <table class="table table-centered table-nowrap table-borderless table-sm">
+                                            <thead class="table-light">
+                                                <tr class="">
+                                                    <th scope="col">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                id="taskotherCheck">
+                                                            <label class="form-check-label" for="taskotherCheck">Task
+                                                                ID</label>
+                                                        </div>
+                                                    </th>
+                                                    <th scope="col">Tasks</th>
+                                                    <th scope="col">Assign to</th>
+                                                    <th scope="col">Due Date</th>
+                                                    <th scope="col">Task priority</th>
+                                                    <th scope="col" style="width: 85px;">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                id="taskotherCheck01">
+                                                            <label class="form-check-label"
+                                                                for="taskotherCheck01">#MN2054</label>
+                                                        </div>
+                                                    </td>
+                                                    <td>Brand logo design</td>
+                                                    <td>
+                                                        <div>
+                                                            <img src="assets/images/users/avatar-9.jpg" alt="image"
+                                                                class="avatar-sm img-thumbnail rounded-circle"
+                                                                title="Donald Mealy" />
+                                                        </div>
+                                                    </td>
+                                                    <td>June 04, 2020</td>
+                                                    <td><span class="badge badge-soft-danger p-1">High</span>
+                                                    </td>
+                                                    <td>
+                                                        <ul class="list-inline table-action m-0">
+                                                            <li class="list-inline-item">
+                                                                <a href="javascript:void(0);" class="action-icon px-1">
+                                                                    <i class="mdi mdi-square-edit-outline"></i></a>
+                                                            </li>
+                                                            <li class="list-inline-item">
+                                                                <div class="dropdown">
+                                                                    <a class="action-icon px-1 dropdown-toggle"
+                                                                        href="#" data-bs-toggle="dropdown"
+                                                                        aria-haspopup="true" aria-expanded="false">
+                                                                        <i class="mdi mdi-dots-vertical"></i>
+                                                                    </a>
+
+                                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                                        <a class="dropdown-item"
+                                                                            href="#">Action</a>
+                                                                        <a class="dropdown-item"
+                                                                            href="#">Another
+                                                                            action</a>
+                                                                        <a class="dropdown-item"
+                                                                            href="#">Something else
+                                                                            here</a>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <h5 class="position-relative mb-0"><a href="#taskcollapse1" class="text-dark d-block"
+                                        data-bs-toggle="collapse">Pending Tasks <span class="text-muted">(08)</span>
+                                        <i class="mdi mdi-chevron-down accordion-arrow"></i></a>
                                 </h5>
                                 <div class="collapse show" id="taskcollapse1">
                                     <div class="table-responsive mt-3">
@@ -95,7 +175,8 @@
                                                     <td>
                                                         <ul class="list-inline table-action m-0">
                                                             <li class="list-inline-item">
-                                                                <a href="javascript:void(0);" class="action-icon px-1">
+                                                                <a href="javascript:void(0);"
+                                                                    class="action-icon px-1">
                                                                     <i class="mdi mdi-square-edit-outline"></i></a>
                                                             </li>
                                                             <li class="list-inline-item">
@@ -210,87 +291,7 @@
                                 </div>
                             </div>
 
-                            <div class="mt-4">
-                                <h5 class="position-relative mb-0"><a href="#taskcollapse3" class="text-dark d-block"
-                                        data-bs-toggle="collapse">Tasks To Do<span class="text-muted">(03)</span> <i
-                                            class="mdi mdi-chevron-down accordion-arrow"></i></a>
-                                </h5>
-                                <div class="collapse show" id="taskcollapse3">
-                                    <div class="table-responsive mt-3">
-                                        <table class="table table-centered table-nowrap table-borderless table-sm">
-                                            <thead class="table-light">
-                                                <tr class="">
-                                                    <th scope="col">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                id="taskotherCheck">
-                                                            <label class="form-check-label" for="taskotherCheck">Task
-                                                                ID</label>
-                                                        </div>
-                                                    </th>
-                                                    <th scope="col">Tasks</th>
-                                                    <th scope="col">Assign to</th>
-                                                    <th scope="col">Due Date</th>
-                                                    <th scope="col">Task priority</th>
-                                                    <th scope="col" style="width: 85px;">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                id="taskotherCheck01">
-                                                            <label class="form-check-label"
-                                                                for="taskotherCheck01">#MN2054</label>
-                                                        </div>
-                                                    </td>
-                                                    <td>Brand logo design</td>
-                                                    <td>
-                                                        <div>
-                                                            <img src="assets/images/users/avatar-9.jpg" alt="image"
-                                                                class="avatar-sm img-thumbnail rounded-circle"
-                                                                title="Donald Mealy" />
-                                                        </div>
-                                                    </td>
-                                                    <td>June 04, 2020</td>
-                                                    <td><span class="badge badge-soft-danger p-1">High</span>
-                                                    </td>
-                                                    <td>
-                                                        <ul class="list-inline table-action m-0">
-                                                            <li class="list-inline-item">
-                                                                <a href="javascript:void(0);"
-                                                                    class="action-icon px-1">
-                                                                    <i class="mdi mdi-square-edit-outline"></i></a>
-                                                            </li>
-                                                            <li class="list-inline-item">
-                                                                <div class="dropdown">
-                                                                    <a class="action-icon px-1 dropdown-toggle"
-                                                                        href="#" data-bs-toggle="dropdown"
-                                                                        aria-haspopup="true" aria-expanded="false">
-                                                                        <i class="mdi mdi-dots-vertical"></i>
-                                                                    </a>
 
-                                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                                        <a class="dropdown-item"
-                                                                            href="#">Action</a>
-                                                                        <a class="dropdown-item"
-                                                                            href="#">Another
-                                                                            action</a>
-                                                                        <a class="dropdown-item"
-                                                                            href="#">Something else
-                                                                            here</a>
-                                                                    </div>
-                                                                </div>
-                                                            </li>
-                                                        </ul>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                     </div>

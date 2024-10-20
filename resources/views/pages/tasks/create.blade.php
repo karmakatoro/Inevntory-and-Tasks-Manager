@@ -39,6 +39,22 @@
                     </div>
                     <form action="{{ route('tasks.store') }}" enctype="multipart/form-data" method="post"
                         class="form-horizontal">
+                        @if (session()->has('success'))
+                            <div class="alert alert-success solid alert-dismissible fade show mt-3">
+                                <svg viewBox="0 0 24 24" width="24 " height="24" stroke="currentColor"
+                                    stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                                    class="me-2">
+                                    <polygon
+                                        points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2">
+                                    </polygon>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                                <strong>Success!</strong> {{ session()->get('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="btn-close">
+                                </button>
+                            </div>
+                        @endif
                         @if (session()->has('error'))
                             <div class="alert alert-danger solid alert-dismissible fade show mt-3">
                                 <svg viewBox="0 0 24 24" width="24 " height="24" stroke="currentColor"
@@ -56,7 +72,7 @@
                             </div>
                         @endif
                         @csrf
-                        <input type="hidden" name="project_id">
+                        <input type="hidden" name="project_id" value="{{ request()->id }}">
                         <div class="col-12">
                             <div class="row">
                                 <div class="col-lg-12 col-sm-12">
@@ -102,8 +118,8 @@
                                         <div class="col-lg-3 col-sm-12 mb-3">
                                             <label for="deadline" class="form-label">Task Deadline</label>
                                             <div class="col-md-12">
-                                                <input type="date" id="deadline" name="deadline" class="form-control"
-                                                    required>
+                                                <input type="date" id="deadline" name="deadline"
+                                                    class="form-control" required>
                                                 @if ($errors->has('deadline'))
                                                     <p class="text-pink mt-2">
                                                         {{ $errors->first('deadline') }}
@@ -118,8 +134,8 @@
                                             <select class="form-control" name="depenend" data-toggle="select2">
                                                 <option>Select</option>
                                                 {{-- <optgroup label="Alaskan/Hawaiian Time Zone"> --}}
-                                                @foreach ($users as $user)
-                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                @foreach ($tasks as $task)
+                                                    <option value="{{ $task->id }}">{{ $task->name }}</option>
                                                 @endforeach
                                                 {{-- </optgroup> --}}
                                             </select>
@@ -131,7 +147,7 @@
                                         </div>
                                         <div class="col-lg-3 col-sm-12 mb-3">
                                             <p class="mb-1 fw-medium mt-3 mt-md-0">Assign to users</p>
-                                            <select class="form-control select2-multiple" name="users_assigned"
+                                            <select class="form-control select2-multiple" name="users_assigned[]"
                                                 data-toggle="select2" multiple="multiple" data-placeholder="Choose ...">
                                                 {{-- <optgroup label="Alaskan/Hawaiian Time Zone"> --}}
                                                 @foreach ($users as $user)
