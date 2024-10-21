@@ -59,13 +59,13 @@
                                 <div class="mt-3">
                                     <h4>Date Start :
                                         {{ \Carbon\Carbon::parse($project->start)->locale('en_EN')->isoFormat('DD
-                                                                            MMMM YYYY') }}
+                                                                                                                    MMMM YYYY') }}
                                     </h4>
                                 </div>
                                 <div class="mt-3">
                                     <h4>Date End :
                                         {{ \Carbon\Carbon::parse($project->end)->locale('en_EN')->isoFormat('DD
-                                                                            MMMM YYYY') }}
+                                                                                                                    MMMM YYYY') }}
                                 </div>
                                 <hr />
 

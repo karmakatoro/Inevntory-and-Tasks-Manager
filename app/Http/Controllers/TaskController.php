@@ -191,7 +191,17 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
-        //
+        $tasks = Task::where('project_id', $task->project_id)
+            ->where('id', "!=", $task->id)
+            ->where("status", "!=", "compteted")
+            ->get();
+
+        $assigned_users = ProjectTask::where('task_id', $task->id)
+            ->pluck('user_id')
+            ->toArray();
+        $users = User::where('status', 'on')->orderBy('name', 'asc')->get();
+
+        return view('pages.tasks.edit', compact('task', 'tasks', 'users', 'assigned_users'));
     }
 
     /**
@@ -199,7 +209,54 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        //
+        $request->validate([
+            'project_id' => 'sometimes|exists:projects,id',
+            'name' => 'sometimes|string|max:255',
+            'description' => 'sometimes|max:500',
+            'deadline' => 'sometimes|date|after_or_equal:today',
+            'depenend' => 'sometimes',
+            'priority' => 'required|in:very high,high,medium,low',
+            'status' => 'required|in:pending,compteted,todo',
+        ]);
+
+        $data_assigns_old = '';
+        $data_assigns_new = '';
+        $data_assigns_compare = '';
+        $data = $request->all();
+        unset($data['users_assigned']);
+        unset($data['_method']);
+
+        $assigns_update  = false;
+
+        if ($request->users_assigned) {
+            $data_assigns_new = $request->users_assigned;
+            $data_assigns_old = ProjectTask::where('task_id', $task->id)
+                ->pluck('user_id')
+                ->toArray();
+            $data_assigns_compare = array_diff($data_assigns_new, $data_assigns_old);
+            if ($data_assigns_compare) {
+                $assigns_update = true;
+            }
+        }
+
+        $task_id = $task->id;
+        $update = $task->update($data);
+
+
+        if ($update) {
+            if ($assigns_update == true) {
+                for ($i = 0; $i < count($data_assigns_compare); $i++) {
+                    ProjectTask::create([
+                        'task_id' => $task_id,
+                        'user_id' => $data_assigns_compare[$i]
+                    ]);
+                }
+            }
+            return redirect()->back()->with('success', 'Task updated successfully');
+        } else {
+            return redirect()->back()->with('error', ' An error occured while creating task')
+                ->withInput();
+        }
     }
 
     /**
