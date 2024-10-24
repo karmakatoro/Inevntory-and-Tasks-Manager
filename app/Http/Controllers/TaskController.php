@@ -183,7 +183,9 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        //
+        $assigns = ProjectTask::where('task_id', $task->id)
+            ->latest()->get();
+        return view('pages.tasks.show', compact('task', 'assigns'));
     }
 
     /**
@@ -241,7 +243,6 @@ class TaskController extends Controller
 
         $task_id = $task->id;
         $update = $task->update($data);
-
 
         if ($update) {
             if ($assigns_update == true) {

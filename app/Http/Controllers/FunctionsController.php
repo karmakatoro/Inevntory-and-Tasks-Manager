@@ -8,10 +8,10 @@ class FunctionsController extends Controller
 {
     public function store_file($file, $path)
     {
-        $fileName = time().'.'.$file->getClientOriginalExtension();
+        $fileName = time() . '.' . $file->getClientOriginalExtension();
         $file->storeAs($path, $fileName, 'public');
 
-        $filePath = 'storage/'.$path.'/'.$fileName;
+        $filePath = 'storage/' . $path . '/' . $fileName;
 
         return $filePath;
     }
@@ -20,13 +20,14 @@ class FunctionsController extends Controller
     {
         $filesTab = [];
         foreach ($files as $file) {
-            $fileName = time().'.'.$file->getClientOriginalExtension();
+            $fileName = time() . '.' . $file->getClientOriginalExtension();
             $file->storeAs($path, $fileName, 'public');
 
-            $filePath = 'storage/'.$path.'/'.$fileName;
+            $filePath = 'storage/' . $path . '/' . $fileName;
             $filesTab[] = [
                 'name' => $file->getClientOriginalName(),
                 'path' => $filePath,
+                'author' => auth()->user()->id
             ];
         }
 
@@ -47,6 +48,5 @@ class FunctionsController extends Controller
                 'message' => 'An error occurred',
             ]);
         }
-
     }
 }
