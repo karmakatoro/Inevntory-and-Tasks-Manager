@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskReportFileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -48,5 +49,9 @@ Route::middleware('auth')->group(function () {
     Route::controller(TaskController::class)->group(function () {
         Route::resource('tasks', TaskController::class);
         Route::delete('dm-tasks', 'delete_multiples')->name('dm-tasks');
+    });
+    Route::controller(TaskReportFileController::class)->group(function () {
+        Route::resource('tasks_report', TaskReportFileController::class);
+        Route::delete('dm-trp', 'delete_multiples')->name('dm-trp');
     });
 });

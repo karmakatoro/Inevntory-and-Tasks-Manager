@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\ProjectTask;
 use App\Models\Task;
+use App\Models\TaskReportFile;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -185,7 +186,85 @@ class TaskController extends Controller
     {
         $assigns = ProjectTask::where('task_id', $task->id)
             ->latest()->get();
-        return view('pages.tasks.show', compact('task', 'assigns'));
+        $users = User::all();
+        $extension = "";
+        if (request()->ajax()) {
+            $files = TaskReportFile::latest()->get();
+
+            return DataTables::of($files)
+                ->addIndexColumn()
+                ->addColumn('checkbox', function ($row) {
+                    return '<div class="form-check font-16 mb-0">
+                                    <input class="form-check-input check-row" name="single-row" value="' . $row->id . '" type="checkbox" id="customerlist' . $row->id . '">
+                                    <label class="form-check-label" for="customerlist01">&nbsp;</label>
+                                </div>';
+                })
+                ->addColumn('name', function ($row) {
+                    $url = asset('assets/images/file-icons/png.svg');
+                    $extension = substr($row->path, strrpos($row->path, '.') + 1);
+                    if ($extension == 'pdf') {
+                        $url = asset('assets/images/file-icons/pdf.svg');
+                    }
+                    $render = '
+                     <img src="' . $url . '" height="30" alt="icon" class="me-2">
+                    <a target="_blank" href="' . asset('storage/' . $row->path) . '" class="text-dark">' . $row->name . '</a>';
+
+                    return $render;
+                })
+
+                ->addColumn('updated_at', function ($row) {
+                    $udpated_at = Carbon::parse($row->updated_at)->locale('en_EN')->isoFormat('DD
+                        MMMM YYYY HH:mm A');
+                    return $udpated_at;
+                })
+                ->addColumn('size', function ($row) {
+                    $path = storage_path('app/public/' . $row->path);
+                    $bytes = filesize($path);
+
+                    if ($bytes >= 1073741824) {
+                        $bytes = number_format($bytes / 1073741824, 2) . ' Go';
+                    } elseif ($bytes >= 1048576) {
+                        $bytes = number_format($bytes / 1048576, 2) . ' Mo';
+                    } elseif ($bytes >= 1024) {
+                        $bytes = number_format($bytes / 1024, 2) . ' Ko';
+                    } elseif ($bytes > 1) {
+                        $bytes = $bytes . ' bytes';
+                    } elseif ($bytes == 1) {
+                        $bytes = $bytes . ' byte';
+                    } else {
+                        $bytes = '0 byte';
+                    }
+                    return $bytes;
+                })
+                ->addColumn('author', function ($row) {
+                    $url = asset('storage/users/' . $row->user->photo);
+                    $render = '
+                    <img src="' . $url . '" alt="task-user" class="avatar-sm img-thumbnail rounded-circle">
+                    ';
+                    return $render;
+                })
+                ->addColumn('action', function ($row) {
+                    $edit_url = route('tasks_report.update', ['tasks_report' => $row->id]);
+                    $delete_url = route('tasks_report.destroy', ['tasks_report' => $row->id]);
+                    $actionBtn = '
+                       <ul class="list-inline table-action m-0">
+                            <li class="list-inline-item">
+                                <a href="#" class="action-icon px-1 share-btn"> <i
+                                        class="mdi mdi-share-variant"></i></a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="j#" class="action-icon px-1 delete-btn" data-url="' . $delete_url . '"> <i
+                                        class="mdi mdi-delete text-danger"></i></a>
+                            </li>
+                            </ul>
+                        ';
+
+                    return $actionBtn;
+                })
+                ->rawColumns(['checkbox', 'name', 'updated_at', 'size', 'author', 'action'])
+                ->make(true);
+        }
+        return view('pages.tasks.show', compact('task', 'assigns', 'users'));
     }
 
     /**

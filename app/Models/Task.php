@@ -36,4 +36,8 @@ class Task extends Model
     {
         return $this->hasMany(ProjectTask::class);
     }
+    public function task_report_file()
+    {
+        return $this->hasMany(TaskReportFile::class);
+    }
 }
