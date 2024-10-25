@@ -104,6 +104,12 @@ class TaskReportFileController extends Controller
      */
     public function destroy(TaskReportFile $tasks_report)
     {
+        if ($tasks_report->user->id != auth()->user()->id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'You\'re not allowed to perfom this action',
+            ]);
+        }
         $deleted = $tasks_report->delete();
         if ($deleted) {
             return response()->json([
