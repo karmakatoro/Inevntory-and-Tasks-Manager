@@ -43,7 +43,8 @@
                                 <i class='mdi mdi-pencil-outline me-1'></i>Edit
                             </a>
                             <!-- item-->
-                            <a href="#" data-url="{{ route('tasks.update', ['task' => $task->id]) }}?status=yes"
+                            <a href="#"
+                                data-url="{{ route('tasks.update', ['task' => $task->id]) }}?status_update=yes"
                                 class="dropdown-item action-completed">
                                 <i class='ri-task-line me-1'></i>Mark as Completed
                             </a>
@@ -179,12 +180,12 @@
                 let url = $(this).attr('data-url');
                 Swal.fire({
                     title: "Are you sure?",
-                    text: "You won't be able to revert this!",
+                    text: "You are about to set this task as completed!",
                     icon: "warning",
                     showCancelButton: !0,
                     confirmButtonColor: "#1abc9c",
                     cancelButtonColor: "#f1556c",
-                    confirmButtonText: "Yes, delete it!",
+                    confirmButtonText: "Yes, continue!",
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({

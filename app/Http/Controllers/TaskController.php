@@ -290,6 +290,13 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
+        if ($request->status_update == 'yes') {
+            $task->update(['status' => 'compteted']);
+            return response()->json([
+                'status' => true,
+                'message' => 'Task set as complted'
+            ]);
+        }
         $request->validate([
             'project_id' => 'sometimes|exists:projects,id',
             'name' => 'sometimes|string|max:255',

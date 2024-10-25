@@ -20,8 +20,10 @@ class Task extends Model
             $task->user()->associate(auth()->user()->id);
         });
         self::updating(function ($task) {
-            $task->project()->associate(request()->project_id);
-            $task->user()->associate(auth()->user()->id);
+            if (!request()->status_update) {
+                $task->project()->associate(request()->project_id);
+                $task->user()->associate(auth()->user()->id);
+            }
         });
     }
     public function user()
