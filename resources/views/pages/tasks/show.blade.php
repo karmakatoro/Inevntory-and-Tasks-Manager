@@ -39,21 +39,19 @@
 
                         <div class="dropdown-menu dropdown-menu-end">
                             <!-- item-->
-                            <a href="#" class="dropdown-item action-attach">
-                                <i class='mdi mdi-attachment me-1'></i>Attachment
-                            </a>
-
-                            <!-- item-->
                             <a href="{{ route('tasks.edit', ['task' => $task->id]) }}" class="dropdown-item">
                                 <i class='mdi mdi-pencil-outline me-1'></i>Edit
                             </a>
                             <!-- item-->
-                            <a href="#" class="dropdown-item action-completed">
+                            <a href="#" data-url="{{ route('tasks.update', ['task' => $task->id]) }}?status=yes"
+                                class="dropdown-item action-completed">
                                 <i class='ri-task-line me-1'></i>Mark as Completed
                             </a>
                             <div class="dropdown-divider"></div>
                             <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item text-danger">
+                            <a href="#" data-redirect="{{ route('projects.show', ['project' => $task->project_id]) }}"
+                                data-url="{{ route('tasks.destroy', ['task' => $task->id]) }}"
+                                class="dropdown-item text-danger delete-btn">
                                 <i class='mdi mdi-delete-outline me-1'></i>Delete
                             </a>
                         </div>
@@ -175,4 +173,123 @@
         </div>
     </div>
     <!-- end row -->
+    <script>
+        $(document).ready(function() {
+            $(document).on('click', '.action-completed', function(e) {
+                let url = $(this).attr('data-url');
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: !0,
+                    confirmButtonColor: "#1abc9c",
+                    cancelButtonColor: "#f1556c",
+                    confirmButtonText: "Yes, delete it!",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: url,
+                            method: 'put',
+                            success: function(response) {
+                                if (response.status == true) {
+                                    Swal.fire({
+                                        title: "Done!",
+                                        text: response.message,
+                                        icon: "success",
+                                        confirmButtonColor: "#1abc9c",
+                                    });
+                                    window.location.reload();
+                                } else {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Error",
+                                        text: 'An error occured! Please try later',
+                                        confirmButtonColor: "#3bafda",
+                                    });
+                                }
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+
+                                if (jqXHR.status === 403) {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Oops...",
+                                        text: "Acces Denied!",
+                                        confirmButtonColor: "#3bafda",
+                                        footer: '<strong>Error code :</strong> 403',
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Oops...",
+                                        text: "An error occured",
+                                        confirmButtonColor: "#3bafda",
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+            $(document).on('click', '.delete-btn', function(e) {
+                e.preventDefault();
+                let url = $(this).attr('data-url');
+                let urlRedirect = $(this).attr('data-redirect');
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: !0,
+                    confirmButtonColor: "#1abc9c",
+                    cancelButtonColor: "#f1556c",
+                    confirmButtonText: "Yes, delete it!",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: url,
+                            method: 'delete',
+                            success: function(response) {
+                                if (response.status == true) {
+                                    Swal.fire({
+                                        title: "Deleted!",
+                                        text: response.message,
+                                        icon: "success",
+                                        confirmButtonColor: "#1abc9c",
+                                    });
+                                    window.location.href = urlRedirect;
+                                } else {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Error",
+                                        text: response.message,
+                                        confirmButtonColor: "#3bafda",
+                                    });
+                                }
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+
+                                if (jqXHR.status === 403) {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Oops...",
+                                        text: "Acces Denied!",
+                                        confirmButtonColor: "#3bafda",
+                                        footer: '<strong>Error code :</strong> 403',
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Oops...",
+                                        text: "An error occured",
+                                        confirmButtonColor: "#3bafda",
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+
+            });
+        });
+    </script>
 @endsection
