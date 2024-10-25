@@ -97,7 +97,7 @@ class TaskController extends Controller
                     $actionBtn = '
                     <ul class="list-inline mb-0">
                         <li class="list-inline-item">
-                            <a href="#" data-id="' . $row->id . '" data-url="' . $edit_url . '" class="action-icon edit-btn"> <i
+                            <a href="' . $edit_url . '" data-id="' . $row->id . '" data-url="' . $edit_url . '" class="action-icon edit-btn"> <i
                                     class="mdi mdi-square-edit-outline"></i></a>
                         </li>
                         <li class="list-inline-item">
@@ -244,12 +244,12 @@ class TaskController extends Controller
                     return $render;
                 })
                 ->addColumn('action', function ($row) {
-                    $edit_url = route('tasks_report.update', ['tasks_report' => $row->id]);
+                    $data_id = $row->id;
                     $delete_url = route('tasks_report.destroy', ['tasks_report' => $row->id]);
                     $actionBtn = '
                        <ul class="list-inline table-action m-0">
                             <li class="list-inline-item">
-                                <a href="#" class="action-icon px-1 share-btn"> <i
+                                <a href="#" data-id="' . $data_id . '" class="action-icon px-1 share-btn"> <i
                                         class="mdi mdi-share-variant"></i></a>
                             </li>
                             <li class="list-inline-item">

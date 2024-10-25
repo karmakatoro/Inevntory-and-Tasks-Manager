@@ -51,7 +51,13 @@ class TaskReportFileController extends Controller
             ]);
         }
     }
-
+    public function share_options(Request $request)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => 'Operation complted successfully!'
+        ]);
+    }
     /**
      * Display the specified resource.
      */

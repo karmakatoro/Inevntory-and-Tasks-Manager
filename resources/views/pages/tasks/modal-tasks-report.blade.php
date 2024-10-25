@@ -13,13 +13,13 @@
                     Errors</strong><br>
                     <div class="errorsList"></div>
                 </div>
-                <form class="needs-validation was-validated" method="POST" action="{{ route('users.store') }}"
-                    id="requestUsers" novalidate="">
-                    <input type="hidden" name="id" id="fileId">
+                <form class="needs-validation was-validated" method="POST" action="{{ route('share-opts') }}"
+                    id="requestShare" novalidate="">
+                    <input type="hidden" name="id" id="taskFileId">
                     <div class="row">
                         <div class="col-lg-12 col-sm-12">
                             <label for="gender" class="form-label">Who can have acces to this file?</label>
-                            <select class="form-select" name="gender" id="gender">
+                            <select class="form-select" name="share_opt" id="gender">
                                 <option selected>Only me</option>
                                 <option value="selected">Selected people</option>
                             </select>
@@ -62,7 +62,6 @@
             },
         });
 
-
         $('.select2-share').select2({
             dropdownParent: $('#task-report-modal'),
             width: '100%',
@@ -94,10 +93,10 @@
 
         $(document).on("click", "#btnSave", function(e) {
             e.preventDefault();
-            var form = $("#requestUsers")
+            var form = $("#requestShare")
 
             var submitBtn = $("#btnSave");
-            var singleId = $("#userId");
+            var singleId = $("#taskFileId");
             submitBtn.html(
                 `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Loading...`
             );
@@ -119,7 +118,6 @@
                         singleId.val("0");
                         $(form).trigger("reset");
                         $("#task-report-modal").modal("hide");
-                        currentDt.ajax.reload();
                     } else if (response.status == false) {
                         Swal.fire({
                             icon: "error",
