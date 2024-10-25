@@ -18,16 +18,16 @@
                     <input type="hidden" name="id" id="taskFileId">
                     <div class="row">
                         <div class="col-lg-12 col-sm-12">
-                            <label for="gender" class="form-label">Who can have acces to this file?</label>
-                            <select class="form-select" name="share_opt" id="gender">
-                                <option selected>Only me</option>
-                                <option value="selected">Selected people</option>
+                            <label for="share_opt" class="form-label">Who can have acces to this file?</label>
+                            <select class="form-select" name="share_opt" id="share_opt">
+                                <option value="0">Only me</option>
+                                <option value="1">Selected people</option>
                             </select>
                         </div>
                         <div class="col-lg-12 col-sm-12 mt-3">
                             <p class="mb-1 fw-medium mt-3 mt-md-0">Assign to users</p>
-                            <select class="form-control select2-share" name="share[]" data-toggle="select2"
-                                multiple="multiple" data-placeholder="Choose ...">
+                            <select class="form-control select2-share" id="share-file" name="share[]"
+                                data-toggle="select2" multiple="multiple" data-placeholder="Choose ...">
                                 {{-- <optgroup label="Alaskan/Hawaiian Time Zone"> --}}
                                 @foreach ($assigns as $project_task)
                                     <option data-image="{{ asset('storage/users/' . $project_task->user->photo) }}"
@@ -94,7 +94,6 @@
         $(document).on("click", "#btnSave", function(e) {
             e.preventDefault();
             var form = $("#requestShare")
-
             var submitBtn = $("#btnSave");
             var singleId = $("#taskFileId");
             submitBtn.html(

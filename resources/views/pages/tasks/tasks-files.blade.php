@@ -136,30 +136,9 @@
         })
         $(document).on('click', '.share-btn', function(e) {
             e.preventDefault();
-            // $("#requestFiles")[0].reset();
-            // let id = $(this).attr('data-id');
-            // let url = $(this).attr('data-url');
+            $("#requestShare")[0].reset();
+            $("#taskFileId").val($(this).attr('data-id'));
             $("#task-report-modal").modal('show');
-            // $.ajax({
-            //     url: url,
-            //     method: 'get',
-            //     success: function(response) {
-            //         if (response.status == true) {
-            //             $("#userId").val(id);
-            //             $("#name").val(response.data.name);
-            //             $("#email").val(response.data.email);
-            //             $("#phone").val(response.data.phone);
-            //             $("#gender").val(response.data.gender);
-            //             $("#type").val(response.data.type);
-            //             $("#accred").val(response.data.accred);
-            //             $("#statusUser").val(response.data.status);
-            //             $("#errorsDiv").css("display", "none");
-            //             $("#task-report-modal").modal('show');
-            //         } else {
-            //             Swal.fire("Erreur", response.message, 'warning');
-            //         }
-            //     }
-            // });
         });
 
         $(document).on('click', '.delete-btn', function(e) {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Task;
 use App\Models\TaskReportFile;
 use Illuminate\Http\Request;
 
@@ -53,10 +54,26 @@ class TaskReportFileController extends Controller
     }
     public function share_options(Request $request)
     {
-        return response()->json([
-            'status' => true,
-            'message' => 'Operation complted successfully!'
-        ]);
+        $check_task_id = TaskReportFile::find($request->id);
+        if (!$check_task_id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'File not found!'
+            ]);
+        }
+        if ($request->share_opt == '0') {
+            $check_task_id->update(['share' => NULL]);
+            return response()->json([
+                'status' => true,
+                'message' => 'You will be the only one to have access to this file'
+            ]);
+        } else {
+            $check_task_id->update(['share' => json_encode($request->share)]);
+            return response()->json([
+                'status' => true,
+                'message' => 'Acces given to users selected!'
+            ]);
+        }
     }
     /**
      * Display the specified resource.

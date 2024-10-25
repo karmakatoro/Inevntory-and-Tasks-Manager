@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Route;
 
 class TaskReportFile extends Model
 {
@@ -19,8 +20,10 @@ class TaskReportFile extends Model
             $taskReportFile->task()->associate(request()->task_id);
         });
         self::updating(function ($taskReportFile) {
-            $taskReportFile->user()->associate(auth()->user()->id);
-            $taskReportFile->task()->associate(request()->task_id);
+            if (Route::currentRouteName() == 'tasks_report.store') {
+                $taskReportFile->user()->associate(auth()->user()->id);
+                $taskReportFile->task()->associate(request()->task_id);
+            }
         });
     }
     public function user()
