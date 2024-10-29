@@ -20,11 +20,11 @@
                         <div class="col-lg-12 col-sm-12">
                             <label for="share_opt" class="form-label">Who can have acces to this file?</label>
                             <select class="form-select" name="share_opt" id="share_opt">
-                                <option value="0">Only me</option>
+                                <option value="0" selected>Only me</option>
                                 <option value="1">Selected people</option>
                             </select>
                         </div>
-                        <div class="col-lg-12 col-sm-12 mt-3">
+                        <div class="col-lg-12 col-sm-12 mt-3 d-none" id="selectUsers">
                             <p class="mb-1 fw-medium mt-3 mt-md-0">Assign to users</p>
                             <select class="form-control select2-share" id="share-file" name="share[]"
                                 data-toggle="select2" multiple="multiple" data-placeholder="Choose ...">
@@ -91,6 +91,17 @@
             }
         });
 
+        $(document).on("change", "#share_opt", function(e) {
+            e.preventDefault();
+            let valueOptionSelected = $(this).val();
+            if (valueOptionSelected == "1") {
+                $("#selectUsers").removeClass("d-none");
+            } else {
+                $("#selectUsers").addClass("d-none");
+                $("#share-file").val("");
+
+            }
+        });
         $(document).on("click", "#btnSave", function(e) {
             e.preventDefault();
             var form = $("#requestShare")

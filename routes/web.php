@@ -20,10 +20,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return redirect()->route('dashboard.sales');
-});
+
 Route::middleware('auth')->group(function () {
+    Route::get('/', function () {
+        return redirect()->route('dashboard.sales');
+    });
     Route::prefix('auth')->controller(AuthController::class)->group(function () {
         Route::get('/login', 'index')->name('login')->withoutMiddleware('auth');
         Route::get('/forgot', 'forgot')->name('auth.forgot')->withoutMiddleware('auth');

@@ -2,14 +2,16 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <div class="fileupload btn btn-success waves-effect waves-light mb-3">
-                    <span><i class="mdi mdi-cloud-upload me-1"></i> Upload Files</span>
-                    <form action="{{ route('tasks_report.store') }}" id="requestTaskFile" method="POST"
-                        enctype="multipart/form-data">
-                        <input type="hidden" name="task_id" value="{{ $task->id }}">
-                        <input type="file" name="files[]" id="uploadTaskFile" class="upload" multiple>
-                    </form>
-                </div>
+                @if ($task->status != 'compteted')
+                    <div class="fileupload btn btn-success waves-effect waves-light mb-3">
+                        <span><i class="mdi mdi-cloud-upload me-1"></i> Upload Files</span>
+                        <form action="{{ route('tasks_report.store') }}" id="requestTaskFile" method="POST"
+                            enctype="multipart/form-data">
+                            <input type="hidden" name="task_id" value="{{ $task->id }}">
+                            <input type="file" name="files[]" id="uploadTaskFile" class="upload" multiple>
+                        </form>
+                    </div>
+                @endif
                 <div class="table-responsive">
                     <table class="table table-centered  table-nowrap mb-0" id="tasks-files-dt"
                         data-url="{{ route('tasks.show', ['task' => $task->id]) }}">
@@ -138,7 +140,43 @@
             e.preventDefault();
             $("#requestShare")[0].reset();
             $("#taskFileId").val($(this).attr('data-id'));
-            $("#task-report-modal").modal('show');
+            let url = $(this).attr('data-url');
+            $.ajax({
+                url: url,
+                method: 'delete',
+                success: function(response) {
+                    if (response.status == true) {
+                        $("#task-report-modal").modal('show');
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: response.message,
+                            confirmButtonColor: "#3bafda",
+                        });
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+
+                    if (jqXHR.status === 403) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Acces Denied!",
+                            confirmButtonColor: "#3bafda",
+                            footer: '<strong>Error code :</strong> 403',
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "An error occured",
+                            confirmButtonColor: "#3bafda",
+                        });
+                    }
+                }
+            });
+
         });
 
         $(document).on('click', '.delete-btn', function(e) {

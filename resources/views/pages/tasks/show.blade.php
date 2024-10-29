@@ -52,7 +52,7 @@
                             <!-- item-->
                             <a href="#" data-redirect="{{ route('projects.show', ['project' => $task->project_id]) }}"
                                 data-url="{{ route('tasks.destroy', ['task' => $task->id]) }}"
-                                class="dropdown-item text-danger delete-btn">
+                                class="dropdown-item text-danger delete-task-btn">
                                 <i class='mdi mdi-delete-outline me-1'></i>Delete
                             </a>
                         </div>
@@ -232,7 +232,7 @@
                     }
                 });
             });
-            $(document).on('click', '.delete-btn', function(e) {
+            $(document).on('click', '.delete-task-btn', function(e) {
                 e.preventDefault();
                 let url = $(this).attr('data-url');
                 let urlRedirect = $(this).attr('data-redirect');
