@@ -168,7 +168,7 @@ class ProductStockController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ProductStock $productStock)
+    public function edit(ProductStock $products_stock)
     {
         //
     }
@@ -184,8 +184,37 @@ class ProductStockController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ProductStock $productStock)
+    public function destroy(ProductStock $products_stock)
     {
-        //
+
+        $deleted = $products_stock->delete();
+        if ($deleted) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Successful supression',
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred',
+            ]);
+        }
+    }
+    public function delete_multiples(Request $request)
+    {
+        $data = $request->all_id;
+        $rows = ProductStock::whereIn('id', $data)->delete();
+
+        if ($rows) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Successful supressions',
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occured',
+            ]);
+        }
     }
 }
