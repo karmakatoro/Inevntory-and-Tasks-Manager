@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductCustomerController;
+use App\Http\Controllers\ProductStockController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TaskController;
@@ -71,6 +72,10 @@ Route::middleware('auth')->group(function () {
     });
     Route::controller(ProductCustomerController::class)->group(function () {
         Route::resource('customers', ProductCustomerController::class);
+        Route::delete('dm-cs', 'delete_multiples')->name('dm-cs');
+    });
+    Route::controller(ProductStockController::class)->group(function () {
+        Route::resource('customers', ProductStockController::class);
         Route::delete('dm-cs', 'delete_multiples')->name('dm-cs');
     });
 });

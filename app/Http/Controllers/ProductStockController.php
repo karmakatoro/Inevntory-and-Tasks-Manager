@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreProductStockRequest;
-use App\Http\Requests\UpdateProductStockRequest;
 use App\Models\ProductStock;
+use Illuminate\Http\Request;
 
 class ProductStockController extends Controller
 {
@@ -27,7 +26,7 @@ class ProductStockController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProductStockRequest $request)
+    public function store(Request $request)
     {
         //
     }
@@ -51,7 +50,7 @@ class ProductStockController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProductStockRequest $request, ProductStock $productStock)
+    public function update(Request $request, ProductStock $productStock)
     {
         //
     }

@@ -44,4 +44,8 @@ class Product extends Model
     {
         return $this->belongsTo(ProductCategory::class);
     }
+    public function product_stock()
+    {
+        return $this->hasMany(ProductStock::class);
+    }
 }
