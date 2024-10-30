@@ -56,4 +56,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(TaskReportFile::class);
     }
+    public function product()
+    {
+        return $this->hasMany(Product::class);
+    }
 }

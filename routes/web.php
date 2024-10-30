@@ -3,11 +3,13 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductCategoryController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskReportFileController;
 use App\Http\Controllers\UserController;
+use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -61,5 +63,9 @@ Route::middleware('auth')->group(function () {
     Route::controller(ProductCategoryController::class)->group(function () {
         Route::resource('product-categories', ProductCategoryController::class);
         Route::delete('dm-prcat', 'delete_multiples')->name('dm-prcat');
+    });
+    Route::controller(ProductController::class)->group(function () {
+        Route::resource('products', ProductController::class);
+        Route::delete('dm-pr', 'delete_multiples')->name('dm-pr');
     });
 });

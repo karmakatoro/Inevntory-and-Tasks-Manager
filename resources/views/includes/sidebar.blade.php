@@ -89,7 +89,7 @@
                     <div class="collapse" id="sidebarEcommerce">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="ecommerce-products.html">List</a>
+                                <a href="{{ route('products.index') }}">List</a>
                             </li>
                             <li>
                                 <a href="{{ route('product-categories.index') }}">Catégories</a>
@@ -102,6 +102,12 @@
                             </li>
                             <li>
                                 <a href="ecommerce-orders-detail.html">Stock</a>
+                            </li>
+                            <li>
+                                <a href="ecommerce-orders-detail.html">Customers</a>
+                            </li>
+                            <li>
+                                <a href="ecommerce-orders-detail.html">Sellers</a>
                             </li>
                         </ul>
                     </div>
