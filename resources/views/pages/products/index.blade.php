@@ -1,22 +1,19 @@
 @extends('layouts.base')
 
-@section('title', 'Product Categories - ' . env('APP_NAME'))
+@section('title', 'Products - ' . env('APP_NAME'))
 
 @section('content')
     <!-- start page title -->
     <div class="row">
         <div class="col-12">
             <div class="page-title-box">
-                <h4 class="page-title">Product Categories</h4>
+                <h4 class="page-title">Products</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item">
                             <a href="{{ route('dashboard.sales') }}">Dashboard</a>
                         </li>
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('products.index') }}">Products</a>
-                        </li>
-                        <li class="breadcrumb-item active">Product Categories</li>
+                        <li class="breadcrumb-item active">Products</li>
                     </ol>
                 </div>
             </div>
@@ -27,15 +24,57 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
+                    <div class="text-center">
+                        <div class="row">
+                            <div class="col-md-3 col-sm-6 col-xl-3">
+                                <div class="py-1">
+                                    <i class="fe-tag font-24"></i>
+                                    <h3>25563</h3>
+                                    <p class="text-uppercase mb-1 font-13 fw-medium">Total Products</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 col-xl-3">
+                                <div class="py-1">
+                                    <i class="fe-archive font-24"></i>
+                                    <h3 class="text-warning">6952</h3>
+                                    <p class="text-uppercase mb-1 font-13 fw-medium">Availiable Products</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 col-xl-3">
+                                <div class="py-1">
+                                    <i class="fe-shield font-24"></i>
+                                    <h3 class="text-success">18361</h3>
+                                    <p class="text-uppercase mb-1 font-13 fw-medium">Total Sells</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 col-xl-3">
+                                <div class="py-1">
+                                    <i class="fe-delete font-24"></i>
+                                    <h3 class="text-danger">250</h3>
+                                    <p class="text-uppercase mb-1 font-13 fw-medium">Total Sellers</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-sm-4">
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#product-category-modal"
-                                class="btn btn-primary mb-2"><i class="mdi mdi-plus-circle me-1"></i> Add Category</a>
+                            <a href="{{ route('products.create') }}" class="btn btn-primary mb-2"><i
+                                    class="mdi mdi-plus-circle me-1"></i> Add
+                                Product</a>
 
                         </div>
                         <div class="col-sm-8">
                             <div class="text-sm-end">
-                                <button data-url="{{ route('dm-prcat') }}" type="button"
+                                <button data-url="{{ route('dm-users') }}" type="button"
                                     class="btn btn-danger mb-2 me-1 delete-all">
                                     <i class="mdi mdi-trash-can-outline"></i></button>
                                 <a href="javascript:void(0);" class="btn btn-primary mb-2"><i
@@ -45,10 +84,23 @@
                             </div>
                         </div><!-- end col-->
                     </div>
-
+                    @if (session()->has('success'))
+                        <div class="alert alert-success solid alert-dismissible fade show mt-3 mb-2">
+                            <svg viewBox="0 0 24 24" width="24 " height="24" stroke="currentColor" stroke-width="2"
+                                fill="none" stroke-linecap="round" stroke-linejoin="round" class="me-2">
+                                <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2">
+                                </polygon>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                            <strong>Success!</strong> {{ session()->get('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="btn-close">
+                            </button>
+                        </div>
+                    @endif
                     <div class="table-responsive">
-                        <table class="table table-centered dt-responsive nowrap w-100" id="product-catgories-dt"
-                            data-api-url="{{ route('product-categories.index') }}">
+                        <table class="table table-centered dt-responsive nowrap w-100" id="products-dt"
+                            data-api-url="{{ route('products.index') }}">
                             <thead class="table-light">
                                 <tr>
                                     <th style="width: 20px;">
@@ -58,8 +110,12 @@
                                             <label class="form-check-label" for="customerlist">&nbsp;</label>
                                         </div>
                                     </th>
-                                    <th>Designation</th>
-                                    <th style="width: 85px;">Status</th>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Added Date</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
                                     <th style="width: 75px;">Action</th>
                                 </tr>
                             </thead>
@@ -78,8 +134,7 @@
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                 },
             });
-
-            currentDt = $("#product-catgories-dt").DataTable({
+            currentDt = $("#products-dt").DataTable({
                 autoWidth: false,
                 order: [0, "ASC"],
                 processing: true,
@@ -87,7 +142,7 @@
                 searchDelay: 1000,
                 paging: true,
                 ajax: {
-                    url: $("#product-catgories-dt").attr("data-api-url"),
+                    url: $("#products-dt").attr("data-api-url"),
                 },
                 iDisplayLength: "10",
                 columns: [{
@@ -97,8 +152,28 @@
                         searchable: false,
                     },
                     {
-                        data: "name",
-                        name: "name",
+                        data: "product",
+                        name: "product",
+                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                    },
+                    {
+                        data: "category",
+                        name: "category",
+                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                    },
+                    {
+                        data: "date",
+                        name: "date",
+                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                    },
+                    {
+                        data: "price",
+                        name: "price",
+                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                    },
+                    {
+                        data: "quantity",
+                        name: "quantity",
                         className: "text-900 sort pe-1 align-middle white-space-nowrap",
                     },
                     {
@@ -116,31 +191,9 @@
                 lengthMenu: [10, 25, 50, 100],
             });
 
-            $(document).on('click', '.edit-btn', function(e) {
-                e.preventDefault();
-                $("#requestProductCategories")[0].reset();
-                let id = $(this).attr('data-id');
-                let url = $(this).attr('data-url');
-                $.ajax({
-                    url: url,
-                    method: 'get',
-                    success: function(response) {
-                        if (response.status == true) {
-                            $("#productCategoryId").val(response.data.id);
-                            $("#name").val(response.data.name);
-                            $("#statusProductCategory").val(response.data.status);
-                            $("#errorsDiv").css("display", "none");
-                            $("#product-category-modal").modal('show');
-                        } else {
-                            Swal.fire("Erreur", response.message, 'warning');
-                        }
-                    }
-                });
-            });
 
             $(document).on('click', '.delete-btn', function(e) {
                 e.preventDefault();
-                let id = $(this).attr('data-id');
                 let url = $(this).attr('data-url');
                 Swal.fire({
                     title: "Are you sure?",
@@ -279,6 +332,4 @@
             });
         });
     </script>
-    @include('pages.product-categories.modal-categories')
-
 @endsection
