@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\TaskReportFile;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class TaskReportFileController extends Controller
@@ -51,6 +52,22 @@ class TaskReportFileController extends Controller
                 'message' => 'Please upload some files!'
             ]);
         }
+    }
+    public function get_share_options(Request $request)
+    {
+        $check_task_id = TaskReportFile::find($request->id);
+        if (!$check_task_id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'File not found!'
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'fileId' => $check_task_id->id,
+            'data' => $check_task_id->share
+        ]);
     }
     public function share_options(Request $request)
     {

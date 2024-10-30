@@ -140,43 +140,7 @@
             e.preventDefault();
             $("#requestShare")[0].reset();
             $("#taskFileId").val($(this).attr('data-id'));
-            let url = $(this).attr('data-url');
-            $.ajax({
-                url: url,
-                method: 'delete',
-                success: function(response) {
-                    if (response.status == true) {
-                        $("#task-report-modal").modal('show');
-                    } else {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Error",
-                            text: response.message,
-                            confirmButtonColor: "#3bafda",
-                        });
-                    }
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-
-                    if (jqXHR.status === 403) {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Oops...",
-                            text: "Acces Denied!",
-                            confirmButtonColor: "#3bafda",
-                            footer: '<strong>Error code :</strong> 403',
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Oops...",
-                            text: "An error occured",
-                            confirmButtonColor: "#3bafda",
-                        });
-                    }
-                }
-            });
-
+            $("#task-report-modal").modal('show');
         });
 
         $(document).on('click', '.delete-btn', function(e) {

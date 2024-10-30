@@ -53,6 +53,7 @@ Route::middleware('auth')->group(function () {
     });
     Route::controller(TaskReportFileController::class)->group(function () {
         Route::resource('tasks_report', TaskReportFileController::class);
+        Route::get('get-share-options-task-file', 'get_share_options')->name('get-share-opts');
         Route::post('share-options-task-file', 'share_options')->name('share-opts');
         Route::delete('dm-trp', 'delete_multiples')->name('dm-trp');
     });
