@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\Models\Product;
+use App\Models\ProductCategory;
 use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
 use Carbon\Carbon;
@@ -11,6 +12,12 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    private $functions;
+
+    public function __construct()
+    {
+        $this->functions = new FunctionsController;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -27,8 +34,8 @@ class ProductController extends Controller
                                 <label class="form-check-label" for="customerlist01">&nbsp;</label>
                             </div>';
                 })
-                ->addColumn('name', function ($row) {
-                    $url = asset('storage/products/' . $row->photo);
+                ->addColumn('product', function ($row) {
+                    $url = asset($row->photo);
                     $subcategories_display = "";
                     $list = "";
                     if ($row->subcategories != NULL) {
@@ -76,7 +83,7 @@ class ProductController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     $edit_url = route('products.edit', ['product' => $row->id]);
-                    $delete_url = route('users.destroy', ['product' => $row->id]);
+                    $delete_url = route('products.destroy', ['product' => $row->id]);
                     $actionBtn = '
                     <ul class="list-inline mb-0">
                         <li class="list-inline-item">
@@ -103,7 +110,8 @@ class ProductController extends Controller
      */
     public function create()
     {
-        //
+        $categories = ProductCategory::orderBy('name', 'asc')->get();
+        return view('pages.products.create', compact('categories'));
     }
 
     /**
@@ -111,7 +119,40 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:100|unique:products,name',
+            'product_category_id' => 'required|integer|exists:product_categories,id',
+            'description' => 'required|string|max:500',
+            'photo' => 'required|image|mimes:png,jpg,jpeg',
+            'status' => 'sometimes|in:on,off',
+            'price' => 'required',
+            'files' => 'sometimes|array',
+            'files.*' => 'sometimes|image|mimes:png,jpg,jpeg',
+        ]);
+        $poster = '';
+        $gallery = '';
+        if ($request->hasFile('photo')) {
+            $poster = $this->functions->store_file($request->photo, 'products/');
+        }
+        if ($request->hasFile('files')) {
+            $gallery = $this->functions->store_multiples_file($request->file('files'), 'products/gallery');
+        }
+        $data = [
+            'slug' => Str::slug($request->name),
+            'subcategories' => json_encode($request->subcategories),
+            'name' => $request->name,
+            'description' => $request->description,
+            'photo' => $poster,
+            'gallery' => $gallery,
+            'price' => $request->price,
+            'status' => $request->status
+        ];
+        $create = Product::create($data);
+        if ($create) {
+            return redirect()->route('products.index')->with('success', 'Product created successfully');
+        } else {
+            return redirect()->back()->with('error', 'An error occured while creating product')->withInput();
+        }
     }
 
     /**

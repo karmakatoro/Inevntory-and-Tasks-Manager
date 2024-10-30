@@ -74,7 +74,7 @@
                         </div>
                         <div class="col-sm-8">
                             <div class="text-sm-end">
-                                <button data-url="{{ route('dm-users') }}" type="button"
+                                <button data-url="{{ route('dm-prcat') }}" type="button"
                                     class="btn btn-danger mb-2 me-1 delete-all">
                                     <i class="mdi mdi-trash-can-outline"></i></button>
                                 <a href="javascript:void(0);" class="btn btn-primary mb-2"><i
@@ -154,7 +154,7 @@
                     {
                         data: "product",
                         name: "product",
-                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                        className: "text-900 sort pe-1 align-middle white-space-wrap",
                     },
                     {
                         data: "category",

@@ -71,7 +71,7 @@
                             <label for="status" class="form-label">Status</label>
                             <select class="form-select" id="statusUser" name="status">
                                 <option value="on">Activated</option>
-                                <option value="off" selected>Desactivated</option>
+                                <option value="off" selected>Deactivated</option>
                             </select>
                         </div>
 
