@@ -31,8 +31,8 @@
             <img src="{{ asset('storage/users/' . auth()->user()->photo) }}" alt="user-img" title="Mat Helme"
                 class="rounded-circle avatar-md">
             <div class="dropdown">
-                <a href="#" class="text-reset dropdown-toggle h5 mt-2 mb-1 d-block" data-bs-toggle="dropdown">{{
-                    auth()->user()->name }}</a>
+                <a href="#" class="text-reset dropdown-toggle h5 mt-2 mb-1 d-block"
+                    data-bs-toggle="dropdown">{{ auth()->user()->name }}</a>
                 <div class="dropdown-menu user-pro-dropdown">
 
                     <!-- item-->
@@ -92,10 +92,7 @@
                                 <a href="ecommerce-products.html">List</a>
                             </li>
                             <li>
-                                <a href="ecommerce-customers.html">Catégories</a>
-                            </li>
-                            <li>
-                                <a href="ecommerce-orders.html">Sub-catégories</a>
+                                <a href="{{ route('product-categories.index') }}">Catégories</a>
                             </li>
                             <li>
                                 <a href="ecommerce-orders-detail.html">Orders</a>
@@ -124,7 +121,7 @@
                                 <a href="{{ route('projects.index') }}">Projects</a>
                             </li>
                             <li>
-                                <a href="{{route('tasks.index')}}">Tasks</a>
+                                <a href="{{ route('tasks.index') }}">Tasks</a>
                             </li>
                             <li>
                                 <a href="email-templates.html">Reports</a>

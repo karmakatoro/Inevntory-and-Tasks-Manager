@@ -176,7 +176,7 @@ class UserController extends Controller
         } else {
             return response()->json([
                 'status' => false,
-                'message' => 'Une erreur est survenue',
+                'message' => 'An error occured',
             ]);
         }
     }

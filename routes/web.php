@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TaskController;
@@ -56,5 +57,9 @@ Route::middleware('auth')->group(function () {
         Route::get('get-share-options-task-file', 'get_share_options')->name('get-share-opts');
         Route::post('share-options-task-file', 'share_options')->name('share-opts');
         Route::delete('dm-trp', 'delete_multiples')->name('dm-trp');
+    });
+    Route::controller(ProductCategoryController::class)->group(function () {
+        Route::resource('product-categories', ProductCategoryController::class);
+        Route::delete('dm-prcat', 'delete_multiples')->name('dm-prcat');
     });
 });
