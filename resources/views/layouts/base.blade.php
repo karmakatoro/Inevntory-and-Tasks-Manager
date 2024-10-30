@@ -90,49 +90,16 @@
     <!-- Vendor js -->
     <script src="{{ asset('assets/js/vendor.min.js') }}"></script>
 
-    <!-- KNOB JS -->
-    <script src="{{ asset('assets/libs/jquery-knob/jquery.knob.min.js') }}"></script>
-    <!-- Apex js-->
-    <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
-
-    <!-- Plugins js-->
-    <script src="{{ asset('assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-world-mill-en.js') }}">
-    </script>
-
-    <!-- Dashboard init-->
-    <script src="{{ asset('assets/js/pages/dashboard-sales.init.js') }}"></script>
-
     <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/jquery-datatables-checkboxes/js/dataTables.checkboxes.min.js') }}"></script>
-
     <!-- third party js ends -->
 
 
     <!-- Validation init js-->
     <script src="{{ asset('assets/js/pages/form-validation.init.js') }}"></script>
-    <!-- Sweet Alerts js -->
     <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
-
-    <!-- Plugins js -->
-    <script src="{{ asset('assets/libs/parsleyjs/parsley.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/quill/quill.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/selectize/js/standalone/selectize.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/mohithg-switchery/switchery.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/multiselect/js/jquery.multi-select.js') }}"></script>
-    <script src="{{ asset('assets/libs/jquery.quicksearch/jquery.quicksearch.min.js') }}"></script>
     <script src="{{ asset('assets/libs/select2/js/select2.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
-
-
-    <!-- init js -->
-
-    <script src="{{ asset('assets/js/pages/form-quilljs.init.js') }}"></script>
     <script src="{{ asset('') }}assets/js/pages/form-advanced.init.js"></script>
-    <script src="{{ asset('assets/js/pages/form-fileuploads.init.js') }}"></script>
 
 
     <!-- App js -->

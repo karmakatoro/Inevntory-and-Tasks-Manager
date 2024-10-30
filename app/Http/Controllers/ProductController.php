@@ -36,16 +36,17 @@ class ProductController extends Controller
                 })
                 ->addColumn('product', function ($row) {
                     $url = asset($row->photo);
+                    $show_url = route('products.show', ['product' => $row->id]) . '?' . $row->slug;
                     $render = ' <div class="d-flex">
                                     <img src="' . $url . '" alt="table-user"
                                         class="me-3 rounded-circle avatar-sm">
                                     <div class="flex-1">
                                         <h5 class="mt-0 mb-1">
-                                            <a href="javascript:void(0);" class="text-dark">
+                                            <a href="' . $show_url . '" class="text-dark">
                                                 ' . $row->name . '
                                             </a>
                                         </h5>
-                                    <p class="mb-0 font-13">Category :' . $row->product_category->name . ' </p>
+                                    <p class="mb-0 font-13">Category : ' . $row->product_category->name . ' </p>
                                     </div>
                                 </div>';
 
@@ -71,10 +72,15 @@ class ProductController extends Controller
                     return '$ ' . $row->price;
                 })
                 ->addColumn('action', function ($row) {
+                    $show_url = route('products.show', ['product' => $row->id]) . '?' . $row->slug;
                     $edit_url = route('products.edit', ['product' => $row->id]);
                     $delete_url = route('products.destroy', ['product' => $row->id]);
                     $actionBtn = '
                     <ul class="list-inline mb-0">
+                        <li class="list-inline-item">
+                            <a href="' . $show_url . '" class="action-icon edit-btn"> <i
+                                    class="mdi mdi-eye"></i></a>
+                        </li>
                         <li class="list-inline-item">
                             <a href="' . $edit_url . '" class="action-icon edit-btn"> <i
                                     class="mdi mdi-square-edit-outline"></i></a>
@@ -121,13 +127,12 @@ class ProductController extends Controller
         $poster = '';
         $gallery = '';
         if ($request->hasFile('photo')) {
-            $poster = $this->functions->store_file($request->photo, 'products/');
+            $poster = $this->functions->store_file($request->photo, 'products');
         }
         if ($request->hasFile('files')) {
             $gallery = $this->functions->store_multiples_file($request->file('files'), 'products/gallery');
         }
         $data = [
-            'slug' => Str::slug($request->name),
             'subcategories' => json_encode($request->subcategories),
             'name' => $request->name,
             'description' => $request->description,
@@ -136,8 +141,8 @@ class ProductController extends Controller
             'price' => $request->price,
             'status' => $request->status
         ];
-        $create = Product::create($data);
-        if ($create) {
+        $new = Product::create($data);
+        if ($new) {
             return redirect()->route('products.index')->with('success', 'Product created successfully');
         } else {
             return redirect()->back()->with('error', 'An error occured while creating product')->withInput();
@@ -177,19 +182,18 @@ class ProductController extends Controller
         $name = '';
         $subcategories = '';
         $poster = $product->photo;
-        if (!$request->name) {
+        if (!isset($request->name)) {
             $name = $product->name;
         }
-        if (!$request->subcategories) {
+        if (!isset($request->subcategories)) {
             $subcategories = $product->subcategories;
         }
         if ($request->hasFile('photo')) {
-            $poster = $this->functions->store_file($request->photo, 'products/');
+            $poster = $this->functions->store_file($request->photo, 'products');
         }
         $data = [
-            'slug' => Str::slug($name),
             'subcategories' => json_encode($subcategories),
-            'name' => $request->name,
+            'name' => $name,
             'description' => $request->description,
             'photo' => $poster,
             'price' => $request->price,
