@@ -104,7 +104,7 @@
                                 <a href="ecommerce-orders-detail.html">Stock</a>
                             </li>
                             <li>
-                                <a href="ecommerce-orders-detail.html">Customers</a>
+                                <a href="{{ route('customers.index') }}">Customers</a>
                             </li>
                             <li>
                                 <a href="ecommerce-orders-detail.html">Sellers</a>
