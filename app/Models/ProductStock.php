@@ -15,8 +15,14 @@ class ProductStock extends Model
     public static function boot()
     {
         parent::boot();
-        self::creating(function ($productStock) {});
-        self::updating(function ($productStock) {});
+        self::creating(function ($productStock) {
+            $productStock->user()->associate(auth()->user()->id);
+            $productStock->product()->associate(request()->product_id);
+        });
+        self::updating(function ($productStock) {
+            $productStock->user()->associate(auth()->user()->id);
+            $productStock->product()->associate(request()->product_id);
+        });
     }
     public function user()
     {

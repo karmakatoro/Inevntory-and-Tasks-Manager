@@ -75,7 +75,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('dm-cs', 'delete_multiples')->name('dm-cs');
     });
     Route::controller(ProductStockController::class)->group(function () {
-        Route::resource('customers', ProductStockController::class);
-        Route::delete('dm-cs', 'delete_multiples')->name('dm-cs');
+        Route::resource('products-stock', ProductStockController::class);
+        Route::delete('dm-ps', 'delete_multiples')->name('dm-ps');
     });
 });
