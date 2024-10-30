@@ -36,14 +36,6 @@ class ProductController extends Controller
                 })
                 ->addColumn('product', function ($row) {
                     $url = asset($row->photo);
-                    $subcategories_display = "";
-                    $list = "";
-                    if ($row->subcategories != NULL) {
-                        for ($i = 0; $i < count(json_decode($row->subcategories)); $i++) {
-                            $list .= json_decode($row->subcategories)[$i] . ', ';
-                        }
-                        $subcategories_display = '<p class="mb-0 font-13">Subcategories :' . $list . ' </p>';
-                    }
                     $render = ' <div class="d-flex">
                                     <img src="' . $url . '" alt="table-user"
                                         class="me-3 rounded-circle avatar-sm">
@@ -53,7 +45,7 @@ class ProductController extends Controller
                                                 ' . $row->name . '
                                             </a>
                                         </h5>
-                                    ' . $subcategories_display . '
+                                    <p class="mb-0 font-13">Category :' . $row->product_category->name . ' </p>
                                     </div>
                                 </div>';
 
@@ -70,9 +62,6 @@ class ProductController extends Controller
                     $render = ' <span class="badge badge-soft-' . $color . '">' . $status_display . '</span>';
 
                     return $render;
-                })
-                ->addColumn('category', function ($row) {
-                    return $row->product_category->name;
                 })
                 ->addColumn('date', function ($row) {
                     return Carbon::parse($row->created_at)->locale('en_EN')->isoFormat('DD
@@ -99,7 +88,7 @@ class ProductController extends Controller
 
                     return $actionBtn;
                 })
-                ->rawColumns(['checkbox', 'product', 'category', 'status', 'date', 'price', 'action'])
+                ->rawColumns(['checkbox', 'product', 'status', 'date', 'price', 'action'])
                 ->make(true);
         }
         return view('pages.products.index');
@@ -168,7 +157,8 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        //
+        $categories = ProductCategory::orderBy('name', 'asc')->get();
+        return view('pages.products.edit', compact('categories', 'product'));
     }
 
     /**
@@ -176,7 +166,41 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        //
+        $request->validate([
+            'name' => 'sometimes|string|max:100',
+            'product_category_id' => 'sometimes|integer|exists:product_categories,id',
+            'description' => 'sometimes|string|max:500',
+            'photo' => 'sometimes|image|mimes:png,jpg,jpeg',
+            'status' => 'sometimes|in:on,off',
+            'price' => 'sometimes',
+        ]);
+        $name = '';
+        $subcategories = '';
+        $poster = $product->photo;
+        if (!$request->name) {
+            $name = $product->name;
+        }
+        if (!$request->subcategories) {
+            $subcategories = $product->subcategories;
+        }
+        if ($request->hasFile('photo')) {
+            $poster = $this->functions->store_file($request->photo, 'products/');
+        }
+        $data = [
+            'slug' => Str::slug($name),
+            'subcategories' => json_encode($subcategories),
+            'name' => $request->name,
+            'description' => $request->description,
+            'photo' => $poster,
+            'price' => $request->price,
+            'status' => $request->status
+        ];
+        $update = $product->update($data);
+        if ($update) {
+            return redirect()->route('products.index')->with('success', 'Product updated successfully');
+        } else {
+            return redirect()->back()->with('error', 'An error occured while creating product')->withInput();
+        }
     }
 
     /**

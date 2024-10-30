@@ -111,7 +111,6 @@
                                         </div>
                                     </th>
                                     <th>Product</th>
-                                    <th>Category</th>
                                     <th>Added Date</th>
                                     <th>Price</th>
                                     <th>Quantity</th>
@@ -155,11 +154,6 @@
                         data: "product",
                         name: "product",
                         className: "text-900 sort pe-1 align-middle white-space-wrap",
-                    },
-                    {
-                        data: "category",
-                        name: "category",
-                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
                     },
                     {
                         data: "date",
