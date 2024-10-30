@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -20,8 +21,10 @@ class Product extends Model
             $product->product_category()->associate(request()->product_category_id);
         });
         self::updating(function ($product) {
-            $product->user()->associate(auth()->user()->id);
-            $product->product_category()->associate(request()->product_category_id);
+            if (Route::currentRouteName() == 'products.update') {
+                $product->user()->associate(auth()->user()->id);
+                $product->product_category()->associate(request()->product_category_id);
+            }
         });
         self::created(function ($product) {
             $length = 6;

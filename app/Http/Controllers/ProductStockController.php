@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
@@ -15,9 +16,9 @@ class ProductStockController extends Controller
     public function index()
     {
         if (request()->ajax()) {
-            $products = ProductStock::latest()->get();
+            $stocks = ProductStock::latest()->get();
 
-            return DataTables::of($products)
+            return DataTables::of($stocks)
                 ->addIndexColumn()
                 ->addColumn('checkbox', function ($row) {
                     return '<div class="form-check font-16 mb-0">
@@ -80,17 +81,10 @@ class ProductStockController extends Controller
                 MMMM YYYY');
                 })
                 ->addColumn('author', function ($row) {
-                    $url = asset($row->user->photo);
+                    $url = asset('storage/users/' . $row->user->photo);
                     $render = ' <div class="d-flex">
                                     <img src="' . $url . '" alt="table-user"
                                         class="me-3 rounded-circle avatar-sm">
-                                    <div class="flex-1">
-                                        <h5 class="mt-0 mb-1">
-                                            <a href="#" class="text-dark">
-                                                ' . $row->user->name . '
-                                            </a>
-                                        </h5>
-                                    </div>
                                 </div>';
                     return $render;
                 })
@@ -115,7 +109,8 @@ class ProductStockController extends Controller
                 ->rawColumns(['checkbox', 'product', 'operation', 'price', 'status', 'date', 'author', 'action'])
                 ->make(true);
         }
-        return view('pages.product-stock.index');
+        $products = Product::orderBy("name", "asc")->get();
+        return view('pages.product-stock.index', compact("products"));
     }
 
     /**
@@ -131,7 +126,35 @@ class ProductStockController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'product_id' => 'required|integer|exists:products,id',
+            'quantity' => 'required',
+            'id' => 'required|integer'
+        ]);
+
+        $product = Product::find($request->product_id);
+        if ($product) {
+            $action = ProductStock::updateOrCreate(
+                ['id' => $request->id],
+                [
+                    'mouvement' => 'e',
+                    'quantity' => $request->quantity,
+                    'price' => $product->price,
+                    'status' => 'accepted'
+                ]
+            );
+            $product->update(['quantity' => $action->quantity]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'New stock of ' . $product->name . ' added!'
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'product not found'
+            ]);
+        }
     }
 
     /**

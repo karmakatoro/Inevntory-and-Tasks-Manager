@@ -2,7 +2,8 @@
     <div class="col-12">
         <div class="row mb-2">
             <div class="col-sm-4">
-                <a href="#" class="btn btn-primary mb-2"><i class="mdi mdi-history me-1"></i> Make a
+                <a href="#" class="btn btn-success mb-2" data-bs-toggle="modal"
+                    data-bs-target="#movement-stock-modal"><i class="mdi mdi-history me-1"></i> Make a
                     movement</a>
 
             </div>
@@ -33,7 +34,7 @@
                         <th>Product</th>
                         <th>Operation</th>
                         <th>Date</th>
-                        <th>Unit Price</th>
+                        <th>Unit Pr.</th>
                         <th>Quantity</th>
                         <th>Author</th>
                         <th>Status</th>
@@ -44,3 +45,4 @@
         </div>
     </div>
 </div>
+@include('pages.product-stock.modal-movement-stock');

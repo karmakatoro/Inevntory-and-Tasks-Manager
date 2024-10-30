@@ -127,14 +127,14 @@
 
             $(document).on('click', '.edit-btn', function(e) {
                 e.preventDefault();
-                $("#requestOperation")[0].reset();
+                $("#requestStockMovement")[0].reset();
                 let url = $(this).attr('data-url');
                 $.ajax({
                     url: url,
                     method: 'get',
                     success: function(response) {
                         if (response.status == true) {
-                            $("#userId").val(respose.date.id);
+                            $("#movementId").val(respose.date.id);
                             $("#movement").val(response.data.name);
                             $("#product").val(response.data.email);
                             $("#phone").val(response.data.phone);
@@ -143,7 +143,7 @@
                             $("#accred").val(response.data.accred);
                             $("#statusUser").val(response.data.status);
                             $("#errorsDiv").css("display", "none");
-                            $("#users-modal").modal('show');
+                            $("#movement-stock-modal").modal('show');
                         } else {
                             Swal.fire("Erreur", response.message, 'warning');
                         }
@@ -292,7 +292,4 @@
             });
         });
     </script>
-    @include('pages.users.modal-users')
-
-
 @endsection

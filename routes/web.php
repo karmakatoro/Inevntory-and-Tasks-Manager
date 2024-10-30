@@ -68,6 +68,7 @@ Route::middleware('auth')->group(function () {
     });
     Route::controller(ProductController::class)->group(function () {
         Route::resource('products', ProductController::class);
+        Route::get('product-price', 'product_price')->name('product-price');
         Route::delete('dm-pr', 'delete_multiples')->name('dm-pr');
     });
     Route::controller(ProductCustomerController::class)->group(function () {

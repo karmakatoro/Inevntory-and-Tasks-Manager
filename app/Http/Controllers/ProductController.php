@@ -109,6 +109,16 @@ class ProductController extends Controller
         return view('pages.products.create', compact('categories'));
     }
 
+    public function product_price(Request $request)
+    {
+        $product = Product::find($request->id);
+        if ($product) {
+            return response()->json([
+                'status' => true,
+                'price' => $product->price
+            ]);
+        }
+    }
     /**
      * Store a newly created resource in storage.
      */
