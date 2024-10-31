@@ -2,24 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\ProductCustomer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
 
-class UserController extends Controller
+class ProductCustomerController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        if ($request->ajax()) {
-            $users = User::latest()->get();
+        if (request()->ajax()) {
+            $customers = ProductCustomer::latest()->get();
 
-            return DataTables::of($users)
+            return DataTables::of($customers)
                 ->addIndexColumn()
                 ->addColumn('checkbox', function ($row) {
                     return '<div class="form-check font-16 mb-0">
@@ -28,7 +26,12 @@ class UserController extends Controller
                             </div>';
                 })
                 ->addColumn('name', function ($row) {
-                    $url = asset('storage/users/' . $row->photo);
+                    $url = asset('storage/users/avatar-female.png');
+                    $gender = "Female";
+                    if ($row->gender == 'm') {
+                        $url = asset('storage/users/avatar-male.png');
+                        $gender = "Male";
+                    }
                     $render = ' <div class="d-flex">
                                     <img src="' . $url . '" alt="table-user"
                                         class="me-3 rounded-circle avatar-sm">
@@ -38,7 +41,7 @@ class UserController extends Controller
                                                 ' . $row->name . '
                                             </a>
                                         </h5>
-                                        <p class="mb-0 font-13">Type : ' . Str::ucfirst($row->type) . '</p>
+                                        <p class="mb-0 font-13">Gender : ' . $gender . '</p>
                                     </div>
                                 </div>';
 
@@ -61,9 +64,22 @@ class UserController extends Controller
                     return Carbon::parse($row->created_at)->locale('en_EN')->isoFormat('DD
                 MMMM YYYY');
                 })
+                ->addColumn('contacts', function ($row) {
+                    $render = '  <h6 class="mt-0 mb-1">Email :
+                                            <a href="mailto:' . $row->email . '" class="text-dark">
+                                                ' . $row->email . '
+                                            </a>
+                                        </h6>
+                                        <h6 class="mt-0 mb-1">Phone :
+                                            <a href="tel:' . $row->phone . '" class="text-dark">
+                                                ' . $row->phone . '
+                                            </a>
+                                        </h6>';
+                    return $render;
+                })
                 ->addColumn('action', function ($row) {
-                    $edit_url = route('users.edit', ['user' => $row->id]);
-                    $delete_url = route('users.destroy', ['user' => $row->id]);
+                    $edit_url = route('customers.edit', ['customer' => $row->id]);
+                    $delete_url = route('customers.destroy', ['customer' => $row->id]);
                     $actionBtn = '
                     <ul class="list-inline mb-0">
                         <li class="list-inline-item">
@@ -79,11 +95,11 @@ class UserController extends Controller
 
                     return $actionBtn;
                 })
-                ->rawColumns(['checkbox', 'name', 'status', 'join', 'action'])
+                ->rawColumns(['checkbox', 'name', 'status', 'contacts', 'join', 'action'])
                 ->make(true);
         }
 
-        return view('pages.users.index');
+        return view('pages.customers.index');
     }
 
     /**
@@ -99,58 +115,29 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $check = User::find($request->id);
-        $data = $request->all();
-        if ($check) {
-            $check_email = User::where('email', $request->email)->first();
-            if ($check_email) {
-                if ($check_email->id != $check->id) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Email already taken',
-                    ]);
-                }
-            }
-            $request->validate([
-                'name' => 'sometimes|string|max:50',
-                'email' => 'sometimes|email|max:50',
-                'phone' => 'sometimes|max:50',
-                'gender' => 'sometimes|in:m,f',
-                'type' => 'sometimes|in:user,admin',
-                'accred' => 'sometimes|in:1,2,3',
-                'status' => 'sometimes|in:on,off',
-            ]);
-        } else {
-            $request->validate([
-                'name' => 'required|string|max:50',
-                'email' => 'required|email|max:50|unique:users,email',
-                'phone' => 'required|max:50',
-                'gender' => 'required|in:m,f',
-                'type' => 'required|in:user,admin',
-                'accred' => 'required|in:1,2,3',
-                'status' => 'required|in:on,off',
-            ]);
-            $photo = 'avatar-female.png';
-            if ($request->gender == 'm') {
-                $photo = 'avatar-male.png';
-            }
-            $password = Hash::make(1287635);
-            $data['photo'] = $photo;
-            $data['password'] = $password;
-        }
-        $action = User::updateOrCreate(
+        $request->validate([
+            'name' => 'required|string|max:50',
+            'email' => 'required|email|max:50',
+            'address' => 'required|string|max:50',
+            'phone' => 'required|max:50',
+            'gender' => 'required|in:m,f',
+            'status' => 'required|in:on,off',
+            'id' => 'required|integer'
+        ]);
+
+        $action = ProductCustomer::updateOrCreate(
             ['id' => $request->id],
-            $data
+            $request->all()
         );
         if ($action) {
             return response()->json([
                 'status' => true,
-                'message' => 'Action done successfully',
+                'message' => 'Action done successfully'
             ]);
         } else {
             return response()->json([
                 'status' => false,
-                'message' => 'An error occured',
+                'message' => 'An error occured'
             ]);
         }
     }
@@ -158,7 +145,7 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show(ProductCustomer $productCustomer)
     {
         //
     }
@@ -166,12 +153,12 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $user)
+    public function edit(ProductCustomer $customer)
     {
-        if ($user) {
+        if ($customer) {
             return response()->json([
                 'status' => true,
-                'data' => $user,
+                'data' => $customer,
             ]);
         } else {
             return response()->json([
@@ -184,7 +171,7 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, ProductCustomer $productCustomer)
     {
         //
     }
@@ -192,17 +179,9 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy(ProductCustomer $customer)
     {
-        $id = $user->id;
-        if ($id == auth()->user()->id) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Impossible to perform this operation!',
-            ]);
-        }
-
-        $deleted = $user->delete();
+        $deleted = $customer->delete();
         if ($deleted) {
             return response()->json([
                 'status' => true,
@@ -215,17 +194,10 @@ class UserController extends Controller
             ]);
         }
     }
-
     public function delete_multiples(Request $request)
     {
         $data = $request->all_id;
-
-        for ($i = 0; $i < count($data); $i++) {
-            if ($data[$i] == auth()->user()->id) {
-                unset($data[$i]);
-            }
-        }
-        $rows = User::whereIn('id', $data)->delete();
+        $rows = ProductCustomer::whereIn('id', $data)->delete();
 
         if ($rows) {
             return response()->json([

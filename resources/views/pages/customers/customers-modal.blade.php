@@ -1,8 +1,9 @@
-<div class="modal fade" id="users-modal" tabindex="-1" role="dialog" aria-labelledby="users-modalTitle" aria-hidden="true">
+<div class="modal fade" id="customers-modal" tabindex="-1" role="dialog" aria-labelledby="users-modalTitle"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="users-modalTitle">Users</h5>
+                <h5 class="modal-title" id="users-modalTitle">Customers</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -12,9 +13,9 @@
                     Errors</strong><br>
                     <div class="errorsList"></div>
                 </div>
-                <form class="needs-validation was-validated" method="POST" action="{{ route('users.store') }}"
-                    id="requestUsers" novalidate="">
-                    <input type="hidden" name="id" id="userId">
+                <form class="needs-validation was-validated" method="POST" action="{{ route('customers.store') }}"
+                    id="requestCustomers" novalidate="">
+                    <input type="hidden" name="id" id="customerId" value="0">
                     <div class="row">
                         <div class="mb-3 col-lg-6 col-sm-12">
                             <label for="name" class="form-label">Names</label>
@@ -24,7 +25,11 @@
                                 Names are required
                             </div>
                         </div>
-
+                        <div class="mb-3 col-lg-6 col-sm-12">
+                            <label for="address" class="form-label">Address</label>
+                            <input type="text" class="form-control" name="address" id="address"
+                                placeholder="Enter the customer address" required>
+                        </div>
                         <div class="mb-3 col-lg-6 col-sm-12">
                             <label for="email" class="form-label">Email</label>
                             <div class="input-group">
@@ -45,6 +50,7 @@
                                 Please provide a phone number.
                             </div>
                         </div>
+
                         <div class="col-lg-6 col-sm-12">
                             <label for="gender" class="form-label">Select the gender</label>
                             <select class="form-select" name="gender" id="gender">
@@ -52,26 +58,12 @@
                                 <option value="f">Female</option>
                             </select>
                         </div>
-                        <div class="col-lg-4 col-sm-12">
-                            <label for="type" class="form-label">Type</label>
-                            <select class="form-select" id="type" name="type">
-                                <option value="admin">Admin</option>
-                                <option value="user" selected>User</option>
-                            </select>
-                        </div>
-                        <div class="col-lg-4 col-sm-12">
-                            <label for="accred" class="form-label">Level</label>
-                            <select class="form-select" id="accred" name="accred">
-                                <option value="1">One</option>
-                                <option value="2" selected>Two</option>
-                                <option value="3">Three</option>
-                            </select>
-                        </div>
-                        <div class="col-lg-4 col-sm-12">
+
+                        <div class="col-lg-6 col-sm-12">
                             <label for="status" class="form-label">Status</label>
                             <select class="form-select" id="statusUser" name="status">
-                                <option value="on">Activated</option>
-                                <option value="off" selected>Deactivated</option>
+                                <option value="on" selected>Activated</option>
+                                <option value="off">Deactivated</option>
                             </select>
                         </div>
 
@@ -94,10 +86,10 @@
         });
         $(document).on("click", "#btnSave", function(e) {
             e.preventDefault();
-            var form = $("#requestUsers")
+            var form = $("#requestCustomers")
 
             var submitBtn = $("#btnSave");
-            var singleId = $("#userId");
+            var singleId = $("#customerId");
             submitBtn.html(
                 `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Loading...`
             );
@@ -118,7 +110,7 @@
                         });
                         singleId.val("0");
                         $(form).trigger("reset");
-                        $("#users-modal").modal("hide");
+                        $("#customers-modal").modal("hide");
                         currentDt.ajax.reload();
                     } else if (response.status == false) {
                         Swal.fire({

@@ -2,24 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use Carbon\Carbon;
+use App\Models\Product;
+use App\Models\ProductStock;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
+use Carbon\Carbon;
 
-class UserController extends Controller
+class ProductStockController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        if ($request->ajax()) {
-            $users = User::latest()->get();
+        if (request()->ajax()) {
+            $stocks = ProductStock::latest()->get();
 
-            return DataTables::of($users)
+            return DataTables::of($stocks)
                 ->addIndexColumn()
                 ->addColumn('checkbox', function ($row) {
                     return '<div class="form-check font-16 mb-0">
@@ -27,22 +26,40 @@ class UserController extends Controller
                                 <label class="form-check-label" for="customerlist01">&nbsp;</label>
                             </div>';
                 })
-                ->addColumn('name', function ($row) {
-                    $url = asset('storage/users/' . $row->photo);
+                ->addColumn('product', function ($row) {
+                    $url = asset($row->product->photo);
+                    $show_url = route('products.show', ['product' => $row->product_id]) . '?' . $row->slug;
                     $render = ' <div class="d-flex">
                                     <img src="' . $url . '" alt="table-user"
                                         class="me-3 rounded-circle avatar-sm">
                                     <div class="flex-1">
                                         <h5 class="mt-0 mb-1">
-                                            <a href="javascript:void(0);" class="text-dark">
-                                                ' . $row->name . '
+                                            <a href="' . $show_url . '" class="text-dark">
+                                                ' . $row->product->name . '
                                             </a>
                                         </h5>
-                                        <p class="mb-0 font-13">Type : ' . Str::ucfirst($row->type) . '</p>
+                                    <p class="mb-0 font-13">Category : ' . $row->product->product_category->name . ' </p>
                                     </div>
                                 </div>';
 
                     return $render;
+                })
+                ->addColumn('operation', function ($row) {
+                    $color = "";
+                    $operation = $row->mouvement;
+                    $operation_display = "";
+                    if ($operation == 'e') {
+                        $operation_display = "Input";
+                        $color = "success";
+                    } else if ($operation == 's') {
+                        $operation_display = "output";
+                        $color = "primary";
+                    } else if ($operation == 'r') {
+                        $operation_display = "Come back";
+                        $color = "warning";
+                    }
+
+                    return '<span class="badge badge-soft-' . $color . '">' . $operation_display . '</span>';
                 })
                 ->addColumn('status', function ($row) {
                     $status = $row->status;
@@ -56,22 +73,32 @@ class UserController extends Controller
 
                     return $render;
                 })
-
-                ->addColumn('join', function ($row) {
+                ->addColumn('price', function ($row) {
+                    return '$ ' . $row->price;
+                })
+                ->addColumn('date', function ($row) {
                     return Carbon::parse($row->created_at)->locale('en_EN')->isoFormat('DD
                 MMMM YYYY');
                 })
+                ->addColumn('author', function ($row) {
+                    $url = asset('storage/users/' . $row->user->photo);
+                    $render = ' <div class="d-flex">
+                                    <img src="' . $url . '" alt="table-user"
+                                        class="me-3 rounded-circle avatar-sm">
+                                </div>';
+                    return $render;
+                })
                 ->addColumn('action', function ($row) {
-                    $edit_url = route('users.edit', ['user' => $row->id]);
-                    $delete_url = route('users.destroy', ['user' => $row->id]);
+                    $edit_url = route('products-stock.edit', ['products_stock' => $row->id]);
+                    $delete_url = route('products-stock.destroy', ['products_stock' => $row->id]);
                     $actionBtn = '
                     <ul class="list-inline mb-0">
                         <li class="list-inline-item">
-                            <a href="#" data-id="' . $row->id . '" data-url="' . $edit_url . '" class="action-icon edit-btn"> <i
+                            <a href="' . $edit_url . '" class="action-icon edit-btn"> <i
                                     class="mdi mdi-square-edit-outline"></i></a>
                         </li>
                         <li class="list-inline-item">
-                            <a href="#" data-id="' . $row->id . '" data-url="' . $delete_url . '" class="action-icon delete-btn"> <i
+                            <a href="#" data-url="' . $delete_url . '" class="action-icon delete-btn"> <i
                                     class="mdi mdi-delete"></i></a>
                         </li>
                     </ul>
@@ -79,11 +106,11 @@ class UserController extends Controller
 
                     return $actionBtn;
                 })
-                ->rawColumns(['checkbox', 'name', 'status', 'join', 'action'])
+                ->rawColumns(['checkbox', 'product', 'operation', 'price', 'status', 'date', 'author', 'action'])
                 ->make(true);
         }
-
-        return view('pages.users.index');
+        $products = Product::orderBy("name", "asc")->get();
+        return view('pages.product-stock.index', compact("products"));
     }
 
     /**
@@ -99,58 +126,33 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $check = User::find($request->id);
-        $data = $request->all();
-        if ($check) {
-            $check_email = User::where('email', $request->email)->first();
-            if ($check_email) {
-                if ($check_email->id != $check->id) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Email already taken',
-                    ]);
-                }
-            }
-            $request->validate([
-                'name' => 'sometimes|string|max:50',
-                'email' => 'sometimes|email|max:50',
-                'phone' => 'sometimes|max:50',
-                'gender' => 'sometimes|in:m,f',
-                'type' => 'sometimes|in:user,admin',
-                'accred' => 'sometimes|in:1,2,3',
-                'status' => 'sometimes|in:on,off',
-            ]);
-        } else {
-            $request->validate([
-                'name' => 'required|string|max:50',
-                'email' => 'required|email|max:50|unique:users,email',
-                'phone' => 'required|max:50',
-                'gender' => 'required|in:m,f',
-                'type' => 'required|in:user,admin',
-                'accred' => 'required|in:1,2,3',
-                'status' => 'required|in:on,off',
-            ]);
-            $photo = 'avatar-female.png';
-            if ($request->gender == 'm') {
-                $photo = 'avatar-male.png';
-            }
-            $password = Hash::make(1287635);
-            $data['photo'] = $photo;
-            $data['password'] = $password;
-        }
-        $action = User::updateOrCreate(
-            ['id' => $request->id],
-            $data
-        );
-        if ($action) {
+        $request->validate([
+            'product_id' => 'required|integer|exists:products,id',
+            'quantity' => 'required',
+            'id' => 'required|integer'
+        ]);
+
+        $product = Product::find($request->product_id);
+        if ($product) {
+            $action = ProductStock::updateOrCreate(
+                ['id' => $request->id],
+                [
+                    'mouvement' => 'e',
+                    'quantity' => $request->quantity,
+                    'price' => $product->price,
+                    'status' => 'accepted'
+                ]
+            );
+            $product->update(['quantity' => $action->quantity]);
+
             return response()->json([
                 'status' => true,
-                'message' => 'Action done successfully',
+                'message' => 'New stock of ' . $product->name . ' added!'
             ]);
         } else {
             return response()->json([
                 'status' => false,
-                'message' => 'An error occured',
+                'message' => 'product not found'
             ]);
         }
     }
@@ -158,7 +160,7 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show(ProductStock $productStock)
     {
         //
     }
@@ -166,12 +168,12 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $user)
+    public function edit(ProductStock $products_stock)
     {
-        if ($user) {
+        if ($products_stock) {
             return response()->json([
                 'status' => true,
-                'data' => $user,
+                'data' => $products_stock,
             ]);
         } else {
             return response()->json([
@@ -184,7 +186,7 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, ProductStock $productStock)
     {
         //
     }
@@ -192,17 +194,10 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy(ProductStock $products_stock)
     {
-        $id = $user->id;
-        if ($id == auth()->user()->id) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Impossible to perform this operation!',
-            ]);
-        }
 
-        $deleted = $user->delete();
+        $deleted = $products_stock->delete();
         if ($deleted) {
             return response()->json([
                 'status' => true,
@@ -215,17 +210,10 @@ class UserController extends Controller
             ]);
         }
     }
-
     public function delete_multiples(Request $request)
     {
         $data = $request->all_id;
-
-        for ($i = 0; $i < count($data); $i++) {
-            if ($data[$i] == auth()->user()->id) {
-                unset($data[$i]);
-            }
-        }
-        $rows = User::whereIn('id', $data)->delete();
+        $rows = ProductStock::whereIn('id', $data)->delete();
 
         if ($rows) {
             return response()->json([

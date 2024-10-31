@@ -1,6 +1,6 @@
 @extends('layouts.base')
 
-@section('title', 'Users - ' . env('APP_NAME'))
+@section('title', 'Customers - ' . env('APP_NAME'))
 
 @section('content')
     <!-- start page title -->
@@ -13,7 +13,7 @@
                         <li class="breadcrumb-item">
                             <a href="{{ route('dashboard.sales') }}">Dashboard</a>
                         </li>
-                        <li class="breadcrumb-item active">Users</li>
+                        <li class="breadcrumb-item active">Customers</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                                 <div class="py-1">
                                     <i class="fe-tag font-24"></i>
                                     <h3>25563</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Total Users</p>
+                                    <p class="text-uppercase mb-1 font-13 fw-medium">Total Customers</p>
                                 </div>
                             </div>
                             <div class="col-md-3 col-sm-6 col-xl-3">
@@ -44,14 +44,14 @@
                                 <div class="py-1">
                                     <i class="fe-shield font-24"></i>
                                     <h3 class="text-success">18361</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">New Users</p>
+                                    <p class="text-uppercase mb-1 font-13 fw-medium">Male Customers</p>
                                 </div>
                             </div>
                             <div class="col-md-3 col-sm-6 col-xl-3">
                                 <div class="py-1">
                                     <i class="fe-delete font-24"></i>
                                     <h3 class="text-danger">250</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Inactive Users</p>
+                                    <p class="text-uppercase mb-1 font-13 fw-medium">Female Users</p>
                                 </div>
                             </div>
                         </div>
@@ -67,14 +67,14 @@
                 <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-sm-4">
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#users-modal"
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#customers-modal"
                                 class="btn btn-primary mb-2"><i class="mdi mdi-plus-circle me-1"></i> Add
-                                User</a>
+                                Customer</a>
 
                         </div>
                         <div class="col-sm-8">
                             <div class="text-sm-end">
-                                <button data-url="{{ route('dm-users') }}" type="button"
+                                <button data-url="{{ route('dm-cs') }}" type="button"
                                     class="btn btn-danger mb-2 me-1 delete-all">
                                     <i class="mdi mdi-trash-can-outline"></i></button>
                                 <a href="javascript:void(0);" class="btn btn-primary mb-2"><i
@@ -86,8 +86,8 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-centered dt-responsive nowrap w-100" id="users-dt"
-                            data-api-url="{{ route('users.index') }}">
+                        <table class="table table-centered dt-responsive nowrap w-100" id="customers-dt"
+                            data-api-url="{{ route('customers.index') }}">
                             <thead class="table-light">
                                 <tr>
                                     <th style="width: 20px;">
@@ -98,8 +98,8 @@
                                         </div>
                                     </th>
                                     <th>Names</th>
-                                    <th>Phone</th>
-                                    <th>Email</th>
+                                    <th>Contacts</th>
+                                    <th>Address</th>
                                     <th>Join</th>
                                     <th>Status</th>
                                     <th style="width: 75px;">Action</th>
@@ -120,11 +120,7 @@
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                 },
             });
-            var openModal = "{{ request()->open }}";
-            if (openModal == 'modal') {
-                $("#users-modal").modal('show');
-            }
-            currentDt = $("#users-dt").DataTable({
+            currentDt = $("#customers-dt").DataTable({
                 autoWidth: false,
                 order: [0, "ASC"],
                 processing: true,
@@ -132,7 +128,7 @@
                 searchDelay: 1000,
                 paging: true,
                 ajax: {
-                    url: $("#users-dt").attr("data-api-url"),
+                    url: $("#customers-dt").attr("data-api-url"),
                 },
                 iDisplayLength: "10",
                 columns: [{
@@ -147,14 +143,14 @@
                         className: "text-900 sort pe-1 align-middle white-space-nowrap",
                     },
                     {
-                        data: "phone",
-                        name: "phone",
+                        data: "contacts",
+                        name: "contacts",
                         className: "text-900 sort pe-1 align-middle white-space-nowrap",
                     },
                     {
-                        data: "email",
-                        name: "email",
-                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                        data: "address",
+                        name: "address",
+                        className: "text-900 sort pe-1 align-middle white-space-wrap",
                     },
                     {
                         data: "join",
@@ -178,24 +174,22 @@
 
             $(document).on('click', '.edit-btn', function(e) {
                 e.preventDefault();
-                $("#requestUsers")[0].reset();
-                let id = $(this).attr('data-id');
+                $("#requestCustomers")[0].reset();
                 let url = $(this).attr('data-url');
                 $.ajax({
                     url: url,
                     method: 'get',
                     success: function(response) {
                         if (response.status == true) {
-                            $("#userId").val(id);
+                            $("#customerId").val(response.data.id);
                             $("#name").val(response.data.name);
                             $("#email").val(response.data.email);
                             $("#phone").val(response.data.phone);
                             $("#gender").val(response.data.gender);
-                            $("#type").val(response.data.type);
-                            $("#accred").val(response.data.accred);
+                            $("#address").val(response.data.address);
                             $("#statusUser").val(response.data.status);
                             $("#errorsDiv").css("display", "none");
-                            $("#users-modal").modal('show');
+                            $("#customers-modal").modal('show');
                         } else {
                             Swal.fire("Erreur", response.message, 'warning');
                         }
@@ -205,7 +199,6 @@
 
             $(document).on('click', '.delete-btn', function(e) {
                 e.preventDefault();
-                let id = $(this).attr('data-id');
                 let url = $(this).attr('data-url');
                 Swal.fire({
                     title: "Are you sure?",
@@ -276,7 +269,7 @@
                 if (checkedCount < 1) {
                     Swal.fire(
                         "Ooops...",
-                        "Vous devez selectionner au minimum 2 enregistrements",
+                        "You must select at least 2 records",
                         "warning"
                     );
                 } else {
@@ -344,7 +337,6 @@
             });
         });
     </script>
-    @include('pages.users.modal-users')
-
+    @include('pages.customers.customers-modal')
 
 @endsection

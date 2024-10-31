@@ -1,118 +1,61 @@
 @extends('layouts.base')
 
-@section('title', 'Users - ' . env('APP_NAME'))
+@section('title', 'Products Stock - ' . env('APP_NAME'))
 
 @section('content')
     <!-- start page title -->
     <div class="row">
         <div class="col-12">
             <div class="page-title-box">
-                <h4 class="page-title">Users</h4>
+                <h4 class="page-title">Products Stock</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item">
                             <a href="{{ route('dashboard.sales') }}">Dashboard</a>
                         </li>
-                        <li class="breadcrumb-item active">Users</li>
+                        <li class="breadcrumb-item active">Products Stock</li>
                     </ol>
                 </div>
             </div>
         </div>
     </div>
-    <!-- end page title -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="text-center">
-                        <div class="row">
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-tag font-24"></i>
-                                    <h3>25563</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Total Users</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-archive font-24"></i>
-                                    <h3 class="text-warning">6952</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Active Users</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-shield font-24"></i>
-                                    <h3 class="text-success">18361</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">New Users</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-delete font-24"></i>
-                                    <h3 class="text-danger">250</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Inactive Users</p>
-                                </div>
-                            </div>
-                        </div>
+    <div class="col-lg-12 col-xl-12">
+        <div class="card">
+            <div class="card-body">
+                <ul class="nav nav-pills navtab-bg" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a href="#stock" data-bs-toggle="tab" aria-expanded="false" class="nav-link ms-0"
+                            aria-selected="false" role="tab">
+                            <i class="mdi mdi-cart-minus me-1"></i>Availiable Products
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a href="#stock-history" data-bs-toggle="tab" aria-expanded="true" class="nav-link active"
+                            aria-selected="true" role="tab" tabindex="-1">
+                            <i class="mdi mdi-history me-1"></i>History
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+
+                    <div class="tab-pane " id="stock" role="tabpanel">
+
+                        @include('pages.product-stock.stock')
                     </div>
-                </div>
+
+
+                    <div class="tab-pane active show" id="stock-history" role="tabpanel">
+                        @include('pages.product-stock.stock-history')
+                    </div>
+
+
+                </div> <!-- end tab-content -->
             </div>
-        </div>
+        </div> <!-- end card-->
+
     </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row mb-2">
-                        <div class="col-sm-4">
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#users-modal"
-                                class="btn btn-primary mb-2"><i class="mdi mdi-plus-circle me-1"></i> Add
-                                User</a>
-
-                        </div>
-                        <div class="col-sm-8">
-                            <div class="text-sm-end">
-                                <button data-url="{{ route('dm-users') }}" type="button"
-                                    class="btn btn-danger mb-2 me-1 delete-all">
-                                    <i class="mdi mdi-trash-can-outline"></i></button>
-                                <a href="javascript:void(0);" class="btn btn-primary mb-2"><i
-                                        class="mdi mdi-printer me-1"></i> Print</a>
-                                <a href="javascript:void(0);" class="btn btn-success mb-2"><i
-                                        class="mdi mdi-database-export me-1"></i> Export</a>
-                            </div>
-                        </div><!-- end col-->
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-centered dt-responsive nowrap w-100" id="users-dt"
-                            data-api-url="{{ route('users.index') }}">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="width: 20px;">
-                                        <div class="form-check font-16 mb-0">
-                                            <input id="checkAllRows" class="form-check-input" type="checkbox"
-                                                id="customerlist">
-                                            <label class="form-check-label" for="customerlist">&nbsp;</label>
-                                        </div>
-                                    </th>
-                                    <th>Names</th>
-                                    <th>Phone</th>
-                                    <th>Email</th>
-                                    <th>Join</th>
-                                    <th>Status</th>
-                                    <th style="width: 75px;">Action</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <!-- end row -->
-        </div>
-    </div>
-    <!-- end row -->
     <script>
         $(document).ready(function() {
             $.ajaxSetup({
@@ -120,11 +63,7 @@
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                 },
             });
-            var openModal = "{{ request()->open }}";
-            if (openModal == 'modal') {
-                $("#users-modal").modal('show');
-            }
-            currentDt = $("#users-dt").DataTable({
+            currentDt = $("#stock-history-dt").DataTable({
                 autoWidth: false,
                 order: [0, "ASC"],
                 processing: true,
@@ -132,7 +71,7 @@
                 searchDelay: 1000,
                 paging: true,
                 ajax: {
-                    url: $("#users-dt").attr("data-api-url"),
+                    url: $("#stock-history-dt").attr("data-api-url"),
                 },
                 iDisplayLength: "10",
                 columns: [{
@@ -142,23 +81,33 @@
                         searchable: false,
                     },
                     {
-                        data: "name",
-                        name: "name",
+                        data: "product",
+                        name: "product",
                         className: "text-900 sort pe-1 align-middle white-space-nowrap",
                     },
                     {
-                        data: "phone",
-                        name: "phone",
+                        data: "operation",
+                        name: "operation",
                         className: "text-900 sort pe-1 align-middle white-space-nowrap",
                     },
                     {
-                        data: "email",
-                        name: "email",
+                        data: "date",
+                        name: "date",
                         className: "text-900 sort pe-1 align-middle white-space-nowrap",
                     },
                     {
-                        data: "join",
-                        name: "join",
+                        data: "price",
+                        name: "price",
+                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                    },
+                    {
+                        data: "quantity",
+                        name: "quantity",
+                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                    },
+                    {
+                        data: "author",
+                        name: "author",
                         className: "text-900 sort pe-1 align-middle white-space-nowrap",
                     },
                     {
@@ -178,24 +127,18 @@
 
             $(document).on('click', '.edit-btn', function(e) {
                 e.preventDefault();
-                $("#requestUsers")[0].reset();
-                let id = $(this).attr('data-id');
+                $("#requestStockMovement")[0].reset();
                 let url = $(this).attr('data-url');
                 $.ajax({
                     url: url,
                     method: 'get',
                     success: function(response) {
                         if (response.status == true) {
-                            $("#userId").val(id);
-                            $("#name").val(response.data.name);
-                            $("#email").val(response.data.email);
-                            $("#phone").val(response.data.phone);
-                            $("#gender").val(response.data.gender);
-                            $("#type").val(response.data.type);
-                            $("#accred").val(response.data.accred);
-                            $("#statusUser").val(response.data.status);
+                            $("#movementId").val(respose.data.id);
+                            $("#product_id").val(response.data.product_id);
+                            $("#quantity").val(response.data.quantity);
                             $("#errorsDiv").css("display", "none");
-                            $("#users-modal").modal('show');
+                            $("#movement-stock-modal").modal('show');
                         } else {
                             Swal.fire("Erreur", response.message, 'warning');
                         }
@@ -344,7 +287,4 @@
             });
         });
     </script>
-    @include('pages.users.modal-users')
-
-
 @endsection

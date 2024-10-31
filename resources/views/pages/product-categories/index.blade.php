@@ -1,19 +1,22 @@
 @extends('layouts.base')
 
-@section('title', 'Users - ' . env('APP_NAME'))
+@section('title', 'Product Categories - ' . env('APP_NAME'))
 
 @section('content')
     <!-- start page title -->
     <div class="row">
         <div class="col-12">
             <div class="page-title-box">
-                <h4 class="page-title">Users</h4>
+                <h4 class="page-title">Product Categories</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item">
                             <a href="{{ route('dashboard.sales') }}">Dashboard</a>
                         </li>
-                        <li class="breadcrumb-item active">Users</li>
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('products.index') }}">Products</a>
+                        </li>
+                        <li class="breadcrumb-item active">Product Categories</li>
                     </ol>
                 </div>
             </div>
@@ -24,57 +27,15 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="text-center">
-                        <div class="row">
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-tag font-24"></i>
-                                    <h3>25563</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Total Users</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-archive font-24"></i>
-                                    <h3 class="text-warning">6952</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Active Users</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-shield font-24"></i>
-                                    <h3 class="text-success">18361</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">New Users</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-delete font-24"></i>
-                                    <h3 class="text-danger">250</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Inactive Users</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-sm-4">
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#users-modal"
-                                class="btn btn-primary mb-2"><i class="mdi mdi-plus-circle me-1"></i> Add
-                                User</a>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#product-category-modal"
+                                class="btn btn-primary mb-2"><i class="mdi mdi-plus-circle me-1"></i> Add Category</a>
 
                         </div>
                         <div class="col-sm-8">
                             <div class="text-sm-end">
-                                <button data-url="{{ route('dm-users') }}" type="button"
+                                <button data-url="{{ route('dm-prcat') }}" type="button"
                                     class="btn btn-danger mb-2 me-1 delete-all">
                                     <i class="mdi mdi-trash-can-outline"></i></button>
                                 <a href="javascript:void(0);" class="btn btn-primary mb-2"><i
@@ -86,8 +47,8 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-centered dt-responsive nowrap w-100" id="users-dt"
-                            data-api-url="{{ route('users.index') }}">
+                        <table class="table table-centered dt-responsive nowrap w-100" id="product-catgories-dt"
+                            data-api-url="{{ route('product-categories.index') }}">
                             <thead class="table-light">
                                 <tr>
                                     <th style="width: 20px;">
@@ -97,11 +58,8 @@
                                             <label class="form-check-label" for="customerlist">&nbsp;</label>
                                         </div>
                                     </th>
-                                    <th>Names</th>
-                                    <th>Phone</th>
-                                    <th>Email</th>
-                                    <th>Join</th>
-                                    <th>Status</th>
+                                    <th>Designation</th>
+                                    <th style="width: 85px;">Status</th>
                                     <th style="width: 75px;">Action</th>
                                 </tr>
                             </thead>
@@ -120,11 +78,8 @@
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                 },
             });
-            var openModal = "{{ request()->open }}";
-            if (openModal == 'modal') {
-                $("#users-modal").modal('show');
-            }
-            currentDt = $("#users-dt").DataTable({
+
+            currentDt = $("#product-catgories-dt").DataTable({
                 autoWidth: false,
                 order: [0, "ASC"],
                 processing: true,
@@ -132,7 +87,7 @@
                 searchDelay: 1000,
                 paging: true,
                 ajax: {
-                    url: $("#users-dt").attr("data-api-url"),
+                    url: $("#product-catgories-dt").attr("data-api-url"),
                 },
                 iDisplayLength: "10",
                 columns: [{
@@ -144,21 +99,6 @@
                     {
                         data: "name",
                         name: "name",
-                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
-                    },
-                    {
-                        data: "phone",
-                        name: "phone",
-                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
-                    },
-                    {
-                        data: "email",
-                        name: "email",
-                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
-                    },
-                    {
-                        data: "join",
-                        name: "join",
                         className: "text-900 sort pe-1 align-middle white-space-nowrap",
                     },
                     {
@@ -178,7 +118,7 @@
 
             $(document).on('click', '.edit-btn', function(e) {
                 e.preventDefault();
-                $("#requestUsers")[0].reset();
+                $("#requestProductCategories")[0].reset();
                 let id = $(this).attr('data-id');
                 let url = $(this).attr('data-url');
                 $.ajax({
@@ -186,16 +126,11 @@
                     method: 'get',
                     success: function(response) {
                         if (response.status == true) {
-                            $("#userId").val(id);
+                            $("#productCategoryId").val(response.data.id);
                             $("#name").val(response.data.name);
-                            $("#email").val(response.data.email);
-                            $("#phone").val(response.data.phone);
-                            $("#gender").val(response.data.gender);
-                            $("#type").val(response.data.type);
-                            $("#accred").val(response.data.accred);
-                            $("#statusUser").val(response.data.status);
+                            $("#statusProductCategory").val(response.data.status);
                             $("#errorsDiv").css("display", "none");
-                            $("#users-modal").modal('show');
+                            $("#product-category-modal").modal('show');
                         } else {
                             Swal.fire("Erreur", response.message, 'warning');
                         }
@@ -276,7 +211,7 @@
                 if (checkedCount < 1) {
                     Swal.fire(
                         "Ooops...",
-                        "Vous devez selectionner au minimum 2 enregistrements",
+                        "You must select at least 2 records",
                         "warning"
                     );
                 } else {
@@ -344,7 +279,6 @@
             });
         });
     </script>
-    @include('pages.users.modal-users')
-
+    @include('pages.product-categories.modal-categories')
 
 @endsection
