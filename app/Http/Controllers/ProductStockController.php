@@ -35,7 +35,7 @@ class ProductStockController extends Controller
                                     <div class="flex-1">
                                         <h5 class="mt-0 mb-1">
                                             <a href="' . $show_url . '" class="text-dark">
-                                                ' . $row->name . '
+                                                ' . $row->product->name . '
                                             </a>
                                         </h5>
                                     <p class="mb-0 font-13">Category : ' . $row->product->product_category->name . ' </p>
@@ -170,7 +170,17 @@ class ProductStockController extends Controller
      */
     public function edit(ProductStock $products_stock)
     {
-        //
+        if ($products_stock) {
+            return response()->json([
+                'status' => true,
+                'data' => $products_stock,
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occured',
+            ]);
+        }
     }
 
     /**

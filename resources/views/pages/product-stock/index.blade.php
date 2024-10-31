@@ -134,14 +134,9 @@
                     method: 'get',
                     success: function(response) {
                         if (response.status == true) {
-                            $("#movementId").val(respose.date.id);
-                            $("#movement").val(response.data.name);
-                            $("#product").val(response.data.email);
-                            $("#phone").val(response.data.phone);
-                            $("#gender").val(response.data.gender);
-                            $("#type").val(response.data.type);
-                            $("#accred").val(response.data.accred);
-                            $("#statusUser").val(response.data.status);
+                            $("#movementId").val(respose.data.id);
+                            $("#product_id").val(response.data.product_id);
+                            $("#quantity").val(response.data.quantity);
                             $("#errorsDiv").css("display", "none");
                             $("#movement-stock-modal").modal('show');
                         } else {

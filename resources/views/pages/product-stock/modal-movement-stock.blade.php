@@ -145,7 +145,7 @@
                         });
                         singleId.val("0");
                         $(form).trigger("reset");
-                        $("#users-modal").modal("hide");
+                        $("#movement-stock-modal").modal("hide");
                         currentDt.ajax.reload();
                     } else if (response.status == false) {
                         Swal.fire({
