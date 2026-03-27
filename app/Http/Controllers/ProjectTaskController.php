@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ProjectTask;
 use Illuminate\Http\Request;
-
+use App\Http\Controllers\Controller;
 class ProjectTaskController extends Controller
 {
     /**

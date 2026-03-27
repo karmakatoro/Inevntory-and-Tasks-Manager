@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Models\Product;
-use App\Models\ProductCategory;
-use Illuminate\Support\Str;
-use Yajra\DataTables\DataTables;
 use Carbon\Carbon;
+use App\Models\Product;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\ProductCategory;
+use Yajra\DataTables\DataTables;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\FromRequestProduct;
+use App\Http\Controllers\FunctionsController;
 
 class ProductController extends Controller
 {
@@ -25,7 +27,6 @@ class ProductController extends Controller
     {
         if (request()->ajax()) {
             $products = Product::latest()->get();
-
             return DataTables::of($products)
                 ->addIndexColumn()
                 ->addColumn('checkbox', function ($row) {
@@ -72,28 +73,34 @@ class ProductController extends Controller
                     return '$ ' . $row->price;
                 })
                 ->addColumn('action', function ($row) {
-                    $show_url = route('products.show', ['product' => $row->id]) . '?' . $row->slug;
-                    $edit_url = route('products.edit', ['product' => $row->id]);
-                    $delete_url = route('products.destroy', ['product' => $row->id]);
-                    $actionBtn = '
-                    <ul class="list-inline mb-0">
-                        <li class="list-inline-item">
-                            <a href="' . $show_url . '" class="action-icon edit-btn"> <i
-                                    class="mdi mdi-eye"></i></a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="' . $edit_url . '" class="action-icon edit-btn"> <i
-                                    class="mdi mdi-square-edit-outline"></i></a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="#" data-url="' . $delete_url . '" class="action-icon delete-btn"> <i
-                                    class="mdi mdi-delete"></i></a>
-                        </li>
-                    </ul>
-                    ';
+    $show_url = route('products.show', ['product' => $row->id]) . '?' . $row->slug;
+    $edit_url = route('products.edit', ['product' => $row->id]);
+    $delete_url = route('products.destroy', ['product' => $row->id]);
+    $urlSlug = route('products.show',$row->slug);
+    $actionBtn = '
+    <ul class="list-inline mb-0">
+        <li class="list-inline-item">
+            <a href="'.$urlSlug.'"
+               data-id="' . $row->id . '"
+               data-name="' . addslashes($row->name) . '"
+               data-price="' . addslashes($row->price).'"
+               class="action-icon btn btn-link  btn-add-stock">
+               <i class="mdi mdi-archive-arrow-down"></i>
+            </a>
+        </li>
+        <li class="list-inline-item">
+            <a href="' . $show_url . '" class="action-icon"> <i class="mdi mdi-eye"></i></a>
+        </li>
+        <li class="list-inline-item">
+            <a href="' . $edit_url . '" class="action-icon"> <i class="mdi mdi-square-edit-outline"></i></a>
+        </li>
+        <li class="list-inline-item">
+            <a href="#" data-url="' . $delete_url . '" class="action-icon delete-btn"> <i class="mdi mdi-delete"></i></a>
+        </li>
+    </ul>';
 
-                    return $actionBtn;
-                })
+    return $actionBtn;
+})
                 ->rawColumns(['checkbox', 'product', 'status', 'date', 'price', 'action'])
                 ->make(true);
         }
@@ -106,11 +113,16 @@ class ProductController extends Controller
     public function create()
     {
         $categories = ProductCategory::orderBy('name', 'asc')->get();
-        return view('pages.products.create', compact('categories'));
+        $modelProduct = new Product();
+        return view('pages.products.create', compact('categories','modelProduct'));
     }
 
     public function product_price(Request $request)
     {
+
+    $request->validate([
+        'id' => 'required|integer|exists:products,id'
+    ]);
         $product = Product::find($request->id);
         if ($product) {
             return response()->json([
@@ -119,45 +131,34 @@ class ProductController extends Controller
             ]);
         }
     }
+
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:100|unique:products,name',
-            'product_category_id' => 'required|integer|exists:product_categories,id',
-            'description' => 'required|string|max:500',
-            'photo' => 'required|image|mimes:png,jpg,jpeg',
-            'status' => 'sometimes|in:on,off',
-            'price' => 'required',
-            'files' => 'sometimes|array',
-            'files.*' => 'sometimes|image|mimes:png,jpg,jpeg',
-        ]);
-        $poster = '';
-        $gallery = '';
-        if ($request->hasFile('photo')) {
-            $poster = $this->functions->store_file($request->photo, 'products');
-        }
-        if ($request->hasFile('files')) {
-            $gallery = $this->functions->store_multiples_file($request->file('files'), 'products/gallery');
-        }
-        $data = [
-            'subcategories' => json_encode($request->subcategories),
-            'name' => $request->name,
-            'description' => $request->description,
-            'photo' => $poster,
-            'gallery' => $gallery,
-            'price' => $request->price,
-            'status' => $request->status
-        ];
-        $new = Product::create($data);
-        if ($new) {
-            return redirect()->route('products.index')->with('success', 'Product created successfully');
-        } else {
-            return redirect()->back()->with('error', 'An error occured while creating product')->withInput();
-        }
+    public function store(FromRequestProduct $request)
+{
+    $data = $request->validated();
+
+    // On utilise les variables pour remplir le tableau $data
+    if ($request->hasFile('photo')) {
+        $data['photo'] = $this->functions->store_file($request->photo, 'products');
     }
+
+    if ($request->hasFile('files')) {
+        $data['gallery'] = $this->functions->store_multiples_file($request->file('files'), 'products/gallery');
+    }
+
+    // Gestion propre des sous-catégories (en JSON pour ta migration string)
+    $data['subcategories'] = json_encode($request->subcategories ?? []);
+    $data['status'] = $request->status ?? 'off';
+
+    $new = Product::create($data); // Ici, $data contient maintenant les bons chemins !
+
+    if ($new) {
+        return redirect()->route('products.index')->with('success', 'Product created successfully');
+    }
+    return redirect()->back()->with('error', 'An error occurred')->withInput();
+}
 
     /**
      * Display the specified resource.
@@ -179,43 +180,27 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
-    {
-        $request->validate([
-            'name' => 'sometimes|string|max:100',
-            'product_category_id' => 'sometimes|integer|exists:product_categories,id',
-            'description' => 'sometimes|string|max:500',
-            'photo' => 'sometimes|image|mimes:png,jpg,jpeg',
-            'status' => 'sometimes|in:on,off',
-            'price' => 'sometimes',
-        ]);
-        $name = '';
-        $subcategories = '';
-        $poster = $product->photo;
-        if (!isset($request->name)) {
-            $name = $product->name;
-        }
-        if (!isset($request->subcategories)) {
-            $subcategories = $product->subcategories;
-        }
-        if ($request->hasFile('photo')) {
-            $poster = $this->functions->store_file($request->photo, 'products');
-        }
-        $data = [
-            'subcategories' => json_encode($subcategories),
-            'name' => $name,
-            'description' => $request->description,
-            'photo' => $poster,
-            'price' => $request->price,
-            'status' => $request->status
-        ];
-        $update = $product->update($data);
-        if ($update) {
-            return redirect()->route('products.index')->with('success', 'Product updated successfully');
-        } else {
-            return redirect()->back()->with('error', 'An error occured while creating product')->withInput();
-        }
+   public function update(FromRequestProduct $request, Product $product)
+{
+
+    $data = $request->validated();
+
+
+    if ($request->hasFile('photo')) {
+        $data['photo'] = $this->functions->store_file($request->photo, 'products');
+    } else {
+        $data['photo'] = $product->photo;
     }
+
+
+    $data['subcategories'] = json_encode($request->subcategories ?? []);
+
+    if ($product->update($data)) {
+        return redirect()->route('products.index')->with('success', 'Product updated successfully');
+    }
+
+    return redirect()->back()->with('error', 'Update failed')->withInput();
+}
 
     /**
      * Remove the specified resource from storage.

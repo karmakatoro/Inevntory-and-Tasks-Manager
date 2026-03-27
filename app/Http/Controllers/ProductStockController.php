@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Product;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
-use Carbon\Carbon;
+use App\Http\Controllers\Controller;
 
 class ProductStockController extends Controller
 {
@@ -133,28 +134,34 @@ class ProductStockController extends Controller
         ]);
 
         $product = Product::find($request->product_id);
-        if ($product) {
-            $action = ProductStock::updateOrCreate(
-                ['id' => $request->id],
-                [
-                    'mouvement' => 'e',
-                    'quantity' => $request->quantity,
-                    'price' => $product->price,
-                    'status' => 'accepted'
-                ]
-            );
-            $product->update(['quantity' => $action->quantity]);
-
+        if(!$product){
             return response()->json([
-                'status' => true,
-                'message' => 'New stock of ' . $product->name . ' added!'
-            ]);
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'product not found'
+                'status'=>false,
+                'message'=>'Product not Found'
             ]);
         }
+       if($request->id >0){
+        $oldMovement = ProductStock::find($request->id);
+         if($oldMovement)
+            {
+                $product->decrement('quantity',$oldMovement->quantity);
+            }
+       }
+       $movement = ProductStock::updateOrCreate(
+        ['id'=>$request->id],
+       [
+         'mouvement'=>'e',
+        'quantity'=>$request->quantity,
+        'price'=>$product->price,
+        'status'=>'accepted',
+
+       ]
+       );
+       $product->increment('quantity',$request->quantity);
+       return response()->json([
+            'status'=>true,
+            'message' => ($request->id > 0 ? 'Stock updated' : 'New stock added') . ' for ' . $product->name
+       ]);
     }
 
     /**
@@ -163,11 +170,14 @@ class ProductStockController extends Controller
     public function show(ProductStock $productStock)
     {
         //
+
     }
 
     /**
      * Show the form for editing the specified resource.
      */
+
+
     public function edit(ProductStock $products_stock)
     {
         if ($products_stock) {

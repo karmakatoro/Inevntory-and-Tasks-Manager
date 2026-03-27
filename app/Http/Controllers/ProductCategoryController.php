@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ProductCategory;
 use Illuminate\Http\Request;
+use App\Models\ProductCategory;
 use Yajra\DataTables\DataTables;
+use App\Http\Controllers\Controller;
 
 
 class ProductCategoryController extends Controller
@@ -64,7 +65,11 @@ class ProductCategoryController extends Controller
      */
     public function create()
     {
-        //
+        // //
+        // $modelCategory = new ProductCategory();
+        // return view('pages.product-categories.modal-categories',[
+        //     'category'=>$modelCategory
+        // ]);
     }
 
     /**

@@ -2,16 +2,36 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\User;
+use Illuminate\Support\Str;
+use App\Models\ProductStock;
+use App\Models\ProductCategory;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $guarded = [];
+    protected $casts = [
+        'subcategories'=>'array',
+        'gallery'=>'array'
+    ];
+    protected $fillable = [
+        'code',
+        'subcategories',
+        'product_category_id',
+        'user_id',
+        'name',
+        'description',
+        'photo',
+        'gallery',
+        'price',
+        'quantity',
+        'cmp',
+        'status'
+    ];
 
     public static function boot()
     {
@@ -19,11 +39,13 @@ class Product extends Model
         self::creating(function ($product) {
             $product->user()->associate(auth()->user()->id);
             $product->product_category()->associate(request()->product_category_id);
+            $product->slug = str::slug($product->name);
         });
         self::updating(function ($product) {
             if (Route::currentRouteName() == 'products.update') {
                 $product->user()->associate(auth()->user()->id);
                 $product->product_category()->associate(request()->product_category_id);
+                $product->slug = str::slug($product->name);
             }
         });
         self::created(function ($product) {
@@ -35,8 +57,8 @@ class Product extends Model
                 $randomString .= $characters[rand(0, $charactersLength - 1)];
             }
             $uniqueCode = 'SKU-0' . $product->id . '-' . $randomString;
-            $product->update(['code' => $uniqueCode]);
-            $product->update(['slug' => Str::slug($product->name)]);
+            $product->update(['code'=>$uniqueCode]);
+
         });
     }
     public function user()

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
-use Illuminate\Http\Request;
-
+use App\Models\Project;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\FunctionsController;
+use Illuminate\Http\RequestFunctionsController;
 class ProjectController extends Controller
 {
     private $functions;
