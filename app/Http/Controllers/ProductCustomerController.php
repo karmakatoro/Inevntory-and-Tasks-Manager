@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ProductCustomer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Models\ProductCustomer;
 use Yajra\DataTables\DataTables;
+use App\Http\Controllers\Controller;
 
 class ProductCustomerController extends Controller
 {

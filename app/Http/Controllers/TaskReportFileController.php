@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App;
 use App\Models\Task;
-use App\Models\TaskReportFile;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\TaskReportFile;
+use App\Http\Controllers\Controller;
 
 class TaskReportFileController extends Controller
 {
@@ -79,7 +81,7 @@ class TaskReportFileController extends Controller
             ]);
         }
         if ($request->share_opt == '0') {
-            $check_task_id->update(['share' => NULL]);
+            $check_task_id->update(['share' => null]);
             return response()->json([
                 'status' => true,
                 'message' => 'You will be the only one to have access to this file'

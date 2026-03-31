@@ -24,32 +24,42 @@
             <div class="card-body">
                 <ul class="nav nav-pills navtab-bg" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <a href="#stock" data-bs-toggle="tab" aria-expanded="false" class="nav-link ms-0"
-                            aria-selected="false" role="tab">
-                            <i class="mdi mdi-cart-minus me-1"></i>Availiable Products
+                        <a href="#stock" data-bs-toggle="tab" aria-expanded="false" class="nav-link ms-0 active"
+                            aria-selected="true" role="tab">
+                            <i class="mdi mdi-cart-minus me-1"></i> Stock Central
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a href="#stock-history" data-bs-toggle="tab" aria-expanded="true" class="nav-link active"
-                            aria-selected="true" role="tab" tabindex="-1">
-                            <i class="mdi mdi-history me-1"></i>History
+                        <a href="#cart-content" data-bs-toggle="tab" aria-expanded="false" class="nav-link ms-0 "
+                            aria-selected="true" role="tab">
+                            <i class="mdi mdi-cart-minus me-1"></i> Panier d'attribution
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a href="#stock-history" data-bs-toggle="tab" aria-expanded="true" class="nav-link "
+                            aria-selected="false" role="tab" tabindex="-1">
+                            <i class="mdi mdi-history me-1"></i>Historique de mouvement de Stock Central
                         </a>
                     </li>
                 </ul>
 
                 <div class="tab-content">
-
-                    <div class="tab-pane " id="stock" role="tabpanel">
-
+                    <div class="tab-pane active show" id="stock" role="tabpanel">
                         @include('pages.product-stock.stock')
                     </div>
 
-
-                    <div class="tab-pane active show" id="stock-history" role="tabpanel">
-                        @include('pages.product-stock.stock-history')
+                    <div class="tab-pane" id="cart-content" role="tabpanel">
+                        <div id="cart-ajax-container">
+                            <div class="text-center p-5 text-muted">
+                                <div class="spinner-border text-primary m-2" role="status"></div>
+                                <p>Chargement du panier...</p>
+                            </div>
+                        </div>
                     </div>
 
-
+                    <div class="tab-pane" id="stock-history" role="tabpanel">
+                        @include('pages.product-stock.stock-history')
+                    </div>
                 </div> <!-- end tab-content -->
             </div>
         </div> <!-- end card-->
@@ -58,233 +68,213 @@
 
     <script>
         $(document).ready(function() {
+            // Configuration CSRF pour tous les appels AJAX
             $.ajaxSetup({
                 headers: {
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                 },
             });
-            currentDt = $("#stock-history-dt").DataTable({
+
+            // 1. Initialisation de la DataTable Historique
+            var currentDt = $("#stock-history-dt").DataTable({
                 autoWidth: false,
                 order: [0, "ASC"],
                 processing: true,
                 serverSide: true,
-                searchDelay: 1000,
-                paging: true,
                 ajax: {
                     url: $("#stock-history-dt").attr("data-api-url"),
                 },
-                iDisplayLength: "10",
                 columns: [{
                         data: "checkbox",
                         name: "checkbox",
                         orderable: false,
-                        searchable: false,
+                        searchable: false
                     },
                     {
                         data: "product",
-                        name: "product",
-                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                        name: "product"
                     },
                     {
                         data: "operation",
-                        name: "operation",
-                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                        name: "operation"
                     },
                     {
                         data: "date",
-                        name: "date",
-                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                        name: "date"
                     },
                     {
                         data: "price",
-                        name: "price",
-                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                        name: "price"
                     },
                     {
                         data: "quantity",
-                        name: "quantity",
-                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                        name: "quantity"
                     },
                     {
                         data: "author",
-                        name: "author",
-                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                        name: "author"
                     },
                     {
                         data: "status",
-                        name: "status",
-                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                        name: "status"
                     },
                     {
                         data: "action",
                         name: "action",
                         orderable: false,
-                        searchable: false,
+                        searchable: false
                     },
                 ],
                 lengthMenu: [10, 25, 50, 100],
             });
 
+
+            // 3. Gestion des boutons Edit/Delete (Délégation pour que ça marche même après AJAX)
             $(document).on('click', '.edit-btn', function(e) {
                 e.preventDefault();
-                $("#requestStockMovement")[0].reset();
                 let url = $(this).attr('data-url');
-                $.ajax({
-                    url: url,
-                    method: 'get',
-                    success: function(response) {
-                        if (response.status == true) {
-                            $("#movementId").val(respose.data.id);
-                            $("#product_id").val(response.data.product_id);
-                            $("#quantity").val(response.data.quantity);
-                            $("#errorsDiv").css("display", "none");
-                            $("#movement-stock-modal").modal('show');
-                        } else {
-                            Swal.fire("Erreur", response.message, 'warning');
-                        }
+                $.get(url, function(response) {
+                    if (response.status) {
+                        $("#movementId").val(response.data.id);
+                        $("#product_id").val(response.data.product_id);
+                        $("#quantity").val(response.data.quantity);
+                        $("#movement-stock-modal").modal('show');
                     }
                 });
             });
 
             $(document).on('click', '.delete-btn', function(e) {
                 e.preventDefault();
-                let id = $(this).attr('data-id');
                 let url = $(this).attr('data-url');
                 Swal.fire({
-                    title: "Are you sure?",
-                    text: "You won't be able to revert this!",
+                    title: "Êtes-vous sûr ?",
                     icon: "warning",
-                    showCancelButton: !0,
+                    showCancelButton: true,
+                    confirmButtonText: "Oui, supprimer !",
                     confirmButtonColor: "#1abc9c",
                     cancelButtonColor: "#f1556c",
-                    confirmButtonText: "Yes, delete it!",
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
                             url: url,
-                            method: 'delete',
+                            method: 'DELETE',
                             success: function(response) {
-                                if (response.status == true) {
-                                    Swal.fire({
-                                        title: "Deleted!",
-                                        text: response.message,
-                                        icon: "success",
-                                        confirmButtonColor: "#1abc9c",
-                                    });
+                                if (response.status) {
+                                    Swal.fire("Supprimé !", response.message,
+                                        "success");
                                     currentDt.ajax.reload();
-                                } else {
-                                    Swal.fire({
-                                        icon: "error",
-                                        title: "Error",
-                                        text: response.message,
-                                        confirmButtonColor: "#3bafda",
-                                    });
-                                }
-                            },
-                            error: function(jqXHR, textStatus, errorThrown) {
-
-                                if (jqXHR.status === 403) {
-                                    Swal.fire({
-                                        icon: "error",
-                                        title: "Oops...",
-                                        text: "Acces Denied!",
-                                        confirmButtonColor: "#3bafda",
-                                        footer: '<strong>Error code :</strong> 403',
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        icon: "error",
-                                        title: "Oops...",
-                                        text: "An error occured",
-                                        confirmButtonColor: "#3bafda",
-                                    });
                                 }
                             }
                         });
                     }
                 });
-
-            });
-
-            // Select Multiple Records
-            $(document).on('click', '#checkAllRows', function() {
-                $('.check-row').prop('checked', $(this).prop('checked'));
-            });
-
-            // Delete Multiple records
-            $(document).on('click', '.delete-all', function() {
-                var checkedCount = $('.check-row:checked').length;
-                var url = $(this).attr('data-url');
-
-                if (checkedCount < 1) {
-                    Swal.fire(
-                        "Ooops...",
-                        "Vous devez selectionner au minimum 2 enregistrements",
-                        "warning"
-                    );
-                } else {
-                    var all_id = [];
-                    $('input:checkbox[name="single-row"]:checked').each(function() {
-                        all_id.push($(this).val());
-                    });
-                    Swal.fire({
-                        title: "Are you sure?",
-                        text: "You won't be able to revert this!",
-                        icon: "warning",
-                        showCancelButton: !0,
-                        confirmButtonColor: "#1abc9c",
-                        cancelButtonColor: "#f1556c",
-                        confirmButtonText: "Yes, delete them!",
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: url,
-                                method: 'delete',
-                                data: {
-                                    all_id: all_id,
-                                },
-                                success: function(response) {
-                                    if (response.status == true) {
-                                        Swal.fire({
-                                            title: "Deleted!",
-                                            text: response.message,
-                                            icon: "success",
-                                            confirmButtonColor: "#1abc9c",
-                                        });
-                                        currentDt.ajax.reload();
-                                    } else if (response.status == false) {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Oops...",
-                                            text: response.message,
-                                            confirmButtonColor: "#3bafda",
-                                        });
-                                    }
-                                },
-                                error: function(jqXHR, textStatus, errorThrown) {
-
-                                    if (jqXHR.status === 403) {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Oops...",
-                                            text: "Acces Denied!",
-                                            confirmButtonColor: "#3bafda",
-                                            footer: '<strong>Error code :</strong> 403',
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Oops...",
-                                            text: "An error occured",
-                                            confirmButtonColor: "#3bafda",
-                                        });
-                                    }
-                                }
-                            });
-                        }
-                    });
-                }
             });
         });
+        $(document).ready(function() {
+            function reloadCart(showLoader = false) {
+                let container = $('#cart-ajax-container');
+                let url = "{{ route('cart.fetch') }}";
+
+                if (showLoader) {
+                    container.html(
+                        '<div class="text-center p-5"><div class="spinner-border text-primary"></div><p class="mt-2">Chargement du panier...</p></div>'
+                    );
+                } else {
+                    container.css('opacity', 0.6);
+                }
+
+                // CORRECTION ICI : .ajax (pas .jax)
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === true) {
+                            container.html(response.html);
+
+                            if ($('.select2').length) {
+                                $('.select2').select2({
+                                    // CORRECTION ICI : pas de ";" à la fin
+                                    dropdownParent: $('#cart-content')
+                                });
+                            }
+                        } else {
+                            container.html('<div class="alert alert-warning">Erreur : ' + (response
+                                .message || 'Données invalides') + '</div>');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText); // Pour voir l'erreur dans la console F12
+                        container.html(
+                            '<div class="alert alert-danger">Erreur : Impossible de charger le panier.</div>'
+                        );
+                    },
+                    complete: function() {
+                        container.css('opacity', '1');
+                    }
+                });
+            }
+
+            // Gestion du clic sur l'onglet
+            $('a[href="#cart-content"]').on('shown.bs.tab', function(e) {
+                reloadCart(true);
+            });
+
+            // Rendre la fonction accessible globalement
+            window.reloadCart = reloadCart;
+        });
+        $(document).on('click','.btn-update-qty',function (e) {
+            e.preventDefault();
+            let ProductId = $(this).data('id');
+            let action = $(this).data('action');
+            let url = (action === 'plus') ? "{{ route('cart.increment') }}" :"{{ route('cart.decrement')  }}";
+            $.ajax({
+                url:url,
+                method:'POST',
+                data:{product_id:ProductId},
+                success:function(response){
+                    if(response.status){
+                        Swal.fire("allure",response.message,"success")
+                            reloadCart()
+                    }
+                    else{
+                        Swal.fire("Attention",response.message,"Warning");
+                    }
+                },
+                error: function() {
+            Swal.fire("Erreur", "Impossible de mettre à jour la quantité", "error");
+        }
+        });
+         $(document).on('click', '.btn-remove-item', function(e) {
+                e.preventDefault();
+                let ProductId = $(this).data('id');
+
+            let url = "{{ route('cart.remove') }}";
+
+                Swal.fire({
+                    title: "Êtes-vous sûr ?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Oui, supprimer !",
+                    confirmButtonColor: "#1abc9c",
+                    cancelButtonColor: "#f1556c",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: url,
+                            method: 'DELETE',
+                            success: function(response) {
+                                if (response.status) {
+                                    Swal.fire("Supprimé !", response.message,
+                                        "success");
+                                    currentDt.ajax.reload();
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
+        })
     </script>
 @endsection

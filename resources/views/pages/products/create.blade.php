@@ -3,6 +3,11 @@
 @section('title', 'Create Product - ' . env('APP_NAME'))
 
 @section('content')
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul> @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach </ul>
+    </div>
+@endif
     <!-- price page title -->
     <div class="row">
         <div class="col-12">
@@ -70,7 +75,7 @@
                                 </div>
                                 <div class="col-lg-4 col-sm-12">
                                     <label for="statusProduct" class="form-label">Status</label>
-                                    <select class="form-select" id="statusProduct" name="status">
+                                    <select class="form-select" id="statusProduct" name="status" v>
                                         <option value="on" selected>Activated</option>
                                         <option value="off">Deactivated</option>
                                     </select>

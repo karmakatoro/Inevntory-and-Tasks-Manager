@@ -125,6 +125,7 @@
             <!-- end row -->
         </div>
     </div>
+    @include('pages.product-stock._model-mouvement-stock')
     <!-- end row -->
     <script>
         $(document).ready(function() {

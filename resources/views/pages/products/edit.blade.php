@@ -4,6 +4,11 @@
 
 @section('content')
     <!-- price page title -->
+    @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul> @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach </ul>
+    </div>
+    @endif
     <div class="row">
         <div class="col-12">
             <div class="page-title-box">
@@ -148,17 +153,27 @@
                                 </div>
 
                                 <div class="col-lg-4 col-sm-12">
-                                    <label for="end">Subcategories</label>
+                                    <label for="subcategories">Subcategories</label>
                                     <div class="col-md-12">
-                                        <select required class="form-control select2-multiple" name="subcategories[]"
-                                            data-toggle="select2" multiple="multiple" data-placeholder="Choose ...">
-                                            @foreach ($categories as $product_category)
-                                                <option value="{{ $product_category->id }}"
-                                                    @if (in_array($product_category->id, json_decode($product->subcategories))) selected @endif>
-                                                    {{ $product_category->name }}
+                                        @php
+                                            // On prépare la liste pour éviter l'erreur "Undefined variable"
+// On gère le cas où c'est déjà un array (si tu as mis le cast)
+                                            // ou une string JSON (si tu ne l'as pas mis)
+                                            $selected_subs = is_array($product->subcategories)
+                                                ? $product->subcategories
+                                                : json_decode($product->subcategories, true) ?? [];
+                                        @endphp
+
+                                        <select class="form-control select2-multiple" name="subcategories[]"
+                                            id="subcategories" data-toggle="select2" multiple="multiple"
+                                            data-placeholder="Choose ...">
+                                            @foreach ($categories as $cat)
+                                                <option value="{{ $cat->id }}" @selected(in_array($cat->id, $selected_subs))>
+                                                    {{ $cat->name }}
                                                 </option>
                                             @endforeach
                                         </select>
+
                                         @if ($errors->has('subcategories'))
                                             <p class="text-pink mt-2">
                                                 {{ $errors->first('subcategories') }}

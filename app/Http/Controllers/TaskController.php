@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use App\Models\Task;
+use App\Models\User;
 use App\Models\Project;
 use App\Models\ProjectTask;
-use App\Models\Task;
-use App\Models\TaskReportFile;
-use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Models\TaskReportFile;
 use Yajra\DataTables\DataTables;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\FunctionsController;
 
 class TaskController extends Controller
 {
@@ -184,8 +186,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        $assigns = ProjectTask::where('task_id', $task->id)
-            ->latest()->get();
+        $assigns = ProjectTask::where('task_id', $task->id)->latest()->get();
         $users = User::all();
         $extension = "";
         if (request()->ajax()) {

@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\ProductCategory;
 use App\Models\User;
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use App\Models\ProductCategory;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('photo', 50);
             $table->string('gallery', '500')->nullable(true);
             $table->decimal('price', 10, 2)->nullable(true);
-            $table->float('quantity', 10, 2)->nullable(true);
+            $table->float('quantity', 10, 2)->default(0);
             $table->enum('cmp', ['0', '1'])->default('1');
             $table->enum('status', ['on', 'off']);
             $table->timestamps();

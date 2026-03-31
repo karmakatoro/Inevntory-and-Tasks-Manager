@@ -16,6 +16,7 @@
                 <form class="needs-validation was-validated" method="POST" action="{{ route('products-stock.store') }}"
                     id="requestStockMovement" novalidate="">
                     <input type="hidden" name="id" id="movementId" value="0">
+
                     <div class="row">
                         <div class="mb-3 col-lg-12 col-sm-12">
                             <label for="accred" class="form-label">Product</label>
@@ -174,4 +175,5 @@
 
         });
     })
+
 </script>

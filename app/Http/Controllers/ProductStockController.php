@@ -2,17 +2,92 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Product;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
-use Carbon\Carbon;
+use App\Http\Controllers\Controller;
 
 class ProductStockController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+public function showProductOnstock()
+{
+    if (request()->ajax()) {
+        // Ajout de with() pour charger les catégories et éviter de ralentir le serveur
+        $products = Product::with('product_category')->latest()->get();
+
+        return DataTables::of($products)
+            ->addIndexColumn()
+            ->addColumn('checkbox', function ($row) {
+                return '<div class="form-check font-16 mb-0">
+                            <input class="form-check-input check-row" name="single-row" value="' . $row->id . '" type="checkbox" id="product' . $row->id . '">
+                            <label class="form-check-label" for="product' . $row->id . '">&nbsp;</label>
+                        </div>';
+            })
+            ->addColumn('product', function ($row) {
+                $url = asset($row->photo);
+                $show_url = route('products.show', ['product' => $row->id]);
+
+                return ' <div class="d-flex">
+                            <img src="' . $url . '" alt="product-img" class="me-3 rounded-circle avatar-sm">
+                            <div class="flex-1">
+                                <h5 class="mt-0 mb-1">
+                                    <a href="' . $show_url . '" class="text-dark">' . $row->name . '</a>
+                                </h5>
+                                <p class="mb-0 font-13">Category : ' . ($row->product_category->name ?? 'N/A') . '</p>
+                            </div>
+                        </div>';
+            })
+            ->addColumn('price', function ($row) {
+                return '$' . number_format($row->price, 2);
+            })
+            ->addColumn('quantity', function ($row) {
+                // Correction logique : Danger si <= 0, Success si > 0
+                $color = $row->quantity <= 0 ? 'text-danger' : 'text-success';
+                return '<span class="' . $color . ' fw-bold">' . $row->quantity . '</span>';
+            })
+            ->addColumn('status', function ($row) {
+                $color = $row->status == 'off' ? 'danger' : 'success';
+                $status_display = $row->status == 'off' ? 'Deactivated' : 'Activated';
+                return '<span class="badge badge-soft-' . $color . '">' . $status_display . '</span>';
+            })
+            ->addColumn('action', function ($row) {
+                $stock_url = route('products.show', $row->id);
+
+                // Décommente et assure-toi que la route existe dans web.php
+                // Si la route n'est pas encore prête, mets '#' pour éviter le crash
+                 $slug = route('products.show',$row->slug);;
+
+                return '
+                <ul class="list-inline mb-0">
+                    <li class="list-inline-item">
+                        <a href="javascript:void(0)"
+                           data-id="' . $row->id . '"
+                           data-name="' . addslashes($row->name) . '"
+                           data-price="' . $row->price . '"
+                           class="action-icon btn btn-link btn-add-stock">
+                           <i class="mdi mdi-archive-arrow-down text-primary"></i>
+                        </a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="' . $slug . '"
+                                data-id="'.$row->id.'"
+                        class="action-icon btn-select">
+                            <i class="mdi mdi-check-circle text-success"></i> Selectionner
+                        </a>
+                    </li>
+                </ul>';
+            })
+            ->rawColumns(['checkbox', 'product', 'quantity', 'price','status', 'action'])
+            ->make(true);
+    }
+
+    return view('pages.product-stock.stock');
+}
     public function index()
     {
         if (request()->ajax()) {
@@ -128,33 +203,44 @@ class ProductStockController extends Controller
     {
         $request->validate([
             'product_id' => 'required|integer|exists:products,id',
-            'quantity' => 'required',
+            'quantity' => 'required|numeric',
             'id' => 'required|integer'
         ]);
 
         $product = Product::find($request->product_id);
-        if ($product) {
-            $action = ProductStock::updateOrCreate(
-                ['id' => $request->id],
-                [
-                    'mouvement' => 'e',
-                    'quantity' => $request->quantity,
-                    'price' => $product->price,
-                    'status' => 'accepted'
-                ]
-            );
-            $product->update(['quantity' => $action->quantity]);
-
+        if(!$product){
             return response()->json([
-                'status' => true,
-                'message' => 'New stock of ' . $product->name . ' added!'
-            ]);
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'product not found'
+                'status'=>false,
+                'message'=>'Product not Found'
             ]);
         }
+       if($request->id >0){
+        $oldMovement = ProductStock::find($request->id);
+         if($oldMovement)
+            {
+                $product->decrement('quantity',$oldMovement->quantity);
+            }
+       }
+       $movement = ProductStock::updateOrCreate(
+        ['id'=>$request->id],
+       [
+        'mouvement'=>'e',
+        'quantity'=>$request->quantity,
+        'price'=>$product->price,
+        'status'=>'accepted',
+
+       ]
+       );
+       if(is_null($product->quantity)){
+         $product->quantity = 0;
+
+       }
+        $product->increment('quantity',$request->quantity);
+
+       return response()->json([
+            'status'=>true,
+            'message' => ($request->id > 0 ? 'Stock updated' : 'New stock added') . ' for ' . $product->name
+       ]);
     }
 
     /**
@@ -163,11 +249,14 @@ class ProductStockController extends Controller
     public function show(ProductStock $productStock)
     {
         //
+
     }
 
     /**
      * Show the form for editing the specified resource.
      */
+
+
     public function edit(ProductStock $products_stock)
     {
         if ($products_stock) {

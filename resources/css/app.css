@@ -1,0 +1,18 @@
+.timer-badge {
+    font-family: 'Courier New', Courier, monospace; /* Style digital */
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+/* Animation de pulsation quand le temps est critique */
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+
+.timer-critical {
+    background-color: #dc3545 !important; /* Rouge Bootstrap */
+    color: white !important;
+    animation: pulse-red 1.5s infinite;
+}
