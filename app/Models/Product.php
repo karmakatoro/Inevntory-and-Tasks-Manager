@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Models;
-
 use App\Models\User;
-use Illuminate\Support\Str;
 use App\Models\ProductStock;
 use App\Models\ProductCategory;
+use Illuminate\Support\Str;
+use App\Models\TemporyReservation;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -72,5 +72,12 @@ class Product extends Model
     public function product_stock()
     {
         return $this->hasMany(ProductStock::class);
+    }
+    public function reservations(){
+        return $this->hasMany(TemporaryReservation::class);
+    }
+    public function  getAvailableStockAttribute(){
+                $reserved = $this->reservations()->active()->sum('quantity');
+                return $this->quantity - $reserved;
     }
 }

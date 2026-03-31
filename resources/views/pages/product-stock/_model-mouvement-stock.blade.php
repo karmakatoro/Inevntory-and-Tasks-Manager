@@ -1,4 +1,10 @@
+
 <div class="modal fade" id="stock-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul> @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach </ul>
+    </div>
+@endif
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">

@@ -3,8 +3,7 @@
         <div class="row mb-2">
             <div class="col-sm-4">
                 <a href="#" class="btn btn-success mb-2" data-bs-toggle="modal"
-                    data-bs-target="#movement-stock-modal"><i class="mdi mdi-history me-1"></i> Make a
-                    movement</a>
+                    data-bs-target="#movement-stock-modal"><i class="mdi mdi-history me-1"></i>Approvisionner le stock central</a>
 
             </div>
             <div class="col-sm-8">

@@ -1,18 +1,18 @@
 <?php
+use App\Http\Controllers\CartController;
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProductCategoryController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ProductCustomerController;
-use App\Http\Controllers\ProductStockController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SettingController;
-use App\Http\Controllers\TaskController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProductStockController;
 use App\Http\Controllers\TaskReportFileController;
-use App\Http\Controllers\UserController;
-use App\Models\Product;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProductCategoryController;
+use App\Http\Controllers\ProductCustomerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +27,14 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::middleware('auth')->group(function () {
+    Route::controller(CartController::class)->group(function(){
+        Route::post('cart','addToCart')->name('cart.add');
+        Route::get('cart-fetch',  'fetchCart')->name('cart.fetch');
+        Route::post('cart-increment','incrementer')->name('cart.increment');
+        Route::post('cart-decrement', 'decrementer')->name('cart.decrement');
+        Route::post('Stock-Assigne','validerLot')->name('stock.assgin');
+        Route::delete('cart-remove', 'remove')->name('cart.remove');
+    });
     Route::get('/', function () {
         return redirect()->route('dashboard.sales');
     });
@@ -77,6 +85,8 @@ Route::middleware('auth')->group(function () {
     });
     Route::controller(ProductStockController::class)->group(function () {
         Route::resource('products-stock', ProductStockController::class);
+        Route::get('show-stock-product','showProductOnstock')->name('show-stock-product');
         Route::delete('dm-ps', 'delete_multiples')->name('dm-ps');
     });
+
 });

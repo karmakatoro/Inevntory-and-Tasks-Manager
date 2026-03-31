@@ -14,7 +14,6 @@ class ProductStock extends Model
 
     protected $guarded = [];
   
-
     public static function boot()
     {
         parent::boot();
