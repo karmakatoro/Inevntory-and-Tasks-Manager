@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use App\Models\User;
-use Illuminate\Support\Str;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Yajra\DataTables\DataTables;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Yajra\DataTables\DataTables;
+
 class UserController extends Controller
 {
     /**
@@ -23,22 +23,22 @@ class UserController extends Controller
                 ->addIndexColumn()
                 ->addColumn('checkbox', function ($row) {
                     return '<div class="form-check font-16 mb-0">
-                                <input class="form-check-input check-row" name="single-row" value="' . $row->id . '" type="checkbox" id="customerlist' . $row->id . '">
+                                <input class="form-check-input check-row" name="single-row" value="'.$row->id.'" type="checkbox" id="customerlist'.$row->id.'">
                                 <label class="form-check-label" for="customerlist01">&nbsp;</label>
                             </div>';
                 })
                 ->addColumn('name', function ($row) {
-                    $url = asset('storage/users/' . $row->photo);
+                    $url = asset('storage/users/'.$row->photo);
                     $render = ' <div class="d-flex">
-                                    <img src="' . $url . '" alt="table-user"
+                                    <img src="'.$url.'" alt="table-user"
                                         class="me-3 rounded-circle avatar-sm">
                                     <div class="flex-1">
                                         <h5 class="mt-0 mb-1">
                                             <a href="javascript:void(0);" class="text-dark">
-                                                ' . $row->name . '
+                                                '.$row->name.'
                                             </a>
                                         </h5>
-                                        <p class="mb-0 font-13">Type : ' . Str::ucfirst($row->type) . '</p>
+                                        <p class="mb-0 font-13">Type : '.Str::ucfirst($row->type).'</p>
                                     </div>
                                 </div>';
 
@@ -52,7 +52,7 @@ class UserController extends Controller
                         $color = 'danger';
                         $status_display = 'Desactivated';
                     }
-                    $render = ' <span class="badge badge-soft-' . $color . '">' . $status_display . '</span>';
+                    $render = ' <span class="badge badge-soft-'.$color.'">'.$status_display.'</span>';
 
                     return $render;
                 })
@@ -64,14 +64,20 @@ class UserController extends Controller
                 ->addColumn('action', function ($row) {
                     $edit_url = route('users.edit', ['user' => $row->id]);
                     $delete_url = route('users.destroy', ['user' => $row->id]);
+                    $url =  route('show-stock-agent', $row->id) ;
                     $actionBtn = '
                     <ul class="list-inline mb-0">
+                            <li class="list-inline-item">
+                            <a href="'.$url.'" class="btn btn-sm btn-outline-primary" title="Inventaire complet de l\'agent">
+                                <i class="mdi mdi-account-card-details-outline"></i>
+                             </a>
+                        </li>
                         <li class="list-inline-item">
-                            <a href="#" data-id="' . $row->id . '" data-url="' . $edit_url . '" class="action-icon edit-btn"> <i
+                            <a href="#" data-id="'.$row->id.'" data-url="'.$edit_url.'" class="action-icon edit-btn"> <i
                                     class="mdi mdi-square-edit-outline"></i></a>
                         </li>
                         <li class="list-inline-item">
-                            <a href="#" data-id="' . $row->id . '" data-url="' . $delete_url . '" class="action-icon delete-btn"> <i
+                            <a href="#" data-id="'.$row->id.'" data-url="'.$delete_url.'" class="action-icon delete-btn"> <i
                                     class="mdi mdi-delete"></i></a>
                         </li>
                     </ul>

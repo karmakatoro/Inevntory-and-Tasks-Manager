@@ -1,7 +1,7 @@
 <?php
-use App\Http\Controllers\CartController;
-
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StockAgenController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
@@ -34,6 +34,13 @@ Route::middleware('auth')->group(function () {
         Route::post('cart-decrement', 'decrementer')->name('cart.decrement');
         Route::post('Stock-Assigne','validerLot')->name('stock.assgin');
         Route::delete('cart-remove', 'remove')->name('cart.remove');
+        Route::post('cart-sale','addToCartSale')->name('cart-add-sale');
+        Route::post('cart-update-quantity','upadteQtySaleCart')->name('cart-upadate');
+        Route::delete('cart-sale-delete','removeItmToCartSale')->name('cart-delete');
+        Route::get('cart-index','fetchCartSale')->name('cart-index');
+    });
+    Route::controller(StockAgenController::class)->group(function(){
+        Route::get('/agent/{agent}/stock','index')->name('show-stock-agent');
     });
     Route::get('/', function () {
         return redirect()->route('dashboard.sales');

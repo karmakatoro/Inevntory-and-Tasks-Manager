@@ -6,10 +6,11 @@ use App\Models\AgentStock;
 use App\Models\Assignment;
 use App\Models\Product;
 use App\Models\TemporaryReservation;
-use App\Models\User; // CORRECTION : Vérifie bien le nom du modèle (Temporary au lieu de Tempory)
+use App\Models\User;
+use App\Models\ProductStock;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // AJOUT : Indispensable pour Session::getId()
-use Illuminate\Support\Facades\Session;      // AJOUT : Indispensable pour DB::raw()
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class CartController extends Controller
 {
@@ -260,6 +261,7 @@ class CartController extends Controller
                     ],
                     [
                         'quantity' => DB::raw('quantity + '.$item['quantity']),
+                        'price'=>$item['price']
                     ]
                 );
 
@@ -270,6 +272,14 @@ class CartController extends Controller
                     'product_id' => $productId,
                     'quantity' => $item['quantity'],
                 ]);
+                // ProductStock::create([
+                //     'mouvement'=>'s',
+
+                //     'quantity'=>$item['quantity'],
+                //     'product_id'=>$productId,
+                //     'status'=>'accepted'
+
+                // ]);
             }
 
             // 5. Nettoyage après la boucle
@@ -293,4 +303,97 @@ class CartController extends Controller
         }
 
     }
+
+    public function addToCartSale(Request $request){
+        $producId = $request->product_id;
+        $quantity = $request->quantity ?? 1;
+        $agentId = auth()->id();
+        $stock = AgentStock::where('user_id',$agentId)
+                                ->where('product_id',$producId)
+                                ->first();
+        if (!stock || stock->quantity < $quantity ) {
+                return response()->json([
+                    'status'=>false,
+                    'message'=>"solde insuffisant! il vous reste uniquement {$stock} unites"
+                ]);
+        }
+        $cart = session()->get('sale_cart',[]);
+        $currentInCart = isset($cart[$productId])? $cart[$productId]['quantity'] :0;
+        if(($currentInCart + $quantity)>$stock->quantity){
+            return response()->json([
+                'status' => false,
+                'message' => "Impossible d'ajouter plus. Limite de votre stock atteinte."
+            ], 422);
+        }
+        if(isset($cart[$productId])){
+            $cart[$productId]['quantity'] += $quantity;
+        }
+        else {
+            $product = Product::findOrFail($productId);
+            $cart[$productId]= [
+                'id'=>$product->id,
+                'name'=>$product->name,
+                'quantity'=>$quantity,
+                'price'=>$product->price,
+                'subtotal'=>$product->price * $quantity
+            ];
+            session()->put('sale_cart',$cart);
+            return response()->json([
+            'status' => true,
+            'message' => "Produit ajouté au panier",
+            'cart_count' => count($cart)
+        ]);
+        }
+    }
+    public function upadteQtySaleCart(Request $request){
+        $cart = session()->get('sale_cart');
+        $id = $request->product_id;
+        $action = $request->action;
+
+        if(isset($cart[$id])){
+            if($action == 'plus'){
+                $stock = AgentStck::where('user_id',auth()->id())->where('product_id',$id)->first();
+                if($cart[$id]['quantity']>=$stock->quantity){
+                    return response()->json([
+                        'status'=>false,
+                        'message'=>'Stock maximum atteint'
+                    ]);
+
+                }
+                $cart[$id]['quantity']++;
+            }
+            else{
+                $cart[$id]['quantity']--;
+            }
+            if($cart[$id]['quantity']<=0){
+                unset($cart[$id]);
+            }
+            else {
+                $cart[$id]['subtotal'] = $cart[$id]['quantity'] * $cart[$id]['price'];
+            }
+            session()->put('sale_cart', $cart);
+            return response()->json(['status' => true]);
+        }
+
+    }
+    public function removeItmToCartSale(Request $request){
+        $cart = session()->get('sale_cart');
+        $id = $request->product_id;
+        if(isset($cart[$id])){
+            unset($cart[$id]);
+            session()->put('sale_cart',$cart);
+            return response()->json(['status' => true, 'message' => 'Article retiré']);
+        }
+    }
+    public function fetchCartSale()
+    {
+        $cart = session()->get('sale_cart', []);
+        $total = array_sum(array_column($cart, 'subtotal'));
+
+        // On retourne une vue partielle (Blade) que le JS va injecter
+        $html = view('pages.stock-agent.cart-content', compact('cart', 'total'))->render();
+
+        return response()->json(['status' => true, 'html' => $html]);
+    }
 }
+

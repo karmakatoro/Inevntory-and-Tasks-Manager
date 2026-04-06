@@ -12,8 +12,16 @@ class ProductStock extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $guarded = [];
-  
+   // C'est cette liste qui autorise l'insertion
+    protected $fillable = [
+        'mouvement',
+        'product_id',
+        'quantity',
+        'status',
+        'user_id',
+        'price'
+    ];
+
     public static function boot()
     {
         parent::boot();

@@ -57,10 +57,7 @@ public function showProductOnstock()
             })
             ->addColumn('action', function ($row) {
                 $stock_url = route('products.show', $row->id);
-
-                // Décommente et assure-toi que la route existe dans web.php
-                // Si la route n'est pas encore prête, mets '#' pour éviter le crash
-                 $slug = route('products.show',$row->slug);;
+                 $slug = route('products.show',$row->slug);
 
                 return '
                 <ul class="list-inline mb-0">

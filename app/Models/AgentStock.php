@@ -13,6 +13,7 @@ class AgentStock extends Model
     protected $fillable = [
         'user_id',
         'product_id',
+        'price',
         'quantity',
 
     ];
@@ -20,7 +21,7 @@ class AgentStock extends Model
         return $this->belongsTo(User::class,'user_id');
 
     }
-    public function producct(){
+    public function product(){
         return $this->belongsTo(Product::class,'product_id');
     }
     public function stocks()

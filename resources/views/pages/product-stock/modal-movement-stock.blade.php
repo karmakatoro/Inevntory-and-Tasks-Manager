@@ -32,7 +32,7 @@
                         </div>
                         <div class="mb-3 col-lg-12 col-sm-12">
                             <label for="quantity" class="form-label">Unit Price</label>
-                            <input type="text" class="form-control" id="unitPrice" required="" disabled>
+                            <input type="text" class="form-control" id="unitPrice"  disabled>
                         </div>
                         <div class="mb-3 col-lg-12 col-sm-12">
                             <label for="quantity" class="form-label">Quantity</label>

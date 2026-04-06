@@ -64,8 +64,8 @@
                         <!-- item-->
                         <a href="javascript:void(0);" class="dropdown-item notify-item">
                             <div class="notify-icon">
-                                <img src="{{ asset('assets/images/users/avatar-4.jpg') }}"
-                                    class="img-fluid rounded-circle" alt="" />
+                                <img src="{{ asset('assets/images/users/avatar-2.jpg') }}" alt="user-image" class="rounded-circle">
+                                    alt="user-img" class="avatar-md rounded-circle">
                             </div>
                             <p class="notify-details">Karen Robinson</p>
                             <p class="text-muted mb-0 user-msg">
