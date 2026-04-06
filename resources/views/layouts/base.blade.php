@@ -11,99 +11,59 @@
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
 
-    <!-- plugin css -->
+    <!-- 1. TOUS LES CSS -->
     <link href="{{ asset('assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css') }}"
         rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/libs/mohithg-switchery/switchery.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/libs/multiselect/css/multi-select.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/libs/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/libs/selectize/css/selectize.bootstrap3.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css') }}" rel="stylesheet"
-        type="text/css" />
-
-    <!-- App css -->
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css') }}" rel="stylesheet"
         type="text/css" />
     <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" id="app-stylesheet" />
-
-    <!-- icons -->
     <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
-
-    <!-- Sweet Alert-->
     <link href="{{ asset('assets/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
 
-    <link href="{{ asset('assets/libs/quill/quill.core.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/libs/quill/quill.bubble.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/libs/quill/quill.snow.css') }}" rel="stylesheet" type="text/css" />
-
-    <!-- Plugins css -->
-    <link href="{{ asset('assets/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
-
-
-    <!-- Theme Config Js -->
+    <!-- 2. LES SCRIPTS INDISPENSABLES (Dans l'ordre critique) -->
+    <!-- Config en premier -->
     <script src="{{ asset('assets/js/config.js') }}"></script>
-    <script src="{{ asset('assets/js/jquery-3.6.3.min.js') }}"></script>
+
+    <!-- jQuery (via vendor) en DEUXIÈME : Sans lui, rien ne marche -->
+    <script src="{{ asset('assets/js/vendor.min.js') }}"></script>
+
+    <!-- Les Plugins ensuite -->
+    <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/parsleyjs/parsley.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/select2/js/select2.min.js') }}"></script>
+
+
 </head>
 
 <body>
 
-    <!-- Begin page -->
     <div id="wrapper">
-
-
         @include('includes.header')
-
         @include('includes.sidebar')
-
-        <!-- ============================================================== -->
-        <!-- Start Page Content here -->
-        <!-- ============================================================== -->
 
         <div class="content-page">
             <div class="content">
-
-                <!-- Start Content-->
                 <div class="container-fluid">
                     @yield('content')
                 </div>
-
-            </div> <!-- content -->
-
-
-
+            </div>
         </div>
-
-        <!-- ============================================================== -->
-        <!-- End Page content -->
-        <!-- ============================================================== -->
-
-
     </div>
-    <!-- END wrapper -->
 
     @include('includes.right-sidebar')
-
-    <!-- Right bar overlay-->
     <div class="rightbar-overlay"></div>
 
-    <!-- Vendor js -->
-    <script src="{{ asset('assets/js/vendor.min.js') }}"></script>
-
-    <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
-    <!-- third party js ends -->
-
-
-    <!-- Validation init js-->
-    <script src="{{ asset('assets/js/pages/form-validation.init.js') }}"></script>
-    <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/select2/js/select2.min.js') }}"></script>
-    <script src="{{ asset('') }}assets/js/pages/form-advanced.init.js"></script>
-
-
-    <!-- App js -->
+    <!-- Initialisations du thème (peuvent rester ici) -->
     <script src="{{ asset('assets/js/app.min.js') }}"></script>
+
+    <script src="{{ asset('assets/js/pages/form-validation.init.js') }}"></script>
+
+    @yield('scripts')
 
 </body>
 
