@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\AgentStock;
 use App\Models\Assignment;
+use App\Http\Controllers\StockAgentController;
 use App\Models\Product;
 use App\Models\TemporaryReservation;
 use App\Models\User;
 use App\Models\ProductStock;
+use App\Models\ProductCustomer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -305,16 +307,17 @@ class CartController extends Controller
     }
 
     public function addToCartSale(Request $request){
-        $producId = $request->product_id;
+        $productId = $request->product_id;
         $quantity = $request->quantity ?? 1;
-        $agentId = auth()->id();
+        $agentId = auth()->check() ? auth()->id() : $request->agent_id;
+    
         $stock = AgentStock::where('user_id',$agentId)
-                                ->where('product_id',$producId)
+                                ->where('product_id',$productId)
                                 ->first();
-        if (!stock || stock->quantity < $quantity ) {
+        if (!$stock || $stock->quantity < $quantity ) {
                 return response()->json([
                     'status'=>false,
-                    'message'=>"solde insuffisant! il vous reste uniquement {$stock} unites"
+                    'message'=>"solde insuffisant! il vous reste{$productId} {$agentId}uniquement {$stock} unites"
                 ]);
         }
         $cart = session()->get('sale_cart',[]);
@@ -348,11 +351,12 @@ class CartController extends Controller
     public function upadteQtySaleCart(Request $request){
         $cart = session()->get('sale_cart');
         $id = $request->product_id;
+        $agentId = auth()->check()?auth()->id(): $request->id;
         $action = $request->action;
 
         if(isset($cart[$id])){
             if($action == 'plus'){
-                $stock = AgentStck::where('user_id',auth()->id())->where('product_id',$id)->first();
+                $stock = AgentStock::where('user_id', $agentId)->where('product_id',$id)->first();
                 if($cart[$id]['quantity']>=$stock->quantity){
                     return response()->json([
                         'status'=>false,
@@ -387,13 +391,15 @@ class CartController extends Controller
     }
     public function fetchCartSale()
     {
+        $clients = ProductCustomer::latest()->get();
         $cart = session()->get('sale_cart', []);
         $total = array_sum(array_column($cart, 'subtotal'));
 
         // On retourne une vue partielle (Blade) que le JS va injecter
-        $html = view('pages.stock-agent.cart-content', compact('cart', 'total'))->render();
+        $html = view('pages.stock-agent.cart-content', compact('cart', 'total','clients'))->render();
 
         return response()->json(['status' => true, 'html' => $html]);
     }
+
 }
 

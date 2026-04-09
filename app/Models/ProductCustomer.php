@@ -10,4 +10,7 @@ class ProductCustomer extends Model
 {
     use HasFactory, SoftDeletes;
     protected $guarded = [];
+    public function sale():hasMany {
+        return $this->hasMany(Sale::class,'customer_id');
+    }
 }

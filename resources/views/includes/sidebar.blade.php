@@ -100,9 +100,17 @@
                             <li>
                                 <a href="ecommerce-orders-detail.html">Deliveries</a>
                             </li>
-                            <li>
+                            @if (Auth::user()->type==='admin')
+                                 <li>
                                 <a href="{{ route('products-stock.index') }}">Stock</a>
                             </li>
+                            @endif
+
+                            @if (Auth::user()->type === 'user')
+                                <li>
+                                <a href="{{ route('show-stock-agent',['agent'=>Auth::user()->id]) }}">Stock-Agent</a>
+                               </li>
+                            @endif
                             <li>
                                 <a href="{{ route('customers.index') }}">Customers</a>
                             </li>

@@ -67,4 +67,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(ProductStock::class);
     }
+
+    public function Payement(): BelongsTo
+    {
+        return $this->hasMany(User::class, 'recorded_by');
+    }
+    public function user(): hasMany
+    {
+        return $this->hasMany(User::class, 'user_id');
+    }
+
 }

@@ -1,18 +1,20 @@
 <?php
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\StockAgenController;
-use App\Http\Controllers\CartController;
+
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\TaskController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\SettingController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProductStockController;
-use App\Http\Controllers\TaskReportFileController;
 use App\Http\Controllers\ProductCategoryController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductCustomerController;
+use App\Http\Controllers\ProductStockController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\StockAgenController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskReportFileController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,22 +27,25 @@ use App\Http\Controllers\ProductCustomerController;
 |
 */
 
-
 Route::middleware('auth')->group(function () {
-    Route::controller(CartController::class)->group(function(){
-        Route::post('cart','addToCart')->name('cart.add');
-        Route::get('cart-fetch',  'fetchCart')->name('cart.fetch');
-        Route::post('cart-increment','incrementer')->name('cart.increment');
-        Route::post('cart-decrement', 'decrementer')->name('cart.decrement');
-        Route::post('Stock-Assigne','validerLot')->name('stock.assgin');
-        Route::delete('cart-remove', 'remove')->name('cart.remove');
-        Route::post('cart-sale','addToCartSale')->name('cart-add-sale');
-        Route::post('cart-update-quantity','upadteQtySaleCart')->name('cart-upadate');
-        Route::delete('cart-sale-delete','removeItmToCartSale')->name('cart-delete');
-        Route::get('cart-index','fetchCartSale')->name('cart-index');
+    Route::controller(StockAgenController::class)->group(function () {
+        Route::get('/agent/{agent}/stock', 'index')->name('show-stock-agent');
     });
-    Route::controller(StockAgenController::class)->group(function(){
-        Route::get('/agent/{agent}/stock','index')->name('show-stock-agent');
+    Route::controller(CartController::class)->group(function () {
+        Route::post('cart', 'addToCart')->name('cart.add');
+        Route::get('cart-fetch', 'fetchCart')->name('cart.fetch');
+        Route::post('cart-increment', 'incrementer')->name('cart.increment');
+        Route::post('cart-decrement', 'decrementer')->name('cart.decrement');
+        Route::post('Stock-Assigne', 'validerLot')->name('stock.assgin');
+        Route::delete('cart-remove', 'remove')->name('cart.remove');
+        Route::post('cart-sale', 'addToCartSale')->name('cart-add-sale');
+        Route::post('cart-update-quantity', 'upadteQtySaleCart')->name('cart-update');
+        Route::delete('cart-sale-delete', 'removeItmToCartSale')->name('cart-delete');
+        Route::get('cart-index', 'fetchCartSale')->name('cart-index');
+    });
+
+    Route::controller(SaleController::class)->group(function () {
+        Route::post('sale-create', 'store')->name('sales.store');
     });
     Route::get('/', function () {
         return redirect()->route('dashboard.sales');
@@ -92,7 +97,7 @@ Route::middleware('auth')->group(function () {
     });
     Route::controller(ProductStockController::class)->group(function () {
         Route::resource('products-stock', ProductStockController::class);
-        Route::get('show-stock-product','showProductOnstock')->name('show-stock-product');
+        Route::get('show-stock-product', 'showProductOnstock')->name('show-stock-product');
         Route::delete('dm-ps', 'delete_multiples')->name('dm-ps');
     });
 
