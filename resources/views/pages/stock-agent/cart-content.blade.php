@@ -124,6 +124,42 @@
             $('#display_balance').removeClass('text-success').addClass('text-danger');
         }
     });
+    // On utilise 'var' ou une vérification sur 'window' pour éviter le conflit au rechargement AJAX
+    if (typeof window.globalLocation === 'undefined') {
+        window.globalLocation = {
+            lat: null,
+            lng: null
+        };
+    }
+
+    // Fonction de capture (on ne la déclare qu'une fois aussi)
+    if (typeof window.startGeolocCapture === 'undefined') {
+        window.startGeolocCapture = function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        window.globalLocation.lat = position.coords.latitude;
+                        window.globalLocation.lng = position.coords.longitude;
+                        console.log("📍 Position pré-capturée :", window.globalLocation);
+                    },
+                    function(error) {
+                        console.warn("GPS non disponible :", error.message);
+                    }, {
+                        enableHighAccuracy: true,
+                        timeout: 10000
+                    }
+                );
+            }
+        };
+    }
+
+    // Lancer la capture
+    $(document).ready(function() {
+        window.startGeolocCapture();
+    });
+
+
+    // 3. Ton bouton de validation devient instantané
     $('#btn-validate-sale').on('click', function(e) {
         e.preventDefault();
         let btn = $(this);
@@ -132,47 +168,17 @@
         let paymentMethod = $('#payment_method').val();
         let testAgentId = $('meta[name="current-agent-id"]').attr('content');
 
-        // 1. Validations de base
         if (!clientId) {
             alert("Veuillez sélectionner un client.");
             return;
         }
-        if (amountPaid === "" || amountPaid < 0) {
-            alert("Veuillez entrer un montant versé valide.");
-            return;
-        }
 
-        // 2. Désactivation du bouton pendant la recherche GPS
-        btn.prop('disabled', true).html('<i class="mdi mdi-spin mdi-loading"></i> Localisation en cours...');
+        // Désactivation immédiate pour éviter les doubles clics
+        btn.prop('disabled', true).html('<i class="mdi mdi-spin mdi-loading"></i> Traitement...');
 
-        // 3. FONCTION DE GEOLOCALISATION
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    // Succès : On récupère les coordonnées
-                    let lat = position.coords.latitude;
-                    let lng = position.coords.longitude;
-
-                    console.log("Position capturée : ", lat, lng);
-
-                    // 4. Envoi de l'AJAX avec les coordonnées
-                    envoiAjaxVente(clientId, amountPaid, paymentMethod, testAgentId, lat, lng, btn);
-                },
-                function(error) {
-                    // Erreur : L'agent a refusé le GPS ou problème technique
-                    alert("Erreur GPS : Merci d'activer la localisation pour valider la vente.");
-                    btn.prop('disabled', false).html(
-                        '<i class="mdi mdi-cash-check me-1"></i> Finaliser et Encaisser');
-                }, {
-                    enableHighAccuracy: true,
-                    timeout: 5000
-                } // Option pour plus de précision
-            );
-        } else {
-            alert("Votre navigateur ne supporte pas la géolocalisation.");
-            // Au pire, on envoie sans GPS si le navigateur est trop vieux
-            envoiAjaxVente(clientId, amountPaid, paymentMethod, testAgentId, null, null, btn);
-        }
+        // On utilise la position déjà capturée (si null, tant pis, on ne bloque pas la vente)
+        envoiAjaxVente(clientId, amountPaid, paymentMethod, testAgentId, globalLocation.lat, globalLocation.lng,
+            btn);
     });
 
     // Petite fonction helper pour l'envoi AJAX

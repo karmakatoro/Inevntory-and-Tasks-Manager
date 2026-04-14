@@ -19,7 +19,7 @@
                 <img src="{{ asset('assets/images/logo-sm.png') }}" alt="" height="24">
             </span>
             <span class="logo-lg">
-                <img src="{{ asset('assets/images/logo-light.pn') }}g" alt="" height="20">
+                <img src="{{ asset('assets/images/logo-light.png') }}g" alt="" height="20">
             </span>
         </a>
     </div>
@@ -114,8 +114,9 @@
                             <li>
                                 <a href="{{ route('customers.index') }}">Customers</a>
                             </li>
+                            
                             <li>
-                                <a href="ecommerce-orders-detail.html">Sellers</a>
+                                <a href="{{ route('sales.index',['agent'=>Auth::user()->id]) }}">Sellers</a>
                             </li>
                         </ul>
                     </div>

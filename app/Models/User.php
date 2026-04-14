@@ -5,6 +5,8 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\User;
 use App\Models\Product;
+use App\Models\DailyClosing;
+use App\Models\Sale;
 use App\Models\Project;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -75,6 +77,12 @@ class User extends Authenticatable
     public function user(): hasMany
     {
         return $this->hasMany(User::class, 'user_id');
+    }
+    public function sale():hasMany{
+        return $this->hasMany(Sale::class,'agent_id');
+    }
+    public function daiyClosing():hasMany{
+        return $this->hasMany(DailyClosing::class,'agent_id');
     }
 
 }

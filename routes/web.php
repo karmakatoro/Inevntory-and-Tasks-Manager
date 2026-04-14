@@ -15,6 +15,8 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskReportFileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
+use App\Notifications\StockAssignementNofication;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::controller(StockAgenController::class)->group(function () {
         Route::get('/agent/{agent}/stock', 'index')->name('show-stock-agent');
     });
+
     Route::controller(CartController::class)->group(function () {
         Route::post('cart', 'addToCart')->name('cart.add');
         Route::get('cart-fetch', 'fetchCart')->name('cart.fetch');
@@ -46,6 +49,7 @@ Route::middleware('auth')->group(function () {
 
     Route::controller(SaleController::class)->group(function () {
         Route::post('sale-create', 'store')->name('sales.store');
+        Route::get('/sales/{agent}/index','index')->name('sales.index');
     });
     Route::get('/', function () {
         return redirect()->route('dashboard.sales');
@@ -102,3 +106,4 @@ Route::middleware('auth')->group(function () {
     });
 
 });
+

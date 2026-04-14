@@ -128,6 +128,9 @@
     @include('pages.product-stock._model-mouvement-stock')
     <!-- end row -->
     <script>
+        
+        // ;,{J.gEWhWk9uQm.
+        //     “c2643121c_root_stock
         $(document).ready(function() {
             $.ajaxSetup({
                 headers: {

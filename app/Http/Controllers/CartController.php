@@ -13,6 +13,7 @@ use App\Models\ProductCustomer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use App\Jobs\ProcessStockAssignment;
 
 class CartController extends Controller
 {
@@ -224,93 +225,121 @@ class CartController extends Controller
         ]);
     }
 
-    public function validerLot(Request $request)
-    {
-        $agentId = $request->agent_id;
-        $cart = session()->get('assign_cart', []);
-        if (! $agentId) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Veuillez sélectionner un agent.',
-            ], 422);
-        }
-        if (empty($cart)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Le panier est vide.',
-            ], 422);
-        }
-        try {
-            DB::beginTransaction();
+    // public function validerLot(Request $request)
+    // {
+    //     $agentId = $request->agent_id;
+    //     $cart = session()->get('assign_cart', []);
+    //     if (! $agentId) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Veuillez sélectionner un agent.',
+    //         ], 422);
+    //     }
+    //     if (empty($cart)) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Le panier est vide.',
+    //         ], 422);
+    //     }
+    //     try {
+    //         DB::beginTransaction();
 
-            foreach ($cart as $productId => $item) {
-                // 1. Verrouillage et récupération du produit central
-                $product = Product::lockForUpdate()->find($productId);
+    //         foreach ($cart as $productId => $item) {
+    //             // 1. Verrouillage et récupération du produit central
+    //             $product = Product::lockForUpdate()->find($productId);
 
-                if (! $product || $product->quantity < $item['quantity']) {
-                    throw new \Exception('Stock insuffisant pour le produit : '.($product->name ?? $productId));
-                }
+    //             if (! $product || $product->quantity < $item['quantity']) {
+    //                 throw new \Exception('Stock insuffisant pour le produit : '.($product->name ?? $productId));
+    //             }
 
-                // 2. Décrémentation du stock central
-                $product->decrement('quantity', $item['quantity']);
+    //             // 2. Décrémentation du stock central
+    //             $product->decrement('quantity', $item['quantity']);
 
-                // 3. Mise à jour du stock de l'agent (ACCUMULATION)
-                // On utilise DB::raw pour dire à SQL de faire : ancien_stock + nouveau_stock
-                AgentStock::updateOrCreate(
-                    [
-                        'user_id' => $agentId,
-                        'product_id' => $productId,
-                    ],
-                    [
-                        'quantity' => DB::raw('quantity + '.$item['quantity']),
-                        'price'=>$item['price']
-                    ]
-                );
+    //             // 3. Mise à jour du stock de l'agent (ACCUMULATION)
+    //             // On utilise DB::raw pour dire à SQL de faire : ancien_stock + nouveau_stock
+    //             AgentStock::updateOrCreate(
+    //                 [
+    //                     'user_id' => $agentId,
+    //                     'product_id' => $productId,
+    //                 ],
+    //                 [
+    //                     'quantity' => DB::raw('quantity + '.$item['quantity']),
+    //                     'price'=>$item['price']
+    //                 ]
+    //             );
 
-                // 4. Création de la trace dans l'historique
-                Assignment::create([
-                    'sender_id' => auth()->id(),
-                    'receiver_id' => $agentId,
-                    'product_id' => $productId,
-                    'quantity' => $item['quantity'],
-                ]);
-                // ProductStock::create([
-                //     'mouvement'=>'s',
+    //             // 4. Création de la trace dans l'historique
+    //             Assignment::create([
+    //                 'sender_id' => auth()->id(),
+    //                 'receiver_id' => $agentId,
+    //                 'product_id' => $productId,
+    //                 'quantity' => $item['quantity'],
+    //             ]);
+    //             // ProductStock::create([
+    //             //     'mouvement'=>'s',
 
-                //     'quantity'=>$item['quantity'],
-                //     'product_id'=>$productId,
-                //     'status'=>'accepted'
+    //             //     'quantity'=>$item['quantity'],
+    //             //     'product_id'=>$productId,
+    //             //     'status'=>'accepted'
 
-                // ]);
-            }
+    //             // ]);
+    //         }
 
-            // 5. Nettoyage après la boucle
-            TemporaryReservation::where('session_id', session()->getId())->delete();
-            session()->forget('assign_cart');
+    //         // 5. Nettoyage après la boucle
+    //         TemporaryReservation::where('session_id', session()->getId())->delete();
+    //         session()->forget('assign_cart');
 
-            DB::commit();
+    //         DB::commit();
 
-            return response()->json([
-                'status' => true,
-                'message' => "Attribution réussie ! Le stock de l'agent a été mis à jour.",
-            ]);
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => "Attribution réussie ! Le stock de l'agent a été mis à jour.",
+    //         ]);
 
-        } catch (\Exception $e) {
-            DB::rollBack();
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
 
-            return response()->json([
-                'status' => false,
-                'message' => 'Erreur : '.$e->getMessage(),
-            ], 500);
-        }
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Erreur : '.$e->getMessage(),
+    //         ], 500);
+    //     }
 
+    // }
+   public function validerLot(Request $request)
+{
+    // 1. Récupération des données
+    $cart = session()->get('assign_cart');
+    $agentId = $request->agent_id;
+
+    // 2. Validation (Correction de la syntaxe session)
+    if(!$agentId || empty($cart)){
+        return response()->json([
+            'status' => false,
+            'message' => 'Données invalides : agent manquant ou panier vide.'
+        ], 422);
     }
+
+    $adminId = auth()->id();
+    $sessionId = session()->getId();
+
+    // 3. Lancement du Job (Correction de l'orthographe dispatch)
+    ProcessStockAssignment::dispatch($agentId, $adminId, $cart, $sessionId);
+
+    // 4. Nettoyage immédiat pour l'interface utilisateur
+    session()->forget('assign_cart');
+
+    return response()->json([
+        'status' => true,
+        'message' => "L'attribution est lancée en arrière-plan. Vous allez recevoir une notification une fois terminé."
+    ]);
+}
 
     public function addToCartSale(Request $request){
         $productId = $request->product_id;
         $quantity = $request->quantity ?? 1;
         $agentId = auth()->check() ? auth()->id() : $request->agent_id;
-    
+
         $stock = AgentStock::where('user_id',$agentId)
                                 ->where('product_id',$productId)
                                 ->first();

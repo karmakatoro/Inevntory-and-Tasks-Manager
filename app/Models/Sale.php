@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Payement;
 use App\Models\ProductCustomer;
 use App\Models\User;
@@ -54,12 +55,12 @@ class Sale extends Model
         return $this->hasMany(Payement::class,'sale_id');
     }
 
-    public function client(): BelongsTo
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(ProductCustomer::class,'customer_id');
     }
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'agent_id');
     }
 }

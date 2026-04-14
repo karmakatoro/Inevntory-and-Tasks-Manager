@@ -10,8 +10,10 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row mb-2">
-
-                            <div class="col-sm-12">
+                            <div class="col-sm-4">
+                                    <a href="#" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#close-Day"> Cloturer une journee</a>
+                            </div>
+                            <div class="col-sm-8">
                                 <div class="text-sm-end">
                                     <button data-url="{{ route('dm-prcat') }}" type="button"
                                         class="btn btn-danger mb-2 me-1 delete-all">
@@ -49,7 +51,7 @@
                 <!-- end row -->
             </div>
         </div>
-
+        @include('pages.stock-agent.create')
         <!-- end row -->
         <script>
          
