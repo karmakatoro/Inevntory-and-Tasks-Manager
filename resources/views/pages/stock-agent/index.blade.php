@@ -4,21 +4,30 @@
 
 @section('content')
     <!-- start page title -->
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box">
-                <h4 class="page-title">Products Stock</h4>
-                <div class="page-title-right">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('dashboard.sales') }}">Dashboard</a>
-                        </li>
-                        <li class="breadcrumb-item active">Products Stock</li>
-                    </ol>
-                </div>
+ <div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+
+            <div class="page-title-main">
+                <h4 class="page-title mb-0">
+                    Products Stock
+                    <span class="text-muted fw-light mx-2">|</span>
+                    <span class="text-primary">{{ $agent->name }}</span>
+                </h4>
             </div>
+
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item">
+                        <a href="{{ route('dashboard.sales') }}">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item active">Products Stock</li>
+                </ol>
+            </div>
+
         </div>
     </div>
+</div>
     <div class="col-lg-12 col-xl-12">
         <div class="card">
             <div class="card-body">
@@ -35,7 +44,7 @@
                             <i class="mdi mdi-cart-minus me-1"></i> Panier de vente
                         </a>
                     </li>
-                     <li class="nav-item" role="presentation">
+                    <li class="nav-item" role="presentation">
                         <a href="#stock-history" data-bs-toggle="tab" aria-expanded="false" class="nav-link ms-0 "
                             aria-selected="true" role="tab">
                             <i class="mdi mdi-cart-minus me-1"></i> Historique de mouvement de Stock Central
@@ -78,7 +87,7 @@
             // --- 2. FONCTION RELOAD CART ---
             function reloadCart(showLoader = false) {
                 let container = $('#cart-ajax-container');
-                let url = "{{ route('cart.fetch') }}";
+                let url = "{{ route('cart-index') }}";
 
                 if (showLoader) {
                     container.html(
@@ -101,11 +110,14 @@
                                 });
                             }
                         } else {
-                            container.html('<div class="alert alert-warning">Erreur : ' + (response.message || 'Données invalides') + '</div>');
+                            container.html('<div class="alert alert-warning">Erreur : ' + (response
+                                .message || 'Données invalides') + '</div>');
                         }
                     },
                     error: function(xhr) {
-                        container.html('<div class="alert alert-danger">Erreur : Impossible de charger le panier.</div>');
+                        container.html(
+                            '<div class="alert alert-danger">Erreur : Impossible de charger le panier.</div>'
+                            );
                     },
                     complete: function() {
                         container.css('opacity', '1');
@@ -115,7 +127,7 @@
 
             // Rendre accessible pour les autres scripts
             window.reloadCart = reloadCart;
-        // Alias pour éviter les erreurs "undefined"
+            // Alias pour éviter les erreurs "undefined"
 
             // --- 3. INITIALISATION DATATABLE ---
             var currentDt = $("#stock-history-dt").DataTable({
@@ -123,17 +135,49 @@
                 order: [0, "ASC"],
                 processing: true,
                 serverSide: true,
-                ajax: { url: $("#stock-history-dt").attr("data-api-url") },
-                columns: [
-                    { data: "checkbox", name: "checkbox", orderable: false, searchable: false },
-                    { data: "product", name: "product" },
-                    { data: "operation", name: "operation" },
-                    { data: "date", name: "date" },
-                    { data: "price", name: "price" },
-                    { data: "quantity", name: "quantity" },
-                    { data: "author", name: "author" },
-                    { data: "status", name: "status" },
-                    { data: "action", name: "action", orderable: false, searchable: false },
+                ajax: {
+                    url: $("#stock-history-dt").attr("data-api-url")
+                },
+                columns: [{
+                        data: "checkbox",
+                        name: "checkbox",
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: "product",
+                        name: "product"
+                    },
+                    {
+                        data: "operation",
+                        name: "operation"
+                    },
+                    {
+                        data: "date",
+                        name: "date"
+                    },
+                    {
+                        data: "price",
+                        name: "price"
+                    },
+                    {
+                        data: "quantity",
+                        name: "quantity"
+                    },
+                    {
+                        data: "author",
+                        name: "author"
+                    },
+                    {
+                        data: "status",
+                        name: "status"
+                    },
+                    {
+                        data: "action",
+                        name: "action",
+                        orderable: false,
+                        searchable: false
+                    },
                 ],
             });
 
@@ -145,24 +189,37 @@
             // --- 5. ACTIONS DU PANIER (Update Qty) ---
             $(document).on('click', '.btn-update-qty', function(e) {
                 e.preventDefault();
-                let ProductId = $(this).data('id');
-                let action = $(this).data('action');
-                let url = (action === 'plus') ? "{{ route('cart.increment') }}" : "{{ route('cart.decrement') }}";
+                let testAgentId = $('meta[name="current-agent-id"]').attr('content');
+                console.log("Test - Agent ID récupéré :", testAgentId);
+                let productId = $(this).data('id');
+                let action = $(this).data('action'); // 'plus' ou 'minus'
+                let btn = $(this);
+
+                // Désactiver le bouton temporairement pour éviter les doubles clics
+                btn.prop('disabled', true);
 
                 $.ajax({
-                    url: url,
+                    url: "{{ route('cart-update') }}", // Assure-toi que c'est le bon nom de route
                     method: 'POST',
-                    data: { product_id: ProductId },
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        product_id: productId,
+                        action: action,
+
+                    },
                     success: function(response) {
                         if (response.status) {
-                            // Pas besoin de Swal pour chaque clic de quantité (optionnel)
+                            // Si tout est ok, on rafraîchit l'affichage du panier
                             reloadCart();
                         } else {
-                            Swal.fire("Attention", response.message, "warning");
+                            // Si le stock est dépassé (message 'Stock maximum atteint')
+                            alert(response.message);
                         }
+                        btn.prop('disabled', false);
                     },
-                    error: function() {
-                        Swal.fire("Erreur", "Impossible de mettre à jour la quantité", "error");
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        btn.prop('disabled', false);
                     }
                 });
             }); // <-- Fermeture correcte ici
@@ -171,7 +228,7 @@
             $(document).on('click', '.btn-remove-item', function(e) {
                 e.preventDefault();
                 let ProductId = $(this).data('id');
-                let url = "{{ route('cart.remove') }}";
+                let url = "{{ route('cart-delete') }}";
 
                 Swal.fire({
                     title: "Êtes-vous sûr ?",
@@ -185,10 +242,13 @@
                         $.ajax({
                             url: url,
                             method: 'DELETE',
-                            data: { product_id: ProductId },
+                            data: {
+                                product_id: ProductId
+                            },
                             success: function(response) {
                                 if (response.status) {
-                                    Swal.fire("Supprimé !", response.message, "success");
+                                    Swal.fire("Supprimé !", response.message,
+                                    "success");
                                     reloadCart();
                                 }
                             }
@@ -213,7 +273,8 @@
                             method: 'DELETE',
                             success: function(response) {
                                 if (response.status) {
-                                    Swal.fire("Supprimé !", response.message, "success");
+                                    Swal.fire("Supprimé !", response.message,
+                                    "success");
                                     currentDt.ajax.reload();
                                 }
                             }
@@ -222,6 +283,7 @@
                 });
             });
 
-        }); // FIN DU DOCUMENT READY
+        });
+
     </script>
 @endsection

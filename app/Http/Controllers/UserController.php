@@ -64,24 +64,35 @@ class UserController extends Controller
                 ->addColumn('action', function ($row) {
                     $edit_url = route('users.edit', ['user' => $row->id]);
                     $delete_url = route('users.destroy', ['user' => $row->id]);
-                    $url =  route('show-stock-agent', $row->id) ;
+                    $url = route('show-stock-agent', $row->id);
+                    // 1. On initialise le bouton d'inventaire à vide
+                    $inventoryBtn = '';
+
+                    // 2. CONDITION : On n'affiche le bouton QUE si la ligne actuelle ($row)
+                    // est un simple utilisateur (type 'user')
+                    if ($row->type === 'user') {
+                        $inventoryBtn = '
+        <li class="list-inline-item">
+            <a href="'.$url.'" class="btn btn-sm btn-outline-primary" title="Voir l\'inventaire de cet agent">
+                <i class="mdi mdi-account-card-details-outline"></i>
+            </a>
+        </li>';
+                    }
+                    // 2. On assemble le tout
                     $actionBtn = '
-                    <ul class="list-inline mb-0">
-                            <li class="list-inline-item">
-                            <a href="'.$url.'" class="btn btn-sm btn-outline-primary" title="Inventaire complet de l\'agent">
-                                <i class="mdi mdi-account-card-details-outline"></i>
-                             </a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="#" data-id="'.$row->id.'" data-url="'.$edit_url.'" class="action-icon edit-btn"> <i
-                                    class="mdi mdi-square-edit-outline"></i></a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="#" data-id="'.$row->id.'" data-url="'.$delete_url.'" class="action-icon delete-btn"> <i
-                                    class="mdi mdi-delete"></i></a>
-                        </li>
-                    </ul>
-                    ';
+    <ul class="list-inline mb-0">
+        '.$inventoryBtn.'
+        <li class="list-inline-item">
+            <a href="#" data-id="'.$row->id.'" data-url="'.$edit_url.'" class="action-icon edit-btn"> 
+                <i class="mdi mdi-square-edit-outline"></i>
+            </a>
+        </li>
+        <li class="list-inline-item">
+            <a href="#" data-id="'.$row->id.'" data-url="'.$delete_url.'" class="action-icon delete-btn"> 
+                <i class="mdi mdi-delete"></i>
+            </a>
+        </li>
+    </ul>';
 
                     return $actionBtn;
                 })

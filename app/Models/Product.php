@@ -80,4 +80,7 @@ class Product extends Model
                 $reserved = $this->reservations()->active()->sum('quantity');
                 return $this->quantity - $reserved;
     }
+    public function item(){
+        return $this->hasMany(SaleItem::class,'product_id');
+    }
 }

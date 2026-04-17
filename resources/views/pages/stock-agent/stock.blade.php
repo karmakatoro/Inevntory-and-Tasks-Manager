@@ -11,10 +11,7 @@
                     <div class="card-body">
                         <div class="row mb-2">
                             <div class="col-sm-4">
-                                <a href="{{ route('products.create') }}" class="btn btn-primary mb-2"><i
-                                        class="mdi mdi-plus-circle me-1"></i> Add
-                                    Product</a>
-
+                                    <a href="#" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#close-Day"> Cloturer une journee</a>
                             </div>
                             <div class="col-sm-8">
                                 <div class="text-sm-end">
@@ -31,7 +28,7 @@
 
                         <div class="table-responsive">
                             <table class="table table-centered dt-responsive nowrap w-100" id="products-dt"
-                                data-api-url="{{ route('show-stock-agent',$agent->id) }}">
+                                data-api-url="{{ route('show-stock-agent',['agent'=> Auth::user()->id]) }}">
                                 <thead class="table-light">
                                     <tr>
                                         <th style="width: 20px;">
@@ -54,10 +51,10 @@
                 <!-- end row -->
             </div>
         </div>
-
+        @include('pages.stock-agent.create')
         <!-- end row -->
         <script>
-            const agentId = "{{ $agent->id }}";
+         
             $(document).ready(function() {
                 $.ajaxSetup({
                     headers: {
@@ -256,7 +253,7 @@
                 let btn = $(this);
                 btn.prop('disabled', true);
                 $.ajax({
-                    url: "{{ route('cart.add') }}",
+                    url: "{{ route('cart-add-sale') }}",
                     method: 'POST',
                     data: {
                         _token: "{{ csrf_token() }}",
@@ -268,7 +265,7 @@
                         alert(response.message);
 
                         // 2. On appelle notre fonction magique pour rafraîchir l'affichage
-                        renderCart();
+                        reloadCart();
 
                         // 3. Réactiver le bouton
                         btn.prop('disabled', false);
@@ -280,6 +277,7 @@
                     }
                 })
             })
+
         </script>
     </div>
 </div>

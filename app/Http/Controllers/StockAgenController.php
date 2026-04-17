@@ -1,11 +1,13 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\models\AgentStock;
+use App\Models\AgentStock;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
 class StockAgenController extends Controller
@@ -13,8 +15,13 @@ class StockAgenController extends Controller
     //
     public function index(User $agent)
     {
+         if(Auth::user()->type !=='admin'&& Auth::id() !== $agent->id ){
+                abort(403,"Action non autorisée.");
+            }
         if (request()->ajax()) {
             // On filtre par l'ID de l'agent reçu en paramètre
+
+
             $stock = AgentStock::with(['product.product_category'])
                 ->where('user_id', $agent->id)
                 ->latest()
@@ -79,4 +86,6 @@ class StockAgenController extends Controller
         // pour que la page s'affiche lors de la première visite (non-AJAX)
         return view('pages.stock-agent.index', compact('agent'));
     }
-}
+    }
+
+

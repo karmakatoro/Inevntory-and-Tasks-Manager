@@ -66,13 +66,8 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row mb-2">
-                        <div class="col-sm-4">
-                            <a href="{{ route('products.create') }}" class="btn btn-primary mb-2"><i
-                                    class="mdi mdi-plus-circle me-1"></i> Add
-                                Product</a>
 
-                        </div>
-                        <div class="col-sm-8">
+                        <div class="col-sm-12">
                             <div class="text-sm-end">
                                 <button data-url="{{ route('dm-prcat') }}" type="button"
                                     class="btn btn-danger mb-2 me-1 delete-all">
@@ -99,8 +94,8 @@
                         </div>
                     @endif
                     <div class="table-responsive">
-                        <table class="table table-centered dt-responsive nowrap w-100" id="products-dt"
-                            data-api-url="{{ route('products.index') }}">
+                        <table class="table table-centered dt-responsive nowrap w-100" id="sales-dt"
+                            data-api-url="{{ route('sales.index',['agent'=>Auth::user()->id]) }}">
                             <thead class="table-light">
                                 <tr>
                                     <th style="width: 20px;">
@@ -110,10 +105,11 @@
                                             <label class="form-check-label" for="customerlist">&nbsp;</label>
                                         </div>
                                     </th>
-                                    <th>Product</th>
-                                    <th>Added Date</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
+                                    <th>Reference</th>
+                                    <th>Customer</th>
+                                    <th>Montant Total</th>
+                                    <th>Montant Paye</th>
+                                    <th>Reste</th>
                                     <th>Status</th>
                                     <th style="width: 75px;">Action</th>
                                 </tr>
@@ -125,19 +121,15 @@
             <!-- end row -->
         </div>
     </div>
-    @include('pages.product-stock._model-mouvement-stock')
     <!-- end row -->
     <script>
-        
-        // ;,{J.gEWhWk9uQm.
-        //     “c2643121c_root_stock
         $(document).ready(function() {
             $.ajaxSetup({
                 headers: {
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                 },
             });
-            currentDt = $("#products-dt").DataTable({
+            currentDt = $("#sales-dt").DataTable({
                 autoWidth: false,
                 order: [0, "ASC"],
                 processing: true,
@@ -155,26 +147,31 @@
                         searchable: false,
                     },
                     {
-                        data: "product",
-                        name: "product",
+                        data: "reference",
+                        name: "reference",
                         className: "text-900 sort pe-1 align-middle white-space-wrap",
                     },
                     {
-                        data: "date",
-                        name: "date",
+                        data: "customer",
+                        name: "customer",
                         className: "text-900 sort pe-1 align-middle white-space-nowrap",
                     },
                     {
-                        data: "price",
-                        name: "price",
+                        data: "montantTotal",
+                        name: "montantTotal",
                         className: "text-900 sort pe-1 align-middle white-space-nowrap",
                     },
                     {
-                        data: "quantity",
-                        name: "quantity",
+                        data: "montantPaye",
+                        name: "montantPaye",
                         className: "text-900 sort pe-1 align-middle white-space-nowrap",
                     },
                     {
+                        data: "reste",
+                        name: "reste",
+                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                    },
+                     {
                         data: "status",
                         name: "status",
                         className: "text-900 sort pe-1 align-middle white-space-nowrap",
