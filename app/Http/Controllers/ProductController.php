@@ -34,19 +34,19 @@ class ProductController extends Controller
                                 <label class="form-check-label" for="customerlist01">&nbsp;</label>
                             </div>';
                 })
-                ->addColumn('product', function ($row) {
+                 ->addColumn('product', function ($row) {
                     $url = asset($row->photo);
-                    $show_url = route('products.show', ['product' => $row->id]).'?'.$row->slug;
+                    $show_url = route('products.show', ['product' => $row->id]) . '?' . $row->slug;
                     $render = ' <div class="d-flex">
-                                    <img src="'.$url.'" alt="table-user"
+                                    <img src="' . $url . '" alt="table-user"
                                         class="me-3 rounded-circle avatar-sm">
                                     <div class="flex-1">
                                         <h5 class="mt-0 mb-1">
-                                            <a href="'.$show_url.'" class="text-dark">
-                                                '.$row->name.'
+                                            <a href="' . $show_url . '" class="text-dark">
+                                                ' .$row->name. '
                                             </a>
                                         </h5>
-                                    <p class="mb-0 font-13">Category : '.$row->product_category->name.' </p>
+                                    <p class="mb-0 font-13">Category : ' .($row->product_category->name ?? 'N/A'). ' </p>
                                     </div>
                                 </div>';
 
@@ -124,7 +124,7 @@ class ProductController extends Controller
         $request->validate([
             'id' => 'required|integer|exists:products,id',
         ]);
-        $product = Product::find($request->id);
+        $product = Product::findOrFail($request->id);
         if ($product) {
             return response()->json([
                 'status' => true,

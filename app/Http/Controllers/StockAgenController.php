@@ -22,8 +22,8 @@ class StockAgenController extends Controller
             // On filtre par l'ID de l'agent reçu en paramètre
 
 
-            $stock = AgentStock::with(['product.product_category'])
-                ->where('user_id', $agent->id)
+            $stock = AgentStock::
+                where('user_id', $agent->id)
                 ->latest()
                 ->get();
 
@@ -72,7 +72,7 @@ class StockAgenController extends Controller
                 ->addColumn('action', function ($row) {
                     return '<ul class="list-inline mb-0">
                             <li class="list-inline-item">
-                                <a href="javascript:void(0)" data-id="'.$row->id.'" class="action-icon btn-select">
+                                <a href="javascript:void(0)" data-id="'.$row->product->id.'" class="action-icon btn-select">
                                     <i class="mdi mdi-check-circle text-success"></i> Sélectionner
                                 </a>
                             </li>

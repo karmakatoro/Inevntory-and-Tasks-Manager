@@ -33,40 +33,6 @@ class Product extends Model
         'status',
     ];
 
-    // public static function boot()
-    // {
-    //     parent::boot();
-    //     self::creating(function ($product) {
-    //         if (auth()->check()) {
-    //             $product->user()->associate(auth()->user()->id);
-    //         }
-
-    //         // On vérifie si la catégorie est présente dans la requête
-    //         if (request()->has('product_category_id')) {
-    //             $product->product_category()->associate(request()->product_category_id);
-    //         }
-    //         $product->slug = str::slug($product->name);
-    //     });
-    //     self::updating(function ($product) {
-    //         if (Route::currentRouteName() == 'products.update') {
-    //             $product->user()->associate(auth()->user()->id);
-    //             $product->product_category()->associate(request()->product_category_id);
-    //             $product->slug = str::slug($product->name);
-    //         }
-    //     });
-    //     self::created(function ($product) {
-    //         $length = 6;
-    //         $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    //         $charactersLength = strlen($characters);
-    //         $randomString = '';
-    //         for ($i = 0; $i < $length; $i++) {
-    //             $randomString .= $characters[rand(0, $charactersLength - 1)];
-    //         }
-    //         $uniqueCode = 'SKU-0'.$product->id.'-'.$randomString;
-    //         $product->update(['code' => $uniqueCode]);
-
-    //     });
-    // }
     public static function boot()
     {
         parent::boot();

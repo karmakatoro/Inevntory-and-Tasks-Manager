@@ -79,7 +79,6 @@ class ProductCategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:100',
-            'id' => 'required|integer',
             'status' => 'sometimes|in:on,off'
         ]);
         $action = ProductCategory::updateOrCreate(
@@ -102,10 +101,7 @@ class ProductCategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $product_category)
-    {
-        //
-    }
+   
 
     /**
      * Show the form for editing the specified resource.

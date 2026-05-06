@@ -12,16 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('payements', function (Blueprint $table) {
+            // paier
             $table->id();
-            // Référence à la vente concernée
-            $table->foreignId('sale_id')->constrained('sales')->onDelete('cascade');
-
             // Montant versé lors de cette transaction précise
             $table->float('amount', 10, 2);
+            //
+            $table->foreignId('work_session_id')->constrained('work_sessions')->cascadeOnDelete();
 
             // Mode de paiement (très important pour ton rapport de caisse)
             $table->enum('payment_method', ['cash', 'm-pesa', 'airtel_money', 'bank', 'credit_note'])
-                  ->default('cash');
+                ->default('cash');
 
             // Référence externe (ex: ID transaction M-Pesa ou numéro de bordereau)
             $table->string('reference_number')->nullable();
@@ -32,6 +32,7 @@ return new class extends Migration
             $table->text('notes')->nullable();
 
             $table->timestamps();
+
         });
     }
 

@@ -51,7 +51,7 @@ class CartController extends Controller
                 ],
                 [
                     'quantity' => $qtyRequested,
-                    'expires_at' => now()->addMinutes(5),
+                    'expires_at' => now()->addMinutes(2),
                 ]
             );
         } catch (\Exception $e) {
@@ -324,9 +324,7 @@ class CartController extends Controller
     $sessionId = session()->getId();
 
     // 3. Lancement du Job (Correction de l'orthographe dispatch)
-    ProcessStockAssignment::dispatch($agentId, $adminId, $cart, $sessionId)
-    ->onQueue('high')
-    ->afterCommit();
+    ProcessStockAssignment::dispatch($agentId, $adminId, $cart, $sessionId);
 
     // 4. Nettoyage immédiat pour l'interface utilisateur
     session()->forget('assign_cart');
@@ -337,48 +335,66 @@ class CartController extends Controller
     ]);
 }
 
-    public function addToCartSale(Request $request){
-        $productId = $request->product_id;
-        $quantity = $request->quantity ?? 1;
-        $agentId = auth()->check() ? auth()->id() : $request->agent_id;
+    public function addToCartSale(Request $request) {
+    $productId = $request->product_id; // Ici, c'est bien l'ID du produit (ex: 18)
+    $quantity = $request->quantity ?? 1;
+    $agentId = auth()->id() ?? $request->agent_id;
 
-        $stock = AgentStock::where('user_id',$agentId)
-                                ->where('product_id',$productId)
-                                ->first();
-        if (!$stock || $stock->quantity < $quantity ) {
-                return response()->json([
-                    'status'=>false,
-                    'message'=>"solde insuffisant! il vous reste{$productId} {$agentId}uniquement {$stock} unites"
-                ]);
-        }
-        $cart = session()->get('sale_cart',[]);
-        $currentInCart = isset($cart[$productId])? $cart[$productId]['quantity'] :0;
-        if(($currentInCart + $quantity)>$stock->quantity){
-            return response()->json([
-                'status' => false,
-                'message' => "Impossible d'ajouter plus. Limite de votre stock atteinte."
-            ], 422);
-        }
-        if(isset($cart[$productId])){
-            $cart[$productId]['quantity'] += $quantity;
-        }
-        else {
-            $product = Product::findOrFail($productId);
-            $cart[$productId]= [
-                'id'=>$product->id,
-                'name'=>$product->name,
-                'quantity'=>$quantity,
-                'price'=>$product->price,
-                'subtotal'=>$product->price * $quantity
-            ];
-            session()->put('sale_cart',$cart);
-            return response()->json([
-            'status' => true,
-            'message' => "Produit ajouté au panier",
-            'cart_count' => count($cart)
+    // IMPORTANT : On cherche par la colonne 'product_id' et non 'id'
+    $stock = AgentStock::where('product_id', $productId)
+                        ->where('user_id', $agentId)
+                        ->first();
+
+    // 1. Vérification si le stock existe
+    if (!$stock) {
+        return response()->json([
+            'status' => false,
+            'message' => "Erreur : Aucun stock trouvé pour le produit ID {$productId} chez l'agent {$agentId}."
         ]);
-        }
     }
+
+    // 2. Vérification de la quantité disponible
+    if ($stock->quantity < $quantity) {
+        return response()->json([
+            'status' => false,
+            'message' => "Solde insuffisant ! Il ne vous reste que {$stock->quantity} unités."
+        ]);
+    }
+
+    $cart = session()->get('sale_cart', []);
+    $currentInCart = isset($cart[$productId]) ? $cart[$productId]['quantity'] : 0;
+
+    // 3. Vérification cumulative (Panier + nouvelle demande)
+    if (($currentInCart + $quantity) > $stock->quantity) {
+        return response()->json([
+            'status' => false,
+            'message' => "Limite de stock atteinte. Vous avez déjà {$currentInCart} au panier."
+        ], 422);
+    }
+
+    // 4. Ajout ou mise à jour du panier
+    if (isset($cart[$productId])) {
+        $cart[$productId]['quantity'] += $quantity;
+        $cart[$productId]['subtotal'] = $cart[$productId]['quantity'] * $cart[$productId]['price'];
+    } else {
+        $product = Product::findOrFail($productId);
+        $cart[$productId] = [
+            'product_id' => $product->id,
+            'name'       => $product->name,
+            'quantity'   => $quantity,
+            'price'      => $product->price,
+            'subtotal'   => $product->price * $quantity
+        ];
+    }
+
+    session()->put('sale_cart', $cart);
+
+    return response()->json([
+        'status' => true,
+        'message' => "{$product->name} ajouté au panier",
+        'cart_count' => count($cart)
+    ]);
+}
     public function upadteQtySaleCart(Request $request){
         $cart = session()->get('sale_cart');
         $id = $request->product_id;
@@ -433,4 +449,3 @@ class CartController extends Controller
     }
 
 }
-

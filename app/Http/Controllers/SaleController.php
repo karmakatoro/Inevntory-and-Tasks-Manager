@@ -93,54 +93,57 @@ class SaleController extends Controller
         return view('pages.sales.agent.index', compact('agent'));
     }
 
-    public function store(Request $request)
-    {
+   public function store(Request $request)
+{
+    // 1. Récupérer et valider immédiatement les données nécessaires
+    $cart = session()->get('sale_cart');
+    
+    if (!$cart) {
+        return response()->json(['status' => false, 'message' => 'Le panier est vide'], 422);
+    }
 
-        // 1. Récupérer le panier en session
-        $cart = session()->get('sale_cart');
-        $isActiveSession = WorkSession::where('user_id',auth()->id())
-        ->where('status','open')
+    $isActiveSession = WorkSession::where('user_id', auth()->id())
+        ->where('status', 'open')
         ->first();
 
-        $agentId = auth()->check() ? auth()->id() : $request->agent_id;
-        if (! $cart) {
-            return response()->json(['status' => false, 'message' => 'Le panier est vide'], 422);
-        }
-   if (!$isActiveSession) {
+    if (!$isActiveSession) {
         return response()->json([
             'status' => false,
-            'message' => 'Erreur : Aucune session de caisse ouverte pour cet utilisateur.'
+            'message' => 'Erreur : Aucune session de caisse ouverte.'
         ], 403);
     }
-        // 2. Validation des données du formulaire
-        $request->validate([
-            'client_id' => 'required|exists:product_customers,id',
-            'amount_paid' => 'required|numeric|min:0',
-            'payment_method' => 'required|string',
-        ]);
 
-        $totalAmount = array_sum(array_column($cart, 'subtotal'));
-        $workId = $isActiveSession->id;
-        // A. Créer l'entête de la vente
-        $saleData = [
-            'agent_id' => $agentId,
-            'work_session_id'=>$workId,
-            'customer_id' => $request->client_id,
-            'total_amount' => $totalAmount,
-            'amount_paid' => $request->amount_paid, // Sera mis à jour par le premier paiement
-            'payment_method' => $request->payment_method,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-        ];
-        ProcessSale::dispatch($saleData, $cart,$workId);
+    $request->validate([
+        'client_id' => 'required|exists:product_customers,id',
+        'amount_paid' => 'required|numeric|min:0',
+        'payment_method' => 'required|string',
+    ]);
 
-        // Vider le panier immédiatement
-        session()->forget('sale_cart');
+    // 2. Préparation des données
+    $totalAmount = array_sum(array_column($cart, 'subtotal'));
+    $agentId = auth()->id() ?? $request->agent_id;
+    $workId = $isActiveSession->id;
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Vente en cours de traitement...',
-        ]);
+    $saleData = [
+        'agent_id' => $agentId,
+        'work_session_id' => $workId,
+        'customer_id' => $request->client_id,
+        'total_amount' => $totalAmount,
+        'amount_paid' => $request->amount_paid,
+        'payment_method' => $request->payment_method,
+        'latitude' => $request->latitude,
+        'longitude' => $request->longitude,
+    ];
 
-    }
+    // 3. Vider le panier EN PREMIER pour libérer la session
+    session()->forget('sale_cart');
+
+    // 4. Dispatch avec afterCommit pour éviter le Lock Timeout
+    ProcessSale::dispatch($saleData, $cart, $workId)->afterCommit();
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Vente envoyée au système de traitement.',
+    ]);
+}
 }

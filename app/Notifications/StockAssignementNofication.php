@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notification;
 class StockAssignementNofication extends Notification implements ShouldQueue
 {
     use Queueable;
+    
 
     /**
      * Create a new notification instance.

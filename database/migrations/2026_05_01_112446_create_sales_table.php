@@ -17,6 +17,7 @@ return new class extends Migration
             // Les acteurs
             $table->foreignId('agent_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('customer_id')->nullable()->constrained('product_customers')->onDelete('set null');
+            $table->foreignId('work_session_id')->constrained('work_sessions')->cascadeOnDelete();
             $table->float('total_amount', 12, 2)->default(0); // Montant total de la facture
             $table->float('amount_paid', 12, 2)->default(0);   // Somme déjà encaissée
             $table->float('balance', 12, 2)->default(0);       // Reste à payer (Dette)
@@ -25,6 +26,8 @@ return new class extends Migration
             $table->string('payment_method')->nullable(); // cash, m-pesa, credit
             $table->text('notes')->nullable(); // Pour des précisions sur le crédit
             $table->timestamps();
+             $table->decimal('latitude', 10, 8)->nullable();
+         $table->decimal('longitude', 11, 8)->nullable();
         });
     }
 

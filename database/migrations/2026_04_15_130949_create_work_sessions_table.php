@@ -21,8 +21,15 @@ return new class extends Migration
             // Pour le contrôle de caisse physique
             $table->decimal('opening_cash', 15, 2)->default(0); 
             $table->decimal('closing_cash', 15, 2)->nullable();
-        
+        $table->text('note')->nullable();
+         $table->decimal('difference', 15, 2)->default(0);
             $table->timestamps();
+
+
+       
+
+            // sale_items 
+            
         });
     }
 

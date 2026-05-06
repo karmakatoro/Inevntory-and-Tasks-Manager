@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Payement;
+use App\Models\PayementAllocation;
 use App\Models\ProductCustomer;
 use App\Models\User;
 class Sale extends Model
@@ -20,7 +21,8 @@ class Sale extends Model
         'amount_paid',
         'payment_method',
         'invoice_number', // Si tu génères un numéro de facture
-        'status',         // Ex: 'paid', 'debt', 'partial'
+        'balance',         // <--- AJOUTE CECI
+        'payment_status',       // Ex: 'paid', 'debt', 'partial'
         'sale_date',
         'latitude',
         'longitude'
@@ -32,20 +34,31 @@ class Sale extends Model
             $sale->invoice_number = 'VNT-'.date('Y').'-'.str_pad($number,4,'0',STR_PAD_LEFT);
         });
     }
-    public function updatePayementStatus(){
-        $this->amount_paid = $this->payements()->sum('amount');
-        $this->balance = $this->total_amount - $this->amount_paid;
-        if($this->balance <= 0){
-            $this->payment_status = 'Paid';
-        }
-        elseif($this->amount_paid > 0){
-            $this->payment_status = 'Partial';
-        }
-        else{
-            $this->payment_status = 'Unpaid';
-        }
-        $this->save();
+
+public function allocations()
+{
+    return $this->hasMany(PayementAllocation::class, 'sale_id');
+}
+
+public function updatePayementStatus()
+{
+    // On fait la somme de la colonne 'amount_allocated' dans la table pivot
+    $this->amount_paid = $this->allocations()->sum('amount_allocated');
+    
+    $this->balance = $this->total_amount - $this->amount_paid;
+
+    if($this->balance <= 0){
+        $this->payment_status = 'Paid';
     }
+    elseif($this->amount_paid > 0){
+        $this->payment_status = 'Partial';
+    }
+    else{
+        $this->payment_status = 'Unpaid';
+    }
+
+    $this->save();
+}
     public function work():belonsTo{
         return $this->belongsTo(WorkSession::class,'work_session_id');
     }
@@ -54,10 +67,7 @@ class Sale extends Model
         return $this->hasMany(SaleItem::class,'sale_id');
     }
 
-    public function payements(): HasMany
-    {
-        return $this->hasMany(Payement::class,'sale_id');
-    }
+  
 
     public function customer(): BelongsTo
     {
