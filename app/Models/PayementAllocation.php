@@ -15,7 +15,8 @@ class PayementAllocation extends Model
         'payment_id',
         'sale_id',
         'user_id',
-        'amount_allocated'
+        'amount_allocated',
+        'note'
     ];
     
 

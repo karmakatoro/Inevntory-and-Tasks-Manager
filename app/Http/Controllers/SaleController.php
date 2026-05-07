@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Sale;
 use App\Jobs\ProcessSale;
+use App\Models\Sale;
 use App\Models\User;
+use App\Models\WorkSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\WorkSession;
 use Yajra\DataTables\DataTables;
 
 class SaleController extends Controller
@@ -20,7 +20,10 @@ class SaleController extends Controller
         }
         if (request()->ajax()) {
             // On filtre par l'ID de l'agent reçu en paramètre
-            $sales = Sale::with('customer')
+            $sales = Sale::with(['customer' => function ($q) {
+                // On charge les ventes liées pour que l'Accessor total_debt fonctionne
+                $q->with('sales');
+            }])
                 ->where('agent_id', $agent->id)
                 ->latest()
                 ->get();
@@ -70,12 +73,20 @@ class SaleController extends Controller
                 ->addColumn('action', function ($row) {
                     $paymentBtn = '';
                     if ($row->payment_status === 'unpaid' || $row->payment_status === 'partial') {
+                        // On récupère les valeurs depuis le modèle
+                        $totalDebt = $row->customer->total_debt ?? 0;
+                        $clientId = $row->customer_id ?? 0;
+                        $lastAllocated = $row->customer->last_payment_amount;
                         $paymentBtn = '
-                            <li class="list-inline-item">
-                                <a href="javascript:void(0)" data-id="'.$row->id.'" class="action-icon btn-paie">
-                                    <i class="mdi mdi-check-circle text-success"></i> Payer
-                                </a>
-                            </li>';
+            <li class="list-inline-item">
+                <a href="javascript:void(0)" 
+                   data-customer="'.$clientId.'" 
+                   data-debt="'.$totalDebt.'" 
+                   data-last ="'.$lastAllocated.'"
+                   class="action-icon btn-paie">
+                    <i class="mdi mdi-check-circle text-success"></i> Payer
+                </a>
+            </li>';
                     }
 
                     return $actionBtn = '
@@ -93,57 +104,57 @@ class SaleController extends Controller
         return view('pages.sales.agent.index', compact('agent'));
     }
 
-   public function store(Request $request)
-{
-    // 1. Récupérer et valider immédiatement les données nécessaires
-    $cart = session()->get('sale_cart');
-    
-    if (!$cart) {
-        return response()->json(['status' => false, 'message' => 'Le panier est vide'], 422);
-    }
+    public function store(Request $request)
+    {
+        // 1. Récupérer et valider immédiatement les données nécessaires
+        $cart = session()->get('sale_cart');
 
-    $isActiveSession = WorkSession::where('user_id', auth()->id())
-        ->where('status', 'open')
-        ->first();
+        if (! $cart) {
+            return response()->json(['status' => false, 'message' => 'Le panier est vide'], 422);
+        }
 
-    if (!$isActiveSession) {
+        $isActiveSession = WorkSession::where('user_id', auth()->id())
+            ->where('status', 'open')
+            ->first();
+
+        if (! $isActiveSession) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Erreur : Aucune session de caisse ouverte.',
+            ], 403);
+        }
+
+        $request->validate([
+            'client_id' => 'required|exists:product_customers,id',
+            'amount_paid' => 'required|numeric|min:0',
+            'payment_method' => 'required|string',
+        ]);
+
+        // 2. Préparation des données
+        $totalAmount = array_sum(array_column($cart, 'subtotal'));
+        $agentId = auth()->id() ?? $request->agent_id;
+        $workId = $isActiveSession->id;
+
+        $saleData = [
+            'agent_id' => $agentId,
+            'work_session_id' => $workId,
+            'customer_id' => $request->client_id,
+            'total_amount' => $totalAmount,
+            'amount_paid' => $request->amount_paid,
+            'payment_method' => $request->payment_method,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+        ];
+
+        // 3. Vider le panier EN PREMIER pour libérer la session
+        session()->forget('sale_cart');
+
+        // 4. Dispatch avec afterCommit pour éviter le Lock Timeout
+        ProcessSale::dispatch($saleData, $cart, $workId)->afterCommit();
+
         return response()->json([
-            'status' => false,
-            'message' => 'Erreur : Aucune session de caisse ouverte.'
-        ], 403);
+            'status' => true,
+            'message' => 'Vente envoyée au système de traitement.',
+        ]);
     }
-
-    $request->validate([
-        'client_id' => 'required|exists:product_customers,id',
-        'amount_paid' => 'required|numeric|min:0',
-        'payment_method' => 'required|string',
-    ]);
-
-    // 2. Préparation des données
-    $totalAmount = array_sum(array_column($cart, 'subtotal'));
-    $agentId = auth()->id() ?? $request->agent_id;
-    $workId = $isActiveSession->id;
-
-    $saleData = [
-        'agent_id' => $agentId,
-        'work_session_id' => $workId,
-        'customer_id' => $request->client_id,
-        'total_amount' => $totalAmount,
-        'amount_paid' => $request->amount_paid,
-        'payment_method' => $request->payment_method,
-        'latitude' => $request->latitude,
-        'longitude' => $request->longitude,
-    ];
-
-    // 3. Vider le panier EN PREMIER pour libérer la session
-    session()->forget('sale_cart');
-
-    // 4. Dispatch avec afterCommit pour éviter le Lock Timeout
-    ProcessSale::dispatch($saleData, $cart, $workId)->afterCommit();
-
-    return response()->json([
-        'status' => true,
-        'message' => 'Vente envoyée au système de traitement.',
-    ]);
-}
 }

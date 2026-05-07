@@ -19,7 +19,6 @@ class Payement extends Model
         'amount',
         'payment_method',
         'recorded_by',   // L'ID de l'agent qui a encaissé
-        'payment_date',
         'reference_id',  // Utile pour stocker l'ID de transaction M-Pesa ou Airtel
     ];
 
