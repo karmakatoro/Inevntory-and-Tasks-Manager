@@ -48,13 +48,13 @@ public function updatePayementStatus()
     $this->balance = $this->total_amount - $this->amount_paid;
 
     if($this->balance <= 0){
-        $this->payment_status = 'Paid';
+        $this->payment_status = 'paid';
     }
     elseif($this->amount_paid > 0){
-        $this->payment_status = 'Partial';
+        $this->payment_status = 'partial';
     }
     else{
-        $this->payment_status = 'Unpaid';
+        $this->payment_status = 'unpaid';
     }
 
     $this->save();
@@ -69,10 +69,10 @@ public function updatePayementStatus()
 
   
 
-    public function customer(): BelongsTo
-    {
-        return $this->belongsTo(ProductCustomer::class,'customer_id');
-    }
+   public function customer(): BelongsTo
+{
+    return $this->belongsTo(ProductCustomer::class, 'customer_id');
+}
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'agent_id');

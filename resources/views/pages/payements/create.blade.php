@@ -29,7 +29,7 @@
 
                 <form id="formPaiementDette">
                     @csrf
-                    <input type="hidden" name="client_id" id="idClientPaie">
+                    <input type="hidden" name="customer_id" id="idClientPaie">
 
                     <div class="mb-3">
                         <label class="form-label fw-bold text-dark">Montant à Encaisser ($)</label>
@@ -67,11 +67,10 @@
 $(document).ready(function() {
     // 1. Quand on clique sur le bouton "Payer" dans une liste de clients
     $(document).on("click", ".btn-paie", function() {
-        let clientId = $(this).data('id');
-        let saleId = $(this).data('id');
+        let clientId = $(this).data('customer');
         let totalDebt = $(this).data('debt');
-        let lastPaie = $(this).data('last-paie');
-
+        let lastPaie = $(this).data('last');
+            
         $('#idClientPaie').val(clientId);
         $('#displayDettes').text(totalDebt + " $");
         $('#displayLastPaie').text(lastPaie + " $");

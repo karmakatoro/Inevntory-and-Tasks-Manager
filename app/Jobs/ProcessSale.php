@@ -81,11 +81,13 @@ class ProcessSale implements ShouldQueue
                 ]);
 
                 // On crée l'allocation
+                $note = "Le premier versement du client a été automatiquement affecté à la facture {$sale->invoice_number}.";
                 PayementAllocation::create([
                     'sale_id' => $sale->id,
                     'payment_id' => $payment->id,
                     'user_id' => $this->saleData['agent_id'],
                     'amount_allocated' => $this->saleData['amount_paid'],
+                    'note'=>$note
                 ]);
 
             }
