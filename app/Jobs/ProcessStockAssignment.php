@@ -81,9 +81,9 @@ class ProcessStockAssignment implements ShouldQueue
             // 2. Validation de la base de données AVANT les notifications
             DB::commit();
 
-            if ($admin && $agent) {
-                $this->dispatchNotifications($admin, $agent);
-            }
+            // if ($admin && $agent) {
+            //     $this->dispatchNotifications($admin, $agent);
+            // }
 
         } catch (\Exception $e) {
             DB::rollback();
