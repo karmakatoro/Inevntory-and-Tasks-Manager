@@ -51,7 +51,7 @@ class CartController extends Controller
                 ],
                 [
                     'quantity' => $qtyRequested,
-                    'expires_at' => now()->addMinutes(2),
+                    'expires_at' => now()->addMinutes(10),
                 ]
             );
         } catch (\Exception $e) {

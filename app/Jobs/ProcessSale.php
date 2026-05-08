@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\AgentStock;
+use App\Models\CashMovement;
 use App\Models\Payement;
 use App\Models\PayementAllocation;
 use App\Models\ProductCustomer;
@@ -70,7 +71,7 @@ class ProcessSale implements ShouldQueue
                 $agentStock->decrement('quantity', $item['quantity']);
             }
 
-            // 3. Gestion du paiement ET de l'allocation (MODIFIÉ ICI)
+            
             if ($this->saleData['amount_paid'] > 0) {
                 $payment = Payement::create([
                     'customer_id' => $this->saleData['customer_id'],
@@ -81,15 +82,27 @@ class ProcessSale implements ShouldQueue
                 ]);
 
                 // On crée l'allocation
-                $note = "Le premier versement du client a été automatiquement affecté à la facture {$sale->invoice_number}.";
                 PayementAllocation::create([
                     'sale_id' => $sale->id,
                     'payment_id' => $payment->id,
                     'user_id' => $this->saleData['agent_id'],
                     'amount_allocated' => $this->saleData['amount_paid'],
-                    'note'=>$note
+                    'note' => "Premier versement auto-affecté à la facture {$sale->invoice_number}.",
                 ]);
 
+                // Enregistrement du mouvement physique en caisse (Trutabilité pro)
+                CashMovement::create([
+                    'work_session_id' => $this->workId,
+                    'user_id' => $this->saleData['agent_id'], 
+                    'type' => 'in',
+                    'amount' => $this->saleData['amount_paid'],
+                    'category' => 'sale_cash', 
+                    'description' => "Encaissé pour facture {$sale->invoice_number}",
+                    
+                ]);
+
+                // On met à jour la variable pour la notification
+                $paie = $payment;
             }
             DB::commit();
 
@@ -116,7 +129,7 @@ class ProcessSale implements ShouldQueue
                 $msgAgent = $paie
                     ? "Vente enregistrée. Paiement reçu : {$paie->amount} USD."
                     : 'Vente à crédit enregistrée avec succès.';
-               $urlAgent = route('sales.index', ['agent' => $agent->id]);
+                $urlAgent = route('sales.index', ['agent' => $agent->id]);
                 $agent->notify(new StockAssignementNofication($msgAgent, $urlAgent));
             }
 

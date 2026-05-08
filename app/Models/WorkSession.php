@@ -8,12 +8,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Payement;
 use App\Models\Sale;
 use App\Models\User;
+use App\Models\CashMovement;
 
 class WorkSession extends Model
 {
     use HasFactory;
     protected $guarded = [];
 
+    public function workMovement():HasMany{
+        return $this->HasMany(CashMovement::class,'work_session_id');
+    }
+    
     public function work(): HasMany
     {
         return $this->hasMany(Sale::class, 'work_session_id');

@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\DailyClosing;
 use App\Models\Sale;
 use App\Models\Project;
+use App\Models\CashMovement;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -49,6 +50,10 @@ class User extends Authenticatable
     public function project()
     {
         return $this->hasMany(Project::class);
+    }
+    public function cashMovement()
+    {
+        return $this->hasMany(CashMovement::class,'user_id');
     }
     public function task()
     {
