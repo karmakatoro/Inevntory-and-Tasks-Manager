@@ -106,13 +106,13 @@ class ProcessSale implements ShouldQueue
             }
             DB::commit();
 
-            $this->sendNotification($agent, $paie);
-            $this->sendNotification(
-                $agent,
-                $paie,
-                $customer,
-                $sale // L'objet Sale que tu viens de créer/mettre à jour
-            );
+            // $this->sendNotification($agent, $paie);
+            // $this->sendNotification(
+            //     $agent,
+            //     $paie,
+            //     $customer,
+            //     $sale // L'objet Sale que tu viens de créer/mettre à jour
+            // );
 
         } catch (\Exception $e) {
             DB::rollback();
