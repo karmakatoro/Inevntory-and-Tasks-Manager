@@ -77,6 +77,8 @@ Route::middleware('auth')->group(function () {
         });
         Route::controller(PayementController::class)->group(function(){
             Route::post('/payement/create','store')->name('payement.store');
+            Route::get('/payment/{agent}/index','index')->name('payement.show');
+            Route::get('/payment/{agent}/credit','getLsitDebt')->name('payement.credit');
         });
     });
 

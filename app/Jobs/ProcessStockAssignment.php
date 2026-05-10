@@ -67,12 +67,15 @@ class ProcessStockAssignment implements ShouldQueue
                         'quantity' => DB::raw("quantity + $qty"),
                     ]);
 
-                    Assignment::create([
+                    
+                    
+                     Assignment::create([
                         'sender_id' => $this->adminId,
                         'receiver_id' => $this->agentId,
                         'product_id' => $productId,
                         'quantity' => $qty,
                     ]);
+
                 }
             }
 

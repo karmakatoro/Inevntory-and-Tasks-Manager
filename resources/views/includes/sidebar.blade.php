@@ -94,12 +94,12 @@
                             <li>
                                 <a href="{{ route('product-categories.index') }}">Catégories</a>
                             </li>
-                            <li>
+                            {{-- <li>
                                 <a href="ecommerce-orders-detail.html">Orders</a>
                             </li>
                             <li>
                                 <a href="ecommerce-orders-detail.html">Deliveries</a>
-                            </li>
+                            </li> --}}
                             @if (Auth::user()->type==='admin')
                                  <li>
                                 <a href="{{ route('products-stock.index') }}">Stock</a>
@@ -127,19 +127,19 @@
                     <a href="#sidebarEmail" data-bs-toggle="collapse" aria-expanded="false"
                         aria-controls="sidebarEmail">
                         <i class="ri-task-line"></i>
-                        <span> Activities </span>
+                        <span>Caisse</span>
                         <span class="menu-arrow"></span>
                     </a>
                     <div class="collapse" id="sidebarEmail">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="{{ route('projects.index') }}">Projects</a>
+                                <a href="{{ route('payement.show',['agent'=>Auth::user()->id]) }}">Payement</a>
                             </li>
                             <li>
-                                <a href="{{ route('tasks.index') }}">Tasks</a>
+                                <a href="{{ route('tasks.index') }}">Credit</a>
                             </li>
                             <li>
-                                <a href="email-templates.html">Reports</a>
+                                <a href="email-templates.html">Historique</a>
                             </li>
                         </ul>
                     </div>
