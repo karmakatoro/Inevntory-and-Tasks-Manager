@@ -7,13 +7,13 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box">
-                <h4 class="page-title">Products Stock</h4>
+                <h4 class="page-title">Gestion de Stock</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item">
-                            <a href="{{ route('dashboard.sales') }}">Dashboard</a>
+                            <a href="{{ route('dashboard.sales') }}">Tableau de Bord</a>
                         </li>
-                        <li class="breadcrumb-item active">Products Stock</li>
+                        <li class="breadcrumb-item active">Gestion de Stock</li>
                     </ol>
                 </div>
             </div>
@@ -33,12 +33,6 @@
                         <a href="#cart-content" data-bs-toggle="tab" aria-expanded="false" class="nav-link ms-0 "
                             aria-selected="true" role="tab">
                             <i class="mdi mdi-cart-minus me-1"></i> Panier d'attribution
-                        </a>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <a href="#lot-content" data-bs-toggle="tab" aria-expanded="false" class="nav-link ms-0 "
-                            aria-selected="true" role="tab">
-                            <i class="mdi mdi-cart-minus me-1"></i> Stock Agent
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -95,12 +89,23 @@
                 { data: "operation", name: "operation" },
                 { data: "date", name: "date" },
                 { data: "price", name: "price" },
-                { data: "quantity", name: "quantity" },
+                { data: "quantity", name: "quantity" ,className:"text-center"},
                 { data: "author", name: "author" },
                 { data: "status", name: "status" },
                 { data: "action", name: "action", orderable: false, searchable: false },
             ],
             lengthMenu: [10, 25, 50, 100],
+             language: {
+               "sProcessing": "Traitement en cours...",
+                    "sSearch": "Rechercher  :",
+                    "sLengthMenu": "Afficher _MENU_ Produits",
+                    "sInfo": "Affichage de _START_ à _END_ sur _TOTAL_ Produits",
+                    "sEmptyTable": "Aucune dette en cours.",
+                    "oPaginate": {
+                        "sNext": "Suivant",
+                        "sPrevious": "Précédent"
+
+            }},
         });
 
         // --- 3. Fonction de rechargement du Panier ---

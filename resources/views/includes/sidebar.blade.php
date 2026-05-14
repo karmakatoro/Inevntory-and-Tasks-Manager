@@ -136,7 +136,7 @@
                                 <a href="{{ route('payement.show',['agent'=>Auth::user()->id]) }}">Payement</a>
                             </li>
                             <li>
-                                <a href="{{ route('tasks.index') }}">Credit</a>
+                                <a href="{{ route('payement.credit',['agent'=>Auth::user()->id]) }}">Credit</a>
                             </li>
                             <li>
                                 <a href="email-templates.html">Historique</a>

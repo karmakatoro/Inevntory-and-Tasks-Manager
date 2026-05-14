@@ -2,6 +2,7 @@
 
 @section('title', 'Paiements - ' . env('APP_NAME'))
 
+
 @section('content')
     <!-- start page title -->
     <div class="row">
@@ -20,47 +21,68 @@
         </div>
     </div>
 
-    <!-- Statistiques Rapides -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="text-center">
-                        <div class="row">
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-tag font-24"></i>
-                                    <h3>25563</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Total Produits</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-archive font-24"></i>
-                                    <h3 class="text-warning">6952</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Produits Disponibles</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-shield font-24"></i>
-                                    <h3 class="text-success">18361</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Total Ventes</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-users font-24"></i>
-                                    <h3 class="text-danger">250</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Total Vendeurs</p>
-                                </div>
-                            </div>
-                        </div>
+ <div class="row" id="stats-container">
+    <div class="col-md-6 col-xl-3">
+        <div class="card widget-flat custom-card-rounded border-primary-sep shadow-sm">
+            <div class="card-body">
+                <div class="float-end">
+                    <div class="avatar-sm bg-soft-primary rounded-circle">
+                        <i class="fe-tag avatar-title font-22 text-primary"></i>
                     </div>
                 </div>
+                <h6 class="text-muted text-uppercase mt-0">Total Produits</h6>
+                <h3 class="my-2">25,563</h3>
+                <p class="mb-0 text-muted"><span class="small fw-medium">Catalogue complet</span></p>
             </div>
         </div>
     </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card widget-flat custom-card-rounded border-warning-sep shadow-sm">
+            <div class="card-body">
+                <div class="float-end">
+                    <div class="avatar-sm bg-soft-warning rounded-circle">
+                        <i class="fe-archive avatar-title font-22 text-warning"></i>
+                    </div>
+                </div>
+                <h6 class="text-muted text-uppercase mt-0">Disponibles</h6>
+                <h3 class="my-2 text-warning">6,952</h3>
+                <p class="mb-0 text-muted"><span class="small fw-medium">Prêt à la vente</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card widget-flat custom-card-rounded border-success-sep shadow-sm">
+            <div class="card-body">
+                <div class="float-end">
+                    <div class="avatar-sm bg-soft-success rounded-circle">
+                        <i class="fe-shield avatar-title font-22 text-success"></i>
+                    </div>
+                </div>
+                <h6 class="text-muted text-uppercase mt-0">Chiffre d'Affaires</h6>
+                <h3 class="my-2 text-success">18,361 $</h3>
+                <p class="mb-0 text-muted"><span class="text-success small"><i class="mdi mdi-trending-up"></i> +12.5%</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card widget-flat custom-card-rounded border-danger-sep shadow-sm">
+            <div class="card-body">
+                <div class="float-end">
+                    <div class="avatar-sm bg-soft-danger rounded-circle">
+                        <i class="fe-users avatar-title font-22 text-danger"></i>
+                    </div>
+                </div>
+                <h6 class="text-muted text-uppercase mt-0">Réseau Agents</h6>
+                <h3 class="my-2 text-danger">250</h3>
+                <p class="mb-0 text-muted"><span class="small fw-medium">Vendeurs actifs</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
 
     <div class="row">
         <div class="col-12">
@@ -118,6 +140,7 @@
     </div>
 
     @include('pages.payements.create')
+    @include('pages.payements.details-payment')
 
    <script>
     $(document).ready(function() {
@@ -142,7 +165,7 @@
                 }
             },
             { data: "ventes", name: "ventes" },
-            { data: "customer", name: "customer" }
+            { data: "customer", name: "customer",}
         ];
 
         if (isAdmin) {
@@ -150,8 +173,17 @@
         }
 
         tableColumns.push(
-            { data: "amount", name: "amount", className: "text-end" },
-            { data: "status", name: "status", className: "text-center" },
+            { data: "amount", name: "amount", className: "text-center" },
+           { 
+            data: "status", 
+            className: "text-center",
+            render: function(data) {
+                let color = (data === 'Validé' || data === 'Confirmé') ? 'success' : 'warning';
+                return `<span class="badge bg-soft-${color} text-${color} border border-${color}-subtle rounded-pill px-2">
+                            <i class="mdi mdi-circle font-10 me-1"></i>${data}
+                        </span>`;
+            }
+        },
             { data: "action", name: "action", orderable: false, searchable: false }
         );
 
@@ -167,8 +199,16 @@
             columns: tableColumns,
             order: [[1, 'desc']], 
             language: {
-                url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json"
-            },
+               "sProcessing": "Traitement en cours...",
+                    "sSearch": "Rechercher un client :",
+                    "sLengthMenu": "Afficher _MENU_ clients",
+                    "sInfo": "Affichage de _START_ à _END_ sur _TOTAL_ clients",
+                    "sEmptyTable": "Aucune dette en cours.",
+                    "oPaginate": {
+                        "sNext": "Suivant",
+                        "sPrevious": "Précédent"
+
+            }},
             drawCallback: function() {
                 $('[data-bs-toggle="tooltip"]').tooltip();
             }
@@ -178,5 +218,32 @@
             $(".row-checkbox").prop("checked", $(this).prop("checked"));
         });
     });
+$(document).on('click', '.dropdown-item[data-id]', function(e) {
+    e.preventDefault();
+    
+    // Nettoyage de l'ID
+    let paymentId = $(this).attr('data-id').replace(/[/\\%22"']/g, "");
+
+    let modal = $('#details-payment-modal');
+    let container = $('#details-content');
+
+    // On ouvre la modale AVANT l'appel pour l'UX
+    container.html('<div class="text-center py-4"><div class="spinner-border text-primary"></div><p class="mt-2">Chargement des données...</p></div>');
+    modal.modal('show');
+
+    $.ajax({
+        url: `/payement/${paymentId}/details`, // Vérifiez bien l'orthographe 'payement' vs 'payment' ici
+        method: 'GET',
+        // dataType: 'json', <-- SUPPRIMEZ CETTE LIGNE
+        success: function(response) {
+            // Puisque le contrôleur renvoie response($html), 'response' est déjà votre tableau HTML
+            container.html(response);
+        },
+        error: function(xhr) {
+            container.html('<div class="alert alert-danger">Erreur de chargement (Code: ' + xhr.status + ').</div>');
+            console.error("Détails:", xhr.responseText);
+        }
+    });
+});
 </script>
 @endsection

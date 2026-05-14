@@ -11,10 +11,9 @@
                     <button data-url="{{ route('dm-prcat') }}" type="button"
                         class="btn btn-danger mb-2 me-1 delete-all">
                         <i class="mdi mdi-trash-can-outline"></i></button>
-                    <a href="javascript:void(0);" class="btn btn-primary mb-2"><i class="mdi mdi-printer me-1"></i>
-                        Print</a>
+                    <a href="javascript:void(0);" class="btn btn-primary mb-2"><i class="mdi mdi-printer me-1"></i>Imprimer</a>
                     <a href="javascript:void(0);" class="btn btn-success mb-2"><i
-                            class="mdi mdi-database-export me-1"></i> Export</a>
+                            class="mdi mdi-database-export me-1"></i>Exporter</a>
                 </div>
             </div><!-- end col-->
         </div>
@@ -30,12 +29,12 @@
                                 <label class="form-check-label" for="customerlist">&nbsp;</label>
                             </div>
                         </th>
-                        <th>Product</th>
+                        <th>Informations sur les Produits</th>
                         <th>Operation</th>
-                        <th>Date</th>
-                        <th>Unit Pr.</th>
-                        <th>Quantity</th>
-                        <th>Author</th>
+                        <th>Date de création</th>
+                        <th>Prix </th>
+                        <th>Quantité</th>
+                        <th>Auteur</th>
                         <th>Status</th>
                         <th style="width: 75px;">Action</th>
                     </tr>

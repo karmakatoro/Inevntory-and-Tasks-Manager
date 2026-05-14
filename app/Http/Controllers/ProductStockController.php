@@ -37,7 +37,7 @@ class ProductStockController extends Controller
                                 <h5 class="mt-0 mb-1">
                                     <a href="'.$show_url.'" class="text-dark">'.$row->name.'</a>
                                 </h5>
-                                <p class="mb-0 font-13">Category : '.($row->product_category->name ?? 'N/A').'</p>
+                                <p class="mb-0 font-13">Catégorie : '.($row->product_category->name ?? 'N/A').'</p>
                             </div>
                         </div>';
                 })
@@ -52,7 +52,7 @@ class ProductStockController extends Controller
                 })
                 ->addColumn('status', function ($row) {
                     $color = $row->status == 'off' ? 'danger' : 'success';
-                    $status_display = $row->status == 'off' ? 'Deactivated' : 'Activated';
+                    $status_display = $row->status == 'off' ? 'Désactiver' : 'Actif';
 
                     return '<span class="badge badge-soft-'.$color.'">'.$status_display.'</span>';
                 })
@@ -90,7 +90,7 @@ class ProductStockController extends Controller
     public function index()
     {
         if (request()->ajax()) {
-            $stocks = ProductStock::with('product.product_category')
+            $stocks = ProductStock::with('product.product_category',)
                 ->latest()->get();
 
             return DataTables::of($stocks)
@@ -124,7 +124,7 @@ class ProductStockController extends Controller
                                 '.$productName.'
                             </a>
                         </h5>
-                        <p class="mb-0 font-13">Category : '.$categoryName.' </p>
+                        <p class="mb-0 font-13">Catégorie : '.$categoryName.' </p>
                     </div>
                 </div>';
 
@@ -135,13 +135,13 @@ class ProductStockController extends Controller
                     $operation = $row->mouvement;
                     $operation_display = '';
                     if ($operation == 'e') {
-                        $operation_display = 'Input';
+                        $operation_display = 'Entrée';
                         $color = 'success';
                     } elseif ($operation == 's') {
-                        $operation_display = 'output';
+                        $operation_display = 'Sortie';
                         $color = 'primary';
                     } elseif ($operation == 'r') {
-                        $operation_display = 'Come back';
+                        $operation_display = 'Retour';
                         $color = 'warning';
                     }
 
@@ -150,10 +150,10 @@ class ProductStockController extends Controller
                 ->addColumn('status', function ($row) {
                     $status = $row->status;
                     $color = 'success';
-                    $status_display = 'Activated';
+                    $status_display = 'Actif';
                     if ($status == 'off') {
                         $color = 'danger';
-                        $status_display = 'Desactivated';
+                        $status_display = 'Désactiver';
                     }
                     $render = ' <span class="badge badge-soft-'.$color.'">'.$status_display.'</span>';
 

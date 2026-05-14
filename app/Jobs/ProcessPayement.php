@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\PayementAllocation;
 use App\Models\Sale;
+use App\Models\CashMovement;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -24,42 +25,45 @@ class ProcessPayement implements ShouldQueue
     protected $amount;
 
     protected $userId; // On ajoute l'ID de l'utilisateur ici
+    protected $workId;
 
-    public function __construct($payementId,$customerId, $amount, $userId)
+    public function __construct($payementId,$customerId, $amount, $userId,$workId)
     {
         $this->customerId = $customerId;
         $this->payementId = $payementId;
+        $this->workId = $workId;
         $this->amount = $amount;
         $this->userId = $userId; // Reçu du Controller
     }
 
+    // ... début du code identique ...
+
     public function handle(): void
     {
-        // Pas besoin de DB::commit() manuel si tu utilises la closure DB::transaction
         DB::transaction(function () {
             $remaining = $this->amount;
+            $impactedInvoices = []; // Pour stocker les numéros de factures
 
             $unpaidSales = Sale::where('customer_id', $this->customerId)
                 ->whereIn('payment_status', ['unpaid', 'partial'])
                 ->orderBy('created_at', 'asc')
                 ->get();
-            \Log::info("Job FIFO - Client: {$this->customerId}, Ventes trouvées: ".$unpaidSales->count().", Montant: {$remaining}");
+
             foreach ($unpaidSales as $sale) {
-                if ($remaining <= 0) {
-                    break;
-                }
+                if ($remaining <= 0) break;
 
                 $debt = $sale->balance;
                 $allocation = min($remaining, $debt);
-
-                $note = "Affectation automatique FIFO sur facture {$sale->invoice_number}.";
+                
+                // On garde une trace du numéro de facture
+                $impactedInvoices[] = $sale->invoice_number;
 
                 $allocationEntry = PayementAllocation::create([
                     'payment_id' => $this->payementId,
-                    'user_id' => $this->userId, // Utilisation de l'ID passé au constructeur
+                    'user_id' => $this->userId,
                     'amount_allocated' => $allocation,
                     'sale_id' => $sale->id,
-                    'note' => $note,
+                    'note' => "Affectation automatique FIFO sur facture {$sale->invoice_number}.",
                 ]);
 
                 if ($allocationEntry) {
@@ -67,7 +71,18 @@ class ProcessPayement implements ShouldQueue
                     $remaining -= $allocation;
                 }
             }
+
+            // CORRECTION ICI : On utilise les numéros collectés
+            $invoiceList = implode(', ', $impactedInvoices);
+
+            CashMovement::create([
+                'work_session_id' => $this->workId,
+                'user_id' => $this->userId, 
+                'type' => 'in',
+                'amount' => $this->amount,
+                'category' => 'paie_cash', 
+                'description' => "Recouvrement pour les factures : " . ($invoiceList ?: 'N/A'),
+            ]);
         });
-        // Note : La transaction gère le commit/rollback automatiquement ici
     }
 }

@@ -37,6 +37,32 @@
     <script src="{{ asset('assets/libs/parsleyjs/parsley.min.js') }}"></script>
     <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
     <script src="{{ asset('assets/libs/select2/js/select2.min.js') }}"></script>
+    <style>
+    /* L'arrondi global pour toutes les cartes de stats */
+    .custom-card-rounded {
+        border-radius: 15px !important; /* Arrondi moderne sur les 4 coins */
+        border: 1px solid #eef2f7 !important; /* On remet une bordure légère partout */
+        overflow: hidden;
+        transition: transform 0.2s ease;
+    }
+
+    /* On crée la barre de couleur à gauche sans désactiver les autres bordures */
+    .border-primary-sep { border-left: 5px solid #3283f6 !important; }
+    .border-warning-sep { border-left: 5px solid #f7b84b !important; }
+    .border-success-sep { border-left: 5px solid #43b06e !important; }
+    .border-danger-sep  { border-left: 5px solid #f15b71 !important; }
+
+    /* Forcer les icônes en cercles parfaits */
+    .rounded-circle {
+        border-radius: 50% !important;
+    }
+
+    /* Effet de survol doux */
+    .custom-card-rounded:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    }
+</style>
 
 
 </head>

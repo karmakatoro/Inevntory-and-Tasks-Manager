@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\ProcessPayement;
 use App\Models\Payement;
+use App\Models\ProductCustomer;
 use App\Models\Sale;
 use App\Models\User;
 use App\Models\WorkSession;
@@ -42,9 +43,10 @@ class PayementController extends Controller
         ]);
         $user = auth()->id();
         $customer = $request->customer_id;
+        $workId = $isActiveSession->id;
 
         // 2. SECRET SENIOR : On lance le Job en arrière-plan
-        ProcessPayement::dispatch($payment->id, $customer, $request->amount, $user);
+        ProcessPayement::dispatch($payment->id, $customer, $request->amount, $user,$workId);
 
         return response()->json([
             'status' => 'success',
@@ -119,7 +121,7 @@ public function index(User $agent)
                     <div class="dropdown">
                         <button class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">Action</button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="javascript:void(0);"><i class="mdi mdi-eye-outline me-1"></i>Détails</a>
+                            <a class="dropdown-item" href="javascript:void(0);" data-id='.$row->id.'"><i class="mdi mdi-eye-outline me-1"></i>Détails</a>
                             <a class="dropdown-item text-danger delete-payment" data-id="'.$row->id.'" href="javascript:void(0);">
                                 <i class="mdi mdi-trash-can-outline me-1"></i>Supprimer
                             </a>
@@ -132,41 +134,141 @@ public function index(User $agent)
 
     return view('pages.payements.index', compact('agent'));
 }
-    public function  getCustomerDebts(User $agent){
-        if(request()->ajax()){
-            $customers = Customer::whereHas('sales',function($q) use ($agent){
-                $q->where('agent_id',$agent->id)
-                ->whereIn('payment_status',['unpaid',partial]);
-            })
-            ->withSum(['sales'=> function($q) use ($agent){
-                $q->where('agent_id',$agent->id);
-            }],total_amount)
-            ->withSum(['sales' => function($q) use ($agent) {
+    public function getCustomerDebts(User $agent) {
+
+    if (request()->ajax()) {
+        $isAdmin = Auth::user()->type==="admin";
+        $isConnected = Auth::id();
+        $customers = ProductCustomer::whereHas('sales', function($q) use ($agent,$isAdmin) {
+            if(!$isAdmin){
                 $q->where('agent_id', $agent->id);
+            }
+                
+             $q->whereIn('payment_status', ['unpaid', 'partial']);
+            })
+            ->with(['sales' => function($q) use ($agent,$isAdmin) { 
+                if(!$isAdmin){
+                    $q->where('agent_id', $agent->id);
+                }
+                
+            }])
+            ->withSum(['sales' => function($q) use ($agent,$isAdmin) {
+                if(!$isAdmin){
+                    $q->where('agent_id', $agent->id);
+                }
+                
+            }], 'total_amount')
+            ->withSum(['sales' => function($q) use ($agent,$isAdmin) {
+               if(!$isAdmin){
+                    $q->where('agent_id', $agent->id);
+                }
             }], 'amount_paid')
             ->get();
-            return DataTables::of($customers)
-            ->addColumn('customer',fn($row)=>$row->name)
-            ->addColumn('total_du',fn($row)=> number_format($row->sales_sum_total_amount,2).'$')
-            ->addColumn('total_paye',fn($row)=>number_format($row->sales_sum_amount_paid,2).'$')
-            ->addColumn('reste',function($row){
+
+        return DataTables::of($customers)
+            ->addColumn('customer', fn($row) => $row->name)
+            ->addColumn('total_du', fn($row) => number_format($row->sales_sum_total_amount, 2) . '$')
+            ->addColumn('total_paye', fn($row) => number_format($row->sales_sum_amount_paid, 2) . '$')
+            ->addColumn('reste', function($row) {
                 $reste = $row->sales_sum_total_amount - $row->sales_sum_amount_paid;
                 return '<b class="text-danger">' . number_format($reste, 2) . ' $</b>';
             })
-            ->addColumn('historique', function($row) {
-                // On crée un petit résumé visuel pour chaque vente
-                $html = '<ul class="small mb-0">';
-                foreach($row->sales as $sale) {
-                    if($sale->balance > 0) {
-                        $html .= "<li>Facture #{$sale->invoice_number} : <b>{$sale->total_amount}$</b> (Payé: {$sale->amount_paid}$, Reste: <span class='text-warning'>{$sale->balance}$</span>)</li>";
-                    }
-                }
-                $html .= '</ul>';
-                return $html;
-            })
-            ->rawColumns(['reste_a_payer', 'historique', 'action'])
-            ->make(true);
+           
+            ->addColumn('action', function($row) {
+    $reste = $row->sales_sum_total_amount - $row->sales_sum_amount_paid;
+    
+    // Historique préparé pour la modal
+    $historyHtml = '<ul class="list-group list-group-flush">';
+    foreach($row->sales as $sale) {
+        $balance = $sale->total_amount - $sale->amount_paid;
+        if($balance > 0) {
+            $historyHtml .= "<li class='list-group-item d-flex justify-content-between align-items-center'>
+                <span>Facture #{$sale->invoice_number}</span>
+                <span class='badge bg-soft-warning text-warning'>Reste: ".number_format($balance, 2)."$</span>
+            </li>";
         }
-
     }
+    $historyHtml .= '</ul>';
+
+    return '
+        <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-primary btn-paie me-1" 
+                data-customer="'.$row->id.'" 
+                data-debt="'.number_format($reste, 2).'" 
+                title="Payer">
+                <i class="mdi mdi-cash-multiple me-1"></i> Payer
+            </button>
+            
+            <button type="button" class="btn btn-sm btn-info btn-details me-1" 
+                data-name="'.$row->name.'"
+                data-history="'.htmlspecialchars($historyHtml).'" 
+                title="Détails">
+                <i class="mdi mdi-eye-outline me-1"></i> Détails
+            </button>
+
+            <button type="button" class="btn btn-sm btn-danger btn-cancel" 
+                data-id="'.$row->id.'" 
+                title="Annuler">
+                <i class="mdi mdi-close-circle-outline me-1"></i> Annuler
+            </button>
+        </div>';
+})
+            ->rawColumns(['reste', 'action'])
+            ->make(true);
+    }
+
+
+    
+    $isAdmin = Auth::user()->type === 'admin';
+    $isConnected = Auth::id();
+$query = \DB::table('sales')
+    ->whereIn('payment_status', ['unpaid', 'partial']);
+
+// Si ce n'est pas un admin, on filtre strictement par l'ID de l'agent
+if (!$isAdmin) {
+    $query->where('agent_id', $isConnected);
+} 
+// Note : Si vous voulez que l'admin voie la dette d'un agent spécifique 
+// via une route dédiée, utilisez : else { $query->where('agent_id', $agent->id); }
+
+$totalGlobalDebt = $query->selectRaw('SUM(total_amount) - SUM(amount_paid) as net_debt')
+    ->value('net_debt') ?? 0;
+
+    return view('pages.payements.credit', compact('totalGlobalDebt'));
+}
+public function getPayementAllocation($id){
+    $payement = payement::with(['allocations.sale'])->findOrFail($id);
+   
+    $html = '<div class="table-responsive">
+                <table class="table table-sm table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>N° Facture</th>
+                            <th class="text-end">Montant Alloué</th>
+                            <th class="text-center">Date Vente</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+    foreach($payement->allocations as $allocation){
+        $html .= '<tr>
+                    <td>
+                        <span class="fw-bold text-primary">#' . $allocation->sale->invoice_number . '</span>
+                    </td>
+                    <td class="text-end fw-medium">' . number_format($allocation->amount_allocated, 2) . ' $</td>
+                    <td class="text-center">' . \Carbon\Carbon::parse($allocation->sale->created_at)->format('d/m/Y') . '</td>
+                  </tr>';
+    }
+    $html .= '</tbody>
+              <tfoot class="table-light">
+                <tr>
+                    <td class="fw-bold">TOTAL ALLOUÉ</td>
+                    <td class="text-end fw-bold text-success">' . number_format($payement->amount, 2) . ' $</td>
+                    <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>';
+          // Au lieu de return response()->json($html);
+return response($html, 200)->header('Content-Type', 'text/html');;
+}
 }

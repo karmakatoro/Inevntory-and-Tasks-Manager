@@ -97,8 +97,7 @@ class ProcessSale implements ShouldQueue
                     'type' => 'in',
                     'amount' => $this->saleData['amount_paid'],
                     'category' => 'sale_cash', 
-                    'description' => "Encaissé pour facture {$sale->invoice_number}",
-                    
+                    'description' => "Encaissé pour facture {$sale->invoice_number}",    
                 ]);
 
                 // On met à jour la variable pour la notification

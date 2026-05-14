@@ -7,16 +7,16 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box">
-                <h4 class="page-title">Product Categories</h4>
+                <h4 class="page-title">Catégries des Produits</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item">
-                            <a href="{{ route('dashboard.sales') }}">Dashboard</a>
+                            <a href="{{ route('dashboard.sales') }}">Tableau de bord</a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('products.index') }}">Products</a>
+                            <a href="{{ route('products.index') }}">Produits</a>
                         </li>
-                        <li class="breadcrumb-item active">Product Categories</li>
+                        <li class="breadcrumb-item active">Catégries des Produits</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                     <div class="row mb-2">
                         <div class="col-sm-4">
                             <a href="#" data-bs-toggle="modal" data-bs-target="#product-category-modal"
-                                class="btn btn-primary mb-2"><i class="mdi mdi-plus-circle me-1"></i> Add Category</a>
+                                class="btn btn-primary mb-2"><i class="mdi mdi-plus-circle me-1"></i>Ajouter une Catégorie</a>
 
                         </div>
                         <div class="col-sm-8">
@@ -39,9 +39,9 @@
                                     class="btn btn-danger mb-2 me-1 delete-all">
                                     <i class="mdi mdi-trash-can-outline"></i></button>
                                 <a href="javascript:void(0);" class="btn btn-primary mb-2"><i
-                                        class="mdi mdi-printer me-1"></i> Print</a>
+                                        class="mdi mdi-printer me-1"></i>Imprimer</a>
                                 <a href="javascript:void(0);" class="btn btn-success mb-2"><i
-                                        class="mdi mdi-database-export me-1"></i> Export</a>
+                                        class="mdi mdi-database-export me-1"></i>Exporter</a>
                             </div>
                         </div><!-- end col-->
                     </div>
@@ -58,7 +58,7 @@
                                             <label class="form-check-label" for="customerlist">&nbsp;</label>
                                         </div>
                                     </th>
-                                    <th>Designation</th>
+                                    <th>Désignation</th>
                                     <th style="width: 85px;">Status</th>
                                     <th style="width: 75px;">Action</th>
                                 </tr>
@@ -114,6 +114,17 @@
                     },
                 ],
                 lengthMenu: [10, 25, 50, 100],
+                 language: {
+               "sProcessing": "Traitement en cours...",
+                    "sSearch": "Rechercher  :",
+                    "sLengthMenu": "Afficher _MENU_ Catégories",
+                    "sInfo": "Affichage de _START_ à _END_ sur _TOTAL_ Catégories",
+                    "sEmptyTable": "Aucune dette en cours.",
+                    "oPaginate": {
+                        "sNext": "Suivant",
+                        "sPrevious": "Précédent"
+
+            }},
             });
 
             $(document).on('click', '.edit-btn', function(e) {

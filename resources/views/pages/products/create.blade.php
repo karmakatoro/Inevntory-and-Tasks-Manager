@@ -1,6 +1,6 @@
 @extends('layouts.base')
 
-@section('title', 'Create Product - ' . env('APP_NAME'))
+@section('title', 'Créer un produit - ' . env('APP_NAME'))
 
 @section('content')
 @if ($errors->any())
@@ -8,33 +8,31 @@
         <ul> @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach </ul>
     </div>
 @endif
-    <!-- price page title -->
     <div class="row">
         <div class="col-12">
             <div class="page-title-box">
-                <h4 class="page-title">Products</h4>
+                <h4 class="page-title">Produits</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item">
-                            <a href="{{ route('dashboard.sales') }}">Dashboard</a>
+                            <a href="{{ route('dashboard.sales') }}">Tableau de bord</a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('products.index') }}">Products</a>
+                            <a href="{{ route('products.index') }}">Produits</a>
                         </li>
-                        <li class="breadcrumb-item active">Create</li>
+                        <li class="breadcrumb-item active">Créer</li>
                     </ol>
                 </div>
             </div>
         </div>
     </div>
-    <!-- end page title -->
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
                     <div class="row">
                         <div class="col-8">
-                            <h4 class="header-title mb-3">Create new product by filling this form</h4>
+                            <h4 class="header-title mb-3">Créer un nouveau produit en remplissant ce formulaire</h4>
                         </div>
                         <div class="col-4 text-end">
                             <span class="badge bg-primary p-1">{{ auth()->user()->name }}</span>
@@ -53,7 +51,7 @@
                                     <line x1="15" y1="9" x2="9" y2="15"></line>
                                     <line x1="9" y1="9" x2="15" y2="15"></line>
                                 </svg>
-                                <strong>Error!</strong> {{ session()->get('error') }}
+                                <strong>Erreur !</strong> {{ session()->get('error') }}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="btn-close">
                                 </button>
                             </div>
@@ -62,22 +60,22 @@
                         <div class="col-12">
                             <div class="row mb-3">
                                 <div class="col-lg-8 col-sm-12">
-                                    <label class="mb-1" for="name">Product Name</label>
+                                    <label class="mb-1" for="name">Nom du produit</label>
                                     <div class="col-12">
                                         <input type="text" value="{{ old('name') }}" class="form-control"
-                                            id="name" name="name" required>
+                                            id="name" name="name" placeholder="Entrez le nom du produit" required>
                                         @if ($errors->has('name'))
                                             <p class="text-pink mt-2">
-                                                {{ $errors->first('title') }}
+                                                {{ $errors->first('name') }}
                                             </p>
                                         @endif
                                     </div>
                                 </div>
                                 <div class="col-lg-4 col-sm-12">
-                                    <label for="statusProduct" class="form-label">Status</label>
-                                    <select class="form-select" id="statusProduct" name="status" v>
-                                        <option value="on" selected>Activated</option>
-                                        <option value="off">Deactivated</option>
+                                    <label for="statusProduct" class="form-label">Statut</label>
+                                    <select class="form-select" id="statusProduct" name="status">
+                                        <option value="on" selected>Activé</option>
+                                        <option value="off">Désactivé</option>
                                     </select>
                                     @if ($errors->has('status'))
                                         <p class="text-pink mt-2">
@@ -88,12 +86,9 @@
                             </div>
                             <div class="row mb-3">
                                 <div class="col-lg-8 col-sm-12">
-                                    <label class="mb-1" for="description">
-                                        Description</label>
+                                    <label class="mb-1" for="description">Description</label>
                                     <div class="col-md-12">
-                                        <textarea rows="5" id="description" name="description" class="form-control" required>
-                                                {{ old('description') }}
-                                            </textarea>
+                                        <textarea rows="5" id="description" name="description" class="form-control" placeholder="Description détaillée du produit..." required>{{ old('description') }}</textarea>
                                         @if ($errors->has('description'))
                                             <p class="text-pink mt-2">
                                                 {{ $errors->first('description') }}
@@ -102,12 +97,10 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-lg-4">
-                                    <label for="photo">Photo</label>
+                                    <label for="photo">Photo principale</label>
                                     <div class="col-md-12">
                                         <input type="file" id="photo" name="photo" class="form-control"
                                             accept="image/jpeg,image/png,image/jpg" required>
-                                    </div>
-                                    <div class="col-12">
                                     </div>
                                     @if ($errors->has('photo'))
                                         <p class="text-pink mt-2">
@@ -119,10 +112,10 @@
 
                             <div class="row mb-3">
                                 <div class="col-lg-3 col-sm-12">
-                                    <label for="price">Price</label>
+                                    <label for="price">Prix</label>
                                     <div class="col-md-12">
-                                        <input type="integer" id="price" value="{{ old('price') }}" name="price"
-                                            class="form-control" required>
+                                        <input type="number" id="price" value="{{ old('price') }}" name="price"
+                                            class="form-control" placeholder="0.00" required>
                                         @if ($errors->has('price'))
                                             <p class="text-pink mt-2">
                                                 {{ $errors->first('price') }}
@@ -131,10 +124,10 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-sm-12">
-                                    <label for="product_category_id">Product Category</label>
+                                    <label for="product_category_id">Catégorie du produit</label>
                                     <select class="form-control" id="product_category_id" name="product_category_id"
                                         data-toggle="select2" required>
-                                        <option>Select</option>
+                                        <option value="">Sélectionner</option>
                                         @foreach ($categories as $product_category)
                                             <option value="{{ $product_category->id }}">{{ $product_category->name }}
                                             </option>
@@ -148,10 +141,10 @@
                                 </div>
 
                                 <div class="col-lg-3 col-sm-12">
-                                    <label for="end">Subcategories</label>
+                                    <label for="subcategories">Sous-catégories</label>
                                     <div class="col-md-12">
                                         <select required class="form-control select2-multiple" name="subcategories[]"
-                                            data-toggle="select2" multiple="multiple" data-placeholder="Choose ...">
+                                            id="subcategories" data-toggle="select2" multiple="multiple" data-placeholder="Choisir ...">
                                             @foreach ($categories as $product_category)
                                                 <option value="{{ $product_category->id }}">{{ $product_category->name }}
                                                 </option>
@@ -165,7 +158,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-sm-12">
-                                    <label for="files">Product Gallery</label>
+                                    <label for="files">Galerie photos</label>
                                     <div class="col-md-12">
                                         <input type="file" id="files" name="files[]" class="form-control"
                                             multiple accept="image/jpeg,image/png,image/jpg">
@@ -177,14 +170,10 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-12 mt-3 text-end">
-                                    <button type="submit" class="btn btn-primary">Create Product</button>
+                                    <button type="submit" class="btn btn-primary">Créer le produit</button>
                                 </div>
                             </div>
-                        </div> <!-- end col -->
-
-                    </form>
-                </div> <!-- end card-body -->
-            </div> <!-- end card-->
-        </div>
+                        </div> </form>
+                </div> </div> </div>
     </div>
 @endsection
