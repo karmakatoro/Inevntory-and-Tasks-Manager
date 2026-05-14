@@ -18,15 +18,18 @@ class SaleController extends Controller
         if (Auth::user()->type !== 'admin' && Auth::id() !== $agent->id) {
             abort(403, 'Action non autorisée.');
         }
+
         if (request()->ajax()) {
             // On filtre par l'ID de l'agent reçu en paramètre
-            $sales = Sale::with(['customer' => function ($q) {
+            $query = Sale::with(['customer' => function ($q) {
                 // On charge les ventes liées pour que l'Accessor total_debt fonctionne
                 $q->with('sales');
-            }])
-                ->where('agent_id', $agent->id)
-                ->latest()
-                ->get();
+            }]);
+            if(Auth::user()->type !== "admin"){
+                $query->where('agent_id', Auth::id());
+            }
+            $sales = $query->latest()->get();
+                
 
             return DataTables::of($sales)
                 ->addIndexColumn()

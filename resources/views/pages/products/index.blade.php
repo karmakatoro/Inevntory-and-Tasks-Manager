@@ -7,59 +7,80 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box">
-                <h4 class="page-title">Products</h4>
+                <h4 class="page-title">Produits</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item">
-                            <a href="{{ route('dashboard.sales') }}">Dashboard</a>
+                            <a href="{{ route('dashboard.sales') }}">Tableau de Bord</a>
                         </li>
-                        <li class="breadcrumb-item active">Products</li>
+                        <li class="breadcrumb-item active">Gestion des Produits</li>
                     </ol>
                 </div>
             </div>
         </div>
     </div>
     <!-- end page title -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="text-center">
-                        <div class="row">
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-tag font-24"></i>
-                                    <h3>25563</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Total Products</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-archive font-24"></i>
-                                    <h3 class="text-warning">6952</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Availiable Products</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-shield font-24"></i>
-                                    <h3 class="text-success">18361</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Total Sells</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 col-xl-3">
-                                <div class="py-1">
-                                    <i class="fe-delete font-24"></i>
-                                    <h3 class="text-danger">250</h3>
-                                    <p class="text-uppercase mb-1 font-13 fw-medium">Total Sellers</p>
-                                </div>
-                            </div>
-                        </div>
+  <div class="row" id="stats-container">
+    <div class="col-md-6 col-xl-3">
+        <div class="card widget-flat custom-card-rounded border-primary-sep shadow-sm">
+            <div class="card-body">
+                <div class="float-end">
+                    <div class="avatar-sm bg-soft-primary rounded-circle">
+                        <i class="fe-tag avatar-title font-22 text-primary"></i>
                     </div>
                 </div>
+                <h6 class="text-muted text-uppercase mt-0">Total Produits</h6>
+                <h3 class="my-2">25,563</h3>
+                <p class="mb-0 text-muted"><span class="small fw-medium">Catalogue complet</span></p>
             </div>
         </div>
     </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card widget-flat custom-card-rounded border-warning-sep shadow-sm">
+            <div class="card-body">
+                <div class="float-end">
+                    <div class="avatar-sm bg-soft-warning rounded-circle">
+                        <i class="fe-archive avatar-title font-22 text-warning"></i>
+                    </div>
+                </div>
+                <h6 class="text-muted text-uppercase mt-0">Disponibles</h6>
+                <h3 class="my-2 text-warning">6,952</h3>
+                <p class="mb-0 text-muted"><span class="small fw-medium">Prêt à la vente</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card widget-flat custom-card-rounded border-success-sep shadow-sm">
+            <div class="card-body">
+                <div class="float-end">
+                    <div class="avatar-sm bg-soft-success rounded-circle">
+                        <i class="fe-shield avatar-title font-22 text-success"></i>
+                    </div>
+                </div>
+                <h6 class="text-muted text-uppercase mt-0">Chiffre d'Affaires</h6>
+                <h3 class="my-2 text-success">18,361 $</h3>
+                <p class="mb-0 text-muted"><span class="text-success small"><i class="mdi mdi-trending-up"></i> +12.5%</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card widget-flat custom-card-rounded border-danger-sep shadow-sm">
+            <div class="card-body">
+                <div class="float-end">
+                    <div class="avatar-sm bg-soft-danger rounded-circle">
+                        <i class="fe-users avatar-title font-22 text-danger"></i>
+                    </div>
+                </div>
+                <h6 class="text-muted text-uppercase mt-0">Réseau Agents</h6>
+                <h3 class="my-2 text-danger">250</h3>
+                <p class="mb-0 text-muted"><span class="small fw-medium">Vendeurs actifs</span></p>
+            </div>
+        </div>
+    </div>
+</div>
 
     <div class="row">
         <div class="col-12">
@@ -68,8 +89,7 @@
                     <div class="row mb-2">
                         <div class="col-sm-4">
                             <a href="{{ route('products.create') }}" class="btn btn-primary mb-2"><i
-                                    class="mdi mdi-plus-circle me-1"></i> Add
-                                Product</a>
+                                    class="mdi mdi-plus-circle me-1"></i>Ajouter un produit</a>
 
                         </div>
                         <div class="col-sm-8">
@@ -78,9 +98,9 @@
                                     class="btn btn-danger mb-2 me-1 delete-all">
                                     <i class="mdi mdi-trash-can-outline"></i></button>
                                 <a href="javascript:void(0);" class="btn btn-primary mb-2"><i
-                                        class="mdi mdi-printer me-1"></i> Print</a>
+                                        class="mdi mdi-printer me-1"></i>Imprimer</a>
                                 <a href="javascript:void(0);" class="btn btn-success mb-2"><i
-                                        class="mdi mdi-database-export me-1"></i> Export</a>
+                                        class="mdi mdi-database-export me-1"></i>Exporter</a>
                             </div>
                         </div><!-- end col-->
                     </div>
@@ -110,10 +130,10 @@
                                             <label class="form-check-label" for="customerlist">&nbsp;</label>
                                         </div>
                                     </th>
-                                    <th>Product</th>
-                                    <th>Added Date</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
+                                    <th>Information sur le produit</th>
+                                    <th>Date de création</th>
+                                    <th>Prix</th>
+                                    <th>Quantité en stock</th>
                                     <th>Status</th>
                                     <th style="width: 75px;">Action</th>
                                 </tr>
@@ -172,7 +192,7 @@
                     {
                         data: "quantity",
                         name: "quantity",
-                        className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                        className: "text-center",
                     },
                     {
                         data: "status",
@@ -187,7 +207,19 @@
                     },
                 ],
                 lengthMenu: [10, 25, 50, 100],
+            language: {
+               "sProcessing": "Traitement en cours...",
+                    "sSearch": "Rechercher ",
+                    "sLengthMenu": "Afficher _MENU_ Produits",
+                    "sInfo": "Affichage de _START_ à _END_ sur _TOTAL_ Produits",
+                    "sEmptyTable": "Aucune dette en cours.",
+                    "oPaginate": {
+                        "sNext": "Suivant",
+                        "sPrevious": "Précédent"
+
+            }},
             });
+            
 
 
             $(document).on('click', '.delete-btn', function(e) {

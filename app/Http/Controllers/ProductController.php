@@ -46,7 +46,7 @@ class ProductController extends Controller
                                                 ' .$row->name. '
                                             </a>
                                         </h5>
-                                    <p class="mb-0 font-13">Category : ' .($row->product_category->name ?? 'N/A'). ' </p>
+                                    <p class="mb-0 font-13">Catégorie : ' .($row->product_category->name ?? 'N/A'). ' </p>
                                     </div>
                                 </div>';
 

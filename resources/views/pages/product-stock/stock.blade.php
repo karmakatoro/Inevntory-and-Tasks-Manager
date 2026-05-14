@@ -12,8 +12,7 @@
                         <div class="row mb-2">
                             <div class="col-sm-4">
                                 <a href="{{ route('products.create') }}" class="btn btn-primary mb-2"><i
-                                        class="mdi mdi-plus-circle me-1"></i> Add
-                                    Product</a>
+                                        class="mdi mdi-plus-circle me-1"></i>Ajouter un Produit</a>
 
                             </div>
                             <div class="col-sm-8">
@@ -22,9 +21,9 @@
                                         class="btn btn-danger mb-2 me-1 delete-all">
                                         <i class="mdi mdi-trash-can-outline"></i></button>
                                     <a href="javascript:void(0);" class="btn btn-primary mb-2"><i
-                                            class="mdi mdi-printer me-1"></i> Print</a>
+                                            class="mdi mdi-printer me-1"></i>Imprimer</a>
                                     <a href="javascript:void(0);" class="btn btn-success mb-2"><i
-                                            class="mdi mdi-database-export me-1"></i> Export</a>
+                                            class="mdi mdi-database-export me-1"></i>Exporter</a>
                                 </div>
                             </div><!-- end col-->
                         </div>
@@ -41,9 +40,9 @@
                                                 <label class="form-check-label" for="customerlist">&nbsp;</label>
                                             </div>
                                         </th>
-                                        <th>Product</th>
-                                        <th>Price</th>
-                                        <th>Quantity</th>
+                                        <th>Informations sur les Produits</th>
+                                        <th>PriX</th>
+                                        <th>Quantité</th>
                                         <th>Status</th>
                                         <th style="width: 75px;">Action</th>
                                     </tr>
@@ -97,7 +96,7 @@
                 {
                     data: "quantity",
                     name: "quantity",
-                    className: "text-900 sort pe-1 align-middle white-space-nowrap",
+                    className: "text-center",
                 },
                 {
                     data: "status",
@@ -112,6 +111,17 @@
                 },
             ],
             lengthMenu: [10, 25, 50, 100],
+             language: {
+               "sProcessing": "Traitement en cours...",
+                    "sSearch": "Rechercher  :",
+                    "sLengthMenu": "Afficher _MENU_ Produits",
+                    "sInfo": "Affichage de _START_ à _END_ sur _TOTAL_ Produits",
+                    "sEmptyTable": "Aucune dette en cours.",
+                    "oPaginate": {
+                        "sNext": "Suivant",
+                        "sPrevious": "Précédent"
+
+            }},
         });
 
 
