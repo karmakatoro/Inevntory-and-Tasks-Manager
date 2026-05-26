@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use App\Jobs\ProcessStockAssignment;
+use App\Models\WorkSession;
 
 class CartController extends Controller
 {
@@ -310,7 +311,11 @@ class CartController extends Controller
 {
     // 1. Récupération des données
     $cart = session()->get('assign_cart');
-    $agentId = $request->agent_id;
+    $agentId = $request->input('agent_id');
+   
+    $agentActiveSession =  WorkSession::where('user_id',$agentId)
+                            ->where('status', 'open')
+                            ->first();
 
     // 2. Validation (Correction de la syntaxe session)
     if(!$agentId || empty($cart)){
@@ -322,9 +327,10 @@ class CartController extends Controller
 
     $adminId = auth()->id();
     $sessionId = session()->getId();
+    $workSessionId = $agentActiveSession ? $agentActiveSession->id : null;
 
     // 3. Lancement du Job (Correction de l'orthographe dispatch)
-    ProcessStockAssignment::dispatch($agentId, $adminId, $cart, $sessionId);
+    ProcessStockAssignment::dispatch($agentId, $adminId, $cart, $sessionId,$workSessionId);
 
     // 4. Nettoyage immédiat pour l'interface utilisateur
     session()->forget('assign_cart');

@@ -4,7 +4,7 @@
     <div class="card-body border-bottom bg-light">
         <div class="form-group mb-0">
             <label class="form-label text-primary fw-bold">Attribuer ce lot à :</label>
-            <select class="form-select select2" id="target_agent_id">
+            <select class="form-select select2" name="agent_id" id="target_agent_id">
                 <option value="">-- Choisir l'agent --</option>
                 @foreach ($agents as $agent)
                     <option value="{{ $agent->id }}">{{ $agent->name }}</option>

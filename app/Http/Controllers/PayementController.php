@@ -47,10 +47,15 @@ class PayementController extends Controller
 
         // 2. SECRET SENIOR : On lance le Job en arrière-plan
         ProcessPayement::dispatch($payment->id, $customer, $request->amount, $user,$workId);
+        $totalSalesAmount = Sale::sum('total_amount');
+        $totalPaymentsAmount = Payement::sum('amount');
+    
+        $newGlobalDebt = $totalSalesAmount - $totalPaymentsAmount;
 
         return response()->json([
             'status' => 'success',
             'message' => 'Le paiement est en cours de traitement par le système.',
+            'newGlobalDebt' => number_format($newGlobalDebt, 2)
         ]);
     }
 
@@ -221,12 +226,13 @@ public function index(User $agent)
     
     $isAdmin = Auth::user()->type === 'admin';
     $isConnected = Auth::id();
-$query = \DB::table('sales')
+   $query = \DB::table('sales')
     ->whereIn('payment_status', ['unpaid', 'partial']);
 
 // Si ce n'est pas un admin, on filtre strictement par l'ID de l'agent
 if (!$isAdmin) {
     $query->where('agent_id', $isConnected);
+
 } 
 // Note : Si vous voulez que l'admin voie la dette d'un agent spécifique 
 // via une route dédiée, utilisez : else { $query->where('agent_id', $agent->id); }

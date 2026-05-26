@@ -24,7 +24,7 @@ class ProductController extends Controller
     public function index()
     {
         if (request()->ajax()) {
-            $products = Product::latest()->get();
+         $products = Product::query()->latest();
 
             return DataTables::of($products)
                 ->addIndexColumn()
