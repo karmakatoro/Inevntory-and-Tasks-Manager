@@ -1,12 +1,7 @@
 <div class="row">
     <div class="col-12">
         <div class="row mb-2">
-            <div class="col-sm-4">
-                <a href="#" class="btn btn-success mb-2" data-bs-toggle="modal"
-                    data-bs-target="#movement-stock-modal"><i class="mdi mdi-history me-1"></i>Approvisionner le stock central</a>
-
-            </div>
-            <div class="col-sm-8">
+            <div class="col-sm-12">
                 <div class="text-sm-end">
                     <button data-url="{{ route('dm-prcat') }}" type="button"
                         class="btn btn-danger mb-2 me-1 delete-all">
@@ -43,4 +38,4 @@
         </div>
     </div>
 </div>
-@include('pages.product-stock.modal-movement-stock');
+@include('pages.product-stock.modal-movement-stock')

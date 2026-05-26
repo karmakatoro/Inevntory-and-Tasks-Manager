@@ -74,50 +74,65 @@ $(document).ready(function() {
         $('#ModalPaie').modal('show');
     });
 
-    // 2. Traitement AJAX (Inspiré de ton bouton btnSave)
-    $('#btnSubmitPaiement').on('click', function(e) {
-        e.preventDefault();
-        let btn = $(this);
-        let form = $('#formPaiementDette');
-        let amount = $('#amountToPay').val();
+    // 2. Traitement AJAX
+$('#btnSubmitPaiement').on('click', function(e) {
+    e.preventDefault();
+    let btn = $(this);
+    let form = $('#formPaiementDette');
+    let amount = $('#amountToPay').val();
 
-        if(amount <= 0 || amount === "") {
-            Swal.fire("Attention", "Veuillez saisir un montant valide.", "warning");
-            return;
-        }
+    if(amount <= 0 || amount === "") {
+        Swal.fire("Attention", "Veuillez saisir un montant valide.", "warning");
+        return;
+    }
 
-        // État Loading identique à ton autre modal
-        btn.prop('disabled', true).html(
-            `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Enregistrement...`
-        );
+    // État Loading : On bloque le bouton
+    btn.prop('disabled', true).html(
+        `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Enregistrement...`
+    );
 
-        $.ajax({
-            url: "{{ route('payement.store') }}",
-            method: "POST",
-            data: form.serialize(),
-            success: function(response) {
-                if(response.status) {
-                    Swal.fire({
-                        title: "Succès!",
-                        text: response.message,
-                        icon: "success",
-                        confirmButtonColor: "#1abc9c",
-                    }).then(() => {
-                        $('#ModalPaie').modal('hide');
-                        // Recharge la table DataTables si elle s'appelle currentDt
-                        if (typeof currentDt !== 'undefined') currentDt.ajax.reload();
-                        else location.reload();
-                    });
-                } else {
-                    Swal.fire("Erreur", response.message, "error");
-                    btn.prop('disabled', false).html("<i class='mdi mdi-check-circle-outline me-1'></i>Confirmer le paiement");
-                }
-            },
-            error: function(xhr) {
-                btn.prop('disabled', false).html("<i class='mdi mdi-check-circle-outline me-1'></i>Confirmer le paiement");
-                Swal.fire("Erreur", "Une erreur technique est survenue.", "error");
+    $.ajax({
+        url: form.attr('action') || "{{ route('payement.store') }}", // Sécurité : utilise l'action du formulaire ou la route de secours
+        method: "POST",
+        data: form.serialize(),
+        success: function(response) {
+            // LIBÉRATION IMMÉDIATE DU BOUTON dès que le serveur répond avec succès
+            btn.prop('disabled', false).html("<i class='mdi mdi-check-circle-outline me-1'></i>Confirmer le paiement");
+
+            if(response.status) {
+                // On vide le champ montant pour éviter les doubles soumissions si on rouvre la modale
+                $('#amountToPay').val('');
+
+                Swal.fire({
+                    title: "Succès!",
+                    text: response.message,
+                    icon: "success",
+                    confirmButtonColor: "#1abc9c",
+                }).then(() => {
+                    $('#ModalPaie').modal('hide');
+                    
+                    // Recharge la table DataTables
+                    $('#payment-dt').DataTable().ajax.reload(null, false);
+                    
+                    // Mise à jour de la dette globale
+                    if (response.newGlobalDebt !== undefined) {
+                        $('#displayGlobalDebt').text(response.newGlobalDebt);
+                        
+                        if ($.fn.counterUp) {
+                            $('#displayGlobalDebt').counterUp({ delay: 10, time: 1000 });
+                        }
+                    }
+                });
+            } else {
+                Swal.fire("Erreur", response.message, "error");
             }
-        });
+        },
+        error: function(xhr) {
+            // LIBÉRATION DU BOUTON en cas d'erreur serveur ou réseau
+            btn.prop('disabled', false).html("<i class='mdi mdi-check-circle-outline me-1'></i>Confirmer le paiement");
+            Swal.fire("Erreur", "Une erreur technique est survenue.", "error");
+        }
     });
+});
 });
 </script>

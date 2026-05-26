@@ -35,6 +35,12 @@
                             <i class="mdi mdi-cart-minus me-1"></i> Panier d'attribution
                         </a>
                     </li>
+                     <li class="nav-item" role="presentation">
+                        <a href="#assign" data-bs-toggle="tab" aria-expanded="true" class="nav-link "
+                            aria-selected="false" role="tab" tabindex="-1">
+                            <i class="mdi mdi-history me-1"></i> Assignation de Stock
+                        </a>
+                    </li>
                     <li class="nav-item" role="presentation">
                         <a href="#stock-history" data-bs-toggle="tab" aria-expanded="true" class="nav-link "
                             aria-selected="false" role="tab" tabindex="-1">
@@ -59,6 +65,9 @@
 
                     <div class="tab-pane" id="stock-history" role="tabpanel">
                         @include('pages.product-stock.stock-history')
+                    </div>
+                    <div class="tab-pane" id="assign" role="tabpanel">
+                        @include('pages.product-stock.assign')
                     </div>
                 </div> <!-- end tab-content -->
             </div>
@@ -248,5 +257,168 @@
             }
         });
     });
+    $(document).ready(function() {
+    // 1. Configuration et Sécurisation des variables de base
+    const $table = $('#assign-dt');
+    if ($table.length === 0) return; // Sécurité si la table n'est pas sur la page
+
+    const apiUrl = $table.data('api-url');
+    let selectedStatus = 'all'; // Statut de filtre par défaut
+
+    // 2. Initialisation de la DataTable (Server-Side)
+    const tableInstance = $table.DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        ajax: {
+            url: apiUrl,
+            type: 'GET',
+            data: function (d) {
+                // Injection dynamique du statut choisi dans la requête Laravel
+                d.status = selectedStatus;
+            },
+            error: function (xhr) {
+                console.error("Erreur DataTables : ", xhr.responseText);
+            }
+        },
+        columns: [
+            { 
+                data: 'checkbox', 
+                orderable: false, 
+                searchable: false,
+                width: '20px'
+            },
+            { data: 'reference_bon' },
+            { data: 'sender' },
+            { data: 'receiver' },
+            { data: 'created_at' },
+            { data: 'total_distinct_products', className: 'text-center' },
+            { data: 'status', orderable: true },
+            { 
+                data: 'action', 
+                orderable: false, 
+                searchable: false, 
+                className: 'text-center',
+                width: '100px'
+            }
+        ],
+        order: [[4, 'desc']], // Tri par défaut sur la colonne 'Date d'Opération'
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json', // Interface en français
+            
+    "sEmptyTable":     "Aucune donnée disponible dans le tableau",
+    "sInfo":           "Affichage de l'élément _START_ à _END_ sur _TOTAL_ éléments",
+    "sInfoEmpty":      "Affichage de l'élément 0 à 0 sur 0 élément",
+    "sInfoFiltered":   "(filtré à partir de _MAX_ éléments au total)",
+    "sLengthMenu":     "Afficher _MENU_ éléments",
+    "sLoadingRecords": "Chargement...",
+    "sProcessing":     "Traitement...",
+    "sSearch":         "Rechercher :",
+    "sZeroRecords":    "Aucun élément correspondant trouvé",
+    "oPaginate": {
+        "sFirst":    "Premier",
+        "sLast":     "Dernier",
+        "sNext":     "Suivant",
+        "sPrevious": "Précédent"
+    }
+
+        }
+    });
+
+    // 3. UI/UX : Gestion du menu déroulant (Dropdown Filter)
+    $('.btn-status-filter').on('click', function(e) {
+        e.preventDefault();
+
+        // Gestion active visuelle dans le menu
+        $('.btn-status-filter').removeClass('active');
+        $(this).addClass('active');
+
+        // Récupération de la nouvelle valeur de filtre
+        selectedStatus = $(this).data('status');
+
+        // Mise à jour de l'intitulé du bouton principal (sans les icônes/badges)
+        const textLabel = $(this).text().trim().replace('●', '');
+        $('#active-filter-label').text(textLabel);
+
+        // Changement de style cosmétique si un filtre est actif
+        if (selectedStatus !== 'all') {
+            $('#dropdownFilterStatus').removeClass('btn-light').addClass('btn-soft-primary');
+        } else {
+            $('#dropdownFilterStatus').removeClass('btn-soft-primary').addClass('btn-light');
+        }
+
+        // Rechargement instantané de la DataTable avec le nouveau filtre
+        tableInstance.ajax.reload();
+    });
+
+    // 4. UI/UX : Interception du clic pour charger les détails du Bon de Sortie
+    $(document).on('click', '.btn-view-details', function(e) {
+        e.preventDefault();
+
+        const referenceBon = $(this).data('bon');
+        const auteur = $(this).data('sender');
+        const agent = $(this).data('receiver');
+
+        // Préparation et affichage immédiat du modal avec un loader
+        $('#lbl-numero-bon').text(referenceBon);
+        $('#lbl-auteur-bon').text(auteur);
+        $('#lbl-agent-bon').text(agent);
+        
+        $('#tbl-produits-bon').html(`
+            <tr>
+                <td colspan="4" class="text-center py-3 text-muted">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                    Récupération des produits depuis la base de données...
+                </td>
+            </tr>
+        `);
+        
+        $('#modalDetailsBon').modal('show');
+
+        // Appel AJAX pour récupérer les produits masqués derrière ce numéro de bon
+        $.ajax({
+            url: `/products-stock/details/${referenceBon}`,
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                let htmlRows = '';
+
+                if (response.success && response.data.length > 0) {
+                    response.data.forEach(item => {
+                        htmlRows += `
+                            <tr>
+                                <td><span class="fw-semibold text-dark">${item.product_name}</span></td>
+                                <td class="text-center fw-bold text-info font-14">${item.quantity}</td>
+                                <td class="text-center font-13">${item.quantity_received !== null ? `<span class="badge bg-success-lighten text-success">${item.quantity_received}</span>` : '<span class="text-muted">-</span>'}</td>
+                                <td class="text-center text-muted font-13">${item.quantity_returned ?? 0}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    htmlRows = '<tr><td colspan="4" class="text-center text-danger py-2">Aucun produit trouvé ou accès non autorisé.</td></tr>';
+                }
+                
+                // Injection des lignes dans le tableau du modal
+                $('#tbl-produits-bon').html(htmlRows);
+            },
+            error: function(xhr) {
+                console.error("Erreur lors de la récupération du bon : ", xhr);
+                $('#tbl-produits-bon').html(`
+                    <tr>
+                        <td colspan="4" class="text-center text-danger py-2">
+                            <i class="mdi mdi-alert-circle-outline me-1"></i> Échec du chargement des détails (Code ${xhr.status}).
+                        </td>
+                    </tr>
+                `);
+            }
+        });
+    });
+
+    // 5. Case à cocher globale (Sélection de tous les bons)
+    $('#checkAllRows').on('change', function() {
+        const isChecked = $(this).is(':checked');
+        $('.row-checkbox').prop('checked', isChecked);
+    });
+});
 </script>
 @endsection

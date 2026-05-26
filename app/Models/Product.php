@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -19,7 +18,7 @@ class Product extends Model
 
     protected $fillable = [
         'code',
-        
+        'slug',
         'subcategories',
         'product_category_id',
         'user_id',
@@ -33,41 +32,38 @@ class Product extends Model
         'status',
     ];
 
-    public static function boot()
+    protected static function boot()
     {
         parent::boot();
 
-        self::creating(function ($product) {
-            // Utilise l'ID de l'utilisateur connecté s'il existe
-            if (auth()->check()) {
-                $product->user_id = $product->user_id ?? auth()->id();
+        // 🔥 CREATE
+        static::creating(function ($product) {
+
+            // ⚡ SAFE USER ID (seed + API)
+            if (empty($product->user_id)) {
+                $product->user_id = auth()->id() ?? 1;
             }
 
-            // Utilise la catégorie de la requête seulement si elle existe
-            if (request()->filled('product_category_id')) {
-                $product->product_category_id = request()->product_category_id;
-            }
-
-            $product->slug = Str::slug($product->name);
+            // ⚡ SLUG UNIQUE (CRUCIAL pour 15K)
+            $product->slug = Str::slug($product->name . '-' . Str::random(8));
         });
 
-        self::updating(function ($product) {
-            if (Route::currentRouteName() == 'products.update') {
-                if (auth()->check()) {
-                    $product->user_id = $product->user_id ?? auth()->id();
-                }
-                $product->slug = Str::slug($product->name);
-            }
+        // 🔥 UPDATE
+        static::updating(function ($product) {
+
+            $product->slug = Str::slug($product->name . '-' . Str::random(8));
         });
 
-        self::created(function ($product) {
-            $randomString = strtoupper(Str::random(6));
-            $uniqueCode = 'SKU-0'.$product->id.'-'.$randomString;
+        // 🔥 AUTO CODE SKU
+        static::created(function ($product) {
 
-            // Mise à jour silencieuse
-            $product->updateQuietly(['code' => $uniqueCode]);
+            $product->updateQuietly([
+                'code' => 'SKU-' . $product->id . '-' . strtoupper(Str::random(6))
+            ]);
         });
     }
+
+    // ================= RELATIONS =================
 
     public function user()
     {
@@ -89,15 +85,17 @@ class Product extends Model
         return $this->hasMany(TemporaryReservation::class);
     }
 
+    public function item()
+    {
+        return $this->hasMany(SaleItem::class, 'product_id');
+    }
+
+    // ================= ACCESSOR =================
+
     public function getAvailableStockAttribute()
     {
         $reserved = $this->reservations()->active()->sum('quantity');
 
         return $this->quantity - $reserved;
-    }
-
-    public function item()
-    {
-        return $this->hasMany(SaleItem::class, 'product_id');
     }
 }

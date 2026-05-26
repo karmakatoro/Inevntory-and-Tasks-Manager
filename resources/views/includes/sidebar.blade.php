@@ -83,8 +83,8 @@
                     <a href="#sidebarEcommerce" data-bs-toggle="collapse" aria-expanded="false"
                         aria-controls="sidebarEcommerce">
                         <i class="ri-shopping-cart-2-line"></i>
-                        <span class="badge bg-danger float-end">New</span>
-                        <span> Products </span>
+                        <span class="badge bg-danger float-end">Nouveau</span>
+                        <span> Produits </span>
                     </a>
                     <div class="collapse" id="sidebarEcommerce">
                         <ul class="nav-second-level">
@@ -112,11 +112,11 @@
                                </li>
                             @endif
                             <li>
-                                <a href="{{ route('customers.index') }}">Customers</a>
+                                <a href="{{ route('customers.index') }}">Clients</a>
                             </li>
                             
                             <li>
-                                <a href="{{ route('sales.index',['agent'=>Auth::user()->id]) }}">Sellers</a>
+                                <a href="{{ route('sales.index',['agent'=>Auth::user()->id]) }}">Ventes</a>
                             </li>
                         </ul>
                     </div>
@@ -138,9 +138,9 @@
                             <li>
                                 <a href="{{ route('payement.credit',['agent'=>Auth::user()->id]) }}">Credit</a>
                             </li>
-                            <li>
+                            {{-- <li>
                                 <a href="email-templates.html">Historique</a>
-                            </li>
+                            </li> --}}
                         </ul>
                     </div>
                 </li>

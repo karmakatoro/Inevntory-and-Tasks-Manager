@@ -18,33 +18,59 @@ class WorkSessionController extends Controller
     {
         //
     }
-      public function getClosingStats(){
+     public function getClosingStats() {
     try {
         $agentId = auth()->id();
-        $session = WorkSession::where('user_id',$agentId)->where('status','open')->first();
-        $sessionId  = $session->id;
-        $today = now()->startOfDay();
+        $session = WorkSession::where('user_id', $agentId)->where('status', 'open')->first();
+        
+        if (!$session) return response()->json(['error' => 'Session introuvable'], 404);
 
-        // Vérifie bien que les noms de colonnes 'agent_id' et 'amount_paid' existent
-        $totalSales = Sale::where('agent_id', $agentId)
-            ->where('work_session_id', $sessionId)
-            ->sum('total_amount');
-        $totalPayementCash = Payement::where('recorded_by',$agentId)
-                  ->where('work_session_id',$sessionId)
-                   ->sum('amount');
+        $sessionId = $session->id;
 
-        // Vérifie que 'user_id' est la bonne colonne pour l'agent
-        $totalStock = AgentStock::where('user_id', $agentId)
-            ->sum('quantity');
+        // --- SECTION A : PERFORMANCE (Ce que j'ai vendu) ---
+        $totalSales = Sale::where('work_session_id', $sessionId)->sum('total_amount');
+        $cashSales = Sale::where('work_session_id', $sessionId)->sum('amount_paid');
+        $creditSales = Sale::where('work_session_id', $sessionId)->sum('balance');
+
+        // --- SECTION B : RECOUVREMENT (Ce que j'ai encaissé) ---
+        // Paiements pour les ventes faites AUJOURD'HUI
+        $payToday = Payement::where('work_session_id', $sessionId)
+            ->whereHas('allocations.sale', function($q) use ($sessionId) {
+                $q->where('work_session_id', $sessionId);
+            })->sum('amount');
+
+        // Paiements pour des dettes ANCIENNES (Recouvrement pur)
+        $payOldDebt = Payement::where('work_session_id', $sessionId)
+            ->whereHas('allocations.sale', function($q) use ($sessionId) {
+                $q->where('work_session_id', '!=', $sessionId);
+            })->sum('amount');
+
+        // --- SECTION C : LA CAISSE (Ce que je dois avoir en main) ---
+        $totalCashIn = Payement::where('work_session_id', $sessionId)->sum('amount');
+        $expectedInHand = $session->opening_cash + $totalCashIn;
+        $totalStock = \App\Models\AgentStock::where('user_id', $agentId)->sum('quantity');
 
         return response()->json([
-            'total_sales' => number_format($totalSales, 2, '.', ''),
-            'total_stock' => (int)$totalStock,
-            'total_cash'=> number_format($totalPayementCash, 2,'.',''),
-            'agent_id'    => $agentId
+            'agent_name' => auth()->user()->name,
+            'stats' => [
+                'ventes_du_jour' => [
+                    'total' => number_format($totalSales, 2),
+                    'part_cash' => number_format($cashSales, 2),
+                    'part_credit' => number_format($creditSales, 2),
+                    'stock'=>$totalStock,
+                ],
+                'encaissements' => [
+                    'sur_ventes_du_jour' => number_format($payToday, 2),
+                    'sur_dettes_anciennes' => number_format($payOldDebt, 2),
+                    'total_cash_entre' => number_format($totalCashIn, 2),
+                ],
+                'bilan_caisse' => [
+                    'fond_initial' => number_format($session->opening_cash, 2),
+                    'total_attendu' => number_format($expectedInHand, 2),
+                ]
+            ]
         ]);
     } catch (\Exception $e) {
-        // Cela te permettra de voir l'erreur réelle dans les logs de Laravel
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }

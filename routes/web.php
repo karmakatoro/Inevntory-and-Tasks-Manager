@@ -7,7 +7,7 @@ use App\Http\Controllers\{
     ProductStockController, ProjectController, SaleController,
     SettingController, StockAgenController, TaskController,
     TaskReportFileController, UserController, DailyClosingController,
-    WorkSessionController,PayementController
+    WorkSessionController,PayementController,ProductAssignmentController
 };
 use Illuminate\Support\Facades\Route;
 
@@ -22,14 +22,17 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
 
 /* --- ROUTES CONNECTÉES (Nécessitent un Login) --- */
 Route::middleware('auth')->group(function () {
-
+    Route::controller(ProductAssignmentController::class)->group(function(){
+    Route::get('/assign/stock','index')->name('show-assign-stock');
+    Route::get('/products-stock/details/{reference_bon}',  'getDetailsBon')->name('products-stock.details');
+});
     // 1. GESTION DES SESSIONS (Ouverture de journée)
     // Ces routes ne sont PAS dans check.session pour éviter la boucle infinie
     Route::controller(WorkSessionController::class)->group(function () {
         Route::get('/sessions/create', 'create')->name('sessions.create');
         Route::post('/sessions/store', 'store')->name('sessions.store');
         Route::post('/sessions/close','close')->name('sessions.close');
-        Route::get('/closing-stat','getClosingStats')->name('closing.stats');
+       Route::get('/closing-stat','getClosingStats')->name('closing.stats');
 
     });
 
@@ -88,6 +91,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('projects', ProjectController::class);
         Route::delete('dm-projects', 'delete_multiples')->name('dm-projects');
     });
+    
  Route::controller(UserController::class)->group(function () {
         Route::resource('users', UserController::class);
         Route::delete('dm-users', 'delete_multiples')->name('dm-users');
