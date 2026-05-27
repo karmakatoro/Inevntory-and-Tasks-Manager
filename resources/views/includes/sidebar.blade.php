@@ -108,7 +108,7 @@
 
                             @if (Auth::user()->type === 'user')
                                 <li>
-                                <a href="{{ route('show-stock-agent',['agent'=>Auth::user()->id]) }}">Stock-Agent</a>
+                                <a href="{{ route('show-stock-agent',['agent'=>Auth::user()->id]) }}">Stock</a>
                                </li>
                             @endif
                             <li>

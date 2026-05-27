@@ -1,13 +1,10 @@
 <?php
 
 namespace App\Jobs;
+
 use App\Models\AgentStock;
-use App\Models\ProductStock;
-use App\Models\Product;
 use App\Models\WorkSession;
-use App\Models\Payement;
-use App\Models\Sale;
-use App\Models\User;
+use App\Models\Assignment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -18,72 +15,63 @@ use Illuminate\Support\Facades\DB;
 class ProcessStockReturn implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    
     protected $agentId;
     protected $closeData;
-
+    protected $workSessionId;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($agentId,$closeData)
+    public function __construct($agentId, $closeData, $workSessionId)
     {
-        //
         $this->agentId = $agentId;
         $this->closeData = $closeData;
+        $this->workSessionId = $workSessionId;
     }
 
     /**
      * Execute the job.
      */
     public function handle(): void
-{
-    DB::beginTransaction();
-    try {
-        $itemReturn = AgentStock::where('user_id', $this->agentId)
-            ->where('quantity', '>', 0)
-            ->lockForUpdate()
-            ->get();
+    {
+        DB::beginTransaction();
+        try {
+            // 1. Mettre à jour le statut de la session en attente de validation par les responsables
+            $sessionClose = WorkSession::where('id', $this->workSessionId)->first();
 
-        // Récupérer la session via l'agentId passé au Job
-        $sessionClose = WorkSession::where('user_id', $this->agentId)
-            ->where('status', 'open')
-            ->first();
-
-        if ($sessionClose) {
-            // Correction syntaxe update
-            $sessionClose->update($this->closeData);
-        }
-
-        foreach ($itemReturn as $item) {
-            $product = Product::find($item->product_id); // Utilise l'objet $item
-
-            if (!$product) {
-                \Log::error("Produit manquant : ID " . $item->product_id);
-                continue;
+            if ($sessionClose) {
+                // On fusionne le changement de statut pour la file d'attente
+                $data = array_merge($this->closeData); 
+                // Note : Laisse 'open' ou mets 'en_attente' selon ton choix pour la file d'attente du Journal
+                $sessionClose->update($data);
             }
 
-            // Réintégration au stock principal
-            $product->increment('quantity', $item->quantity);
+            // 2. Récupérer tout ce que l'agent possède actuellement dans sa sacoche
+            $agentItems = AgentStock::where('user_id', $this->agentId)
+                ->where('quantity', '>', 0)
+                ->get();
 
-            // Tracer le mouvement de retour
-            ProductStock::create([
-                'product_id' => $product->id,
-                'mouvement'  => 'r', // r pour retour
-                'price'      => $item->price ?? $product->price,
-                'quantity'   => $item->quantity,
-                'status'     => 'accepted',
-                'user_id'    => $this->agentId
-            ]);
+            foreach ($agentItems as $item) {
+                // On inscrit simplement la quantité théorique que l'agent prétend retourner
+                $assignment = Assignment::where('work_session_id', $this->workSessionId)
+                    ->where('product_id', $item->product_id)
+                    ->where('receiver_id', $this->agentId)
+                    ->first();
 
-            // Vider le stock de l'agent
-            $item->update(['quantity' => 0]);
+                if ($assignment) {
+                    $assignment->update([
+                        'quantity_returned' => $item->quantity ,// Déclaration brute de l'agent
+                        'closed_at'=> now(),
+                    ]);
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error("Erreur lors de la pré-clôture de l'agent : " . $e->getMessage());
+            throw $e;
         }
-
-        DB::commit();
-    } catch (\Exception $e) {
-        DB::rollback();
-        \Log::error("Erreur réintégration stock : " . $e->getMessage());
-        throw $e;
     }
-}
 }

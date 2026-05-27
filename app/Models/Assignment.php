@@ -10,17 +10,18 @@ class Assignment extends Model
     use HasFactory;
 
     // 1. AJOUT de 'reference_bon' ici pour autoriser sa création automatique
-    protected $fillable = [
-        'reference_bon', 
-        'sender_id',
-        'receiver_id',
-        'product_id',
-        'quantity',
-        'work_session_id',
-        'quantity_received', 
-        'quantity_returned', 
-        'status'
-    ];
+    // protected $fillable = [
+    //     'reference_bon', 
+    //     'sender_id',
+    //     'receiver_id',
+    //     'product_id',
+    //     'quantity',
+    //     'work_session_id',
+    //     'quantity_received', 
+    //     'quantity_returned', 
+    //     'status'
+    // ];
+    protected $guarded = [];
 
     /**
      * Le gestionnaire ou admin qui a envoyé le lot
