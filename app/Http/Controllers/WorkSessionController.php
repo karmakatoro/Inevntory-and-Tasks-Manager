@@ -145,11 +145,11 @@ class WorkSessionController extends Controller
         'closed_at' => now(),
         'closing_cash' => $request->cashReceived,
         'difference' => $difference,
-        'status' => 'closed'
+        'status' => 'en_attente_cloture'
     ];
 
     // On lance le Job
-    ProcessStockReturn::dispatch(auth()->id(), $closeData);
+    ProcessStockReturn::dispatch(auth()->id(), $closeData,$idSession);
 
     return response()->json([
         'status' => true,

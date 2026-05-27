@@ -38,7 +38,7 @@
                      <li class="nav-item" role="presentation">
                         <a href="#assign" data-bs-toggle="tab" aria-expanded="true" class="nav-link "
                             aria-selected="false" role="tab" tabindex="-1">
-                            <i class="mdi mdi-history me-1"></i> Assignation de Stock
+                            <i class="mdi mdi-history me-1"></i> Attribution de Stock
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">

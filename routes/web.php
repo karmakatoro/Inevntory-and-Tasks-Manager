@@ -25,6 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::controller(ProductAssignmentController::class)->group(function(){
     Route::get('/assign/stock','index')->name('show-assign-stock');
     Route::get('/products-stock/details/{reference_bon}',  'getDetailsBon')->name('products-stock.details');
+    
 });
     // 1. GESTION DES SESSIONS (Ouverture de journée)
     // Ces routes ne sont PAS dans check.session pour éviter la boucle infinie
@@ -43,7 +44,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', function () {
             return redirect()->route('dashboard.sales');
         });
-
+        Route::post('/assignments/accept/{referenceBon}', [ProductAssignmentController::class, 'acceptAssignment'])->name('products-stock.accept');
         // Dashboard
         Route::prefix('dashboard')->controller(DashboardController::class)->group(function () {
             Route::get('/sales', 'index')->name('dashboard.sales');
