@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdateWorkSessionRequest;
 use App\Models\WorkSession;
 use Illuminate\Http\Request;
+use App\Jobs\ProcessStockValidate;
 use App\Models\Sale;
 use App\Models\Payement;
 use App\Jobs\ProcessStockReturn;
@@ -14,12 +15,27 @@ class WorkSessionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+   public function index()
+{
+    // On charge les sessions avec la relation 'user' (l'agent) pour éviter les requêtes N+1
+    $queueSessions = WorkSession::with('user')
+        ->whereIn('status', ['en_attente_cloture', 'stock_valide'])
+        ->orderBy('updated_at', 'asc')
+        ->get();
+
+    // Retourne la vue principale en lui passant la file d'attente
+    return view('pages.journal.index', compact('queueSessions'));
+}
+public function loadStockModal(WorkSession $session)
     {
-        //
+        // On charge les assignations et les produits liés pour éviter les requêtes en boucle (Eager Loading)
+        $session->load('assignment.product');
+        return view('pages.journal._stock_modal', compact('session'));
     }
+
      public function getClosingStats() {
     try {
+
         $agentId = auth()->id();
         $session = WorkSession::where('user_id', $agentId)->where('status', 'open')->first();
         
@@ -74,7 +90,60 @@ class WorkSessionController extends Controller
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
+public function validateCash(Request $request, WorkSession $session){
 
+}
+public function loadCashModal($id)
+{
+    // 1. Récupérer la session de travail
+    $workSession = WorkSession::findOrFail($id);
+    $idSession = $workSession->id;
+
+    // 2. Calculs financiers (identiques à la clôture agent)
+    $totalSales = Sale::where('work_session_id', $idSession)->sum('total_amount');
+    $totalPayment = Payement::where('work_session_id', $idSession)->sum('amount');
+
+    // Le système attend théoriquement : Fonds initial + Ventes réalisées
+    $expectedAmount = $workSession->opening_cash + $totalSales;
+
+    // 3. Envoyer les variables à ton modal Blade
+    return view('pages.journal._cash_modal', compact(
+        'workSession', 
+        'totalSales', 
+        'totalPayment', 
+        'expectedAmount'
+    ));
+}
+public function validateStock(Request $request, WorkSession $session)
+{
+    try {
+        $qtyReturnedPhysical = $request->stock_physique;
+         if(empty($qtyReturnedPhysical)){
+            return response()->json([
+                'status'  => false,
+                'message' => 'Aucune donnée de stock physique n\'a été reçue.'
+            ]);
+        }
+        if($session->status !== 'en_attente_cloture'){
+            return response()->json([
+                'status'=>false,
+                'message'=>'Cette session a déjà été traitée ou n\'est pas en attente de clôture.'
+            ]);
+        }
+        ProcessStockValidate::dispatch($session, auth()->id(), $qtyReturnedPhysical);
+        return response()->json([
+            'status'  => true,
+            'message' => 'Le traitement des stocks a été lancé avec succès en arrière-plan. La session passe à l\'étape d\'encaissement.'
+        ]);
+
+    }
+    catch(\Exception $e){
+       return response()->json([
+            'status'  => false,
+            'message' => 'Erreur lors du lancement du processus : ' . $e->getMessage()
+        ]);
+    }
+}
     /**
      * Show the form for creating a new resource.
      */
@@ -113,17 +182,17 @@ class WorkSessionController extends Controller
             'redirect' => route('dashboard.sales'), // Assure-toi que cette clé existe
         ]);
     }
-    public function close(Request $request)
+public function close(Request $request)
 {
-    // Correction validation
+    // Validation
     $request->validate([
         'cashReceived' => 'required|numeric|min:0',
     ]);
 
-    // On récupère la session (ajout du modèle WorkSession)
+    // On récupère la session
     $workSession = WorkSession::where('user_id', auth()->id())
         ->where('status', 'open')
-        ->first(); // Utilise first() et non get() pour avoir l'objet directement
+        ->first(); 
 
     if (!$workSession) {
         return response()->json(['status' => false, 'message' => 'Aucune session ouverte.'], 404);
@@ -131,29 +200,29 @@ class WorkSessionController extends Controller
 
     $idSession = $workSession->id;
 
-    // Calculs (Ajout des guillemets pour les colonnes)
+    // Calculs
     $totalSales = Sale::where('work_session_id', $idSession)->sum('total_amount');
     $totalPayment = Payement::where('work_session_id', $idSession)->sum('amount');
 
     // Logique : Le système attend (Fonds initial + Ventes réalisées)
     $expectedAmount = $workSession->opening_cash + $totalSales;
 
-    // La différence : ce que l'agent a physiquement moins ce qu'il devrait avoir
-    $difference = $expectedAmount-$request->cashReceveid;
+    
+    $difference = $expectedAmount - $request->cashReceived;
 
     $closeData = [
-        'closed_at' => now(),
+        'closed_at'    => now(),
         'closing_cash' => $request->cashReceived,
-        'difference' => $difference,
-        'status' => 'en_attente_cloture'
+        'difference'   => $difference,
+        'status'       => 'en_attente_cloture'
     ];
 
     // On lance le Job
-    ProcessStockReturn::dispatch(auth()->id(), $closeData,$idSession);
+    ProcessStockReturn::dispatch(auth()->id(), $closeData, $idSession);
 
     return response()->json([
-        'status' => true,
-        'message' => 'Session en cours de clôture. Écart : ' . $difference . '$',
+        'status'   => true,
+        'message'  => 'Session en cours de clôture. Écart : ' . $difference . '$',
         'redirect' => route('sessions.create')
     ]);
 }
