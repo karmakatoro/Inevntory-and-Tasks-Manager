@@ -5,7 +5,7 @@
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
-<form action="{{ route('journal.cash-submit', $session->id) }}" method="POST" class="form-cloture-submit">
+<form action="{{ route('journal.cash-validate', $session->id) }}" method="POST" class="form-cloture-submit">
     @csrf
     <div class="modal-body px-4">
         
@@ -22,12 +22,12 @@
                 <div class="p-3 border rounded bg-light h-100">
                     <span class="text-muted text-uppercase font-size-12 fw-semibold">Attendu Système</span>
                     <h2 class="mt-2 text-primary fw-bold font-monospace">
-                        {{ number_format($totalSalesCash, 2, ',', ' ') }} <small class="font-size-14">USD</small>
+                        <span class="text-muted">{{ number_format($totalSales, 2, ',', ' ') }} $</span>
                     </h2>
                     <p class="text-muted mb-0 font-size-13 mt-3">
                         Ce montant correspond au cumul net de toutes les ventes déclarées "Cash" par l'agent au cours de sa session.
                     </p>
-                    <input type="hidden" name="expected_amount" value="{{ $totalSalesCash }}">
+                    <span class="text-muted">{{ number_format($totalSales, 2, ',', ' ') }} $</span>
                 </div>
             </div>
 

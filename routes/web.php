@@ -29,14 +29,24 @@ Route::middleware('auth')->group(function () {
 });
     // 1. GESTION DES SESSIONS (Ouverture de journée)
     // Ces routes ne sont PAS dans check.session pour éviter la boucle infinie
-    Route::controller(WorkSessionController::class)->group(function () {
-        Route::get('/sessions/create', 'create')->name('sessions.create');
-        Route::post('/sessions/store', 'store')->name('sessions.store');
-        Route::post('/sessions/close','close')->name('sessions.close');
-       Route::get('/closing-stat','getClosingStats')->name('closing.stats');
-
-    });
-
+   Route::controller(WorkSessionController::class)->group(function () {
+    Route::get('/journal', 'index')->name('journal.show');
+    
+    // Étape 1 : Chargement du modal de Stock (URL propre)
+    Route::get('/journal/stock-modal/{session}', 'loadStockModal')->name('journal.stock.modal');
+    Route::post('/journal/stock-validate/{session}', 'validateStock')->name('journal.validate.stock');
+    
+    // Étape 2 : Chargement du modal de Cash (URL corrigée ici !)
+    Route::get('/journal/cash-modal/{session}', 'loadCashModal')->name('journal.cash.modal');
+    Route::post('/journal/cash-validate/{session}', 'validateCash')->name('journal.cash-validate');
+   
+    
+    // Autres routes de session
+    Route::get('/sessions/create', 'create')->name('sessions.create');
+    Route::post('/sessions/store', 'store')->name('sessions.store');
+    Route::post('/sessions/close', 'close')->name('sessions.close');
+    Route::get('/closing-stat', 'getClosingStats')->name('closing.stats');
+});
     // 2. ROUTES SÉCURISÉES (Nécessitent une session de travail OUVERTE)
     Route::middleware('check.session')->group(function () {
 

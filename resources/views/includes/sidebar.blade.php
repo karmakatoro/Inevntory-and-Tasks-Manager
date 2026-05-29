@@ -122,12 +122,11 @@
                     </div>
                 </li>
 
-
                 <li>
                     <a href="#sidebarEmail" data-bs-toggle="collapse" aria-expanded="false"
                         aria-controls="sidebarEmail">
                         <i class="ri-task-line"></i>
-                        <span>Caisse</span>
+                        <span> Inventaire </span>
                         <span class="menu-arrow"></span>
                     </a>
                     <div class="collapse" id="sidebarEmail">
@@ -138,9 +137,10 @@
                             <li>
                                 <a href="{{ route('payement.credit',['agent'=>Auth::user()->id]) }}">Credit</a>
                             </li>
-                            {{-- <li>
-                                <a href="email-templates.html">Historique</a>
-                            </li> --}}
+                            <li>
+                                <a href="{{ route('journal.show') }}">Journal</a>
+                            </li>
+                            
                         </ul>
                     </div>
                 </li>

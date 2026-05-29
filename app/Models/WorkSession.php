@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Payement;
 use App\Models\Sale;
 use App\Models\User;
 use App\Models\CashMovement;
-use App\Models\ProductAssignment;
+use App\Models\Assignment;
+
 
 class WorkSession extends Model
 {
@@ -19,9 +21,10 @@ class WorkSession extends Model
     public function workMovement():HasMany{
         return $this->HasMany(CashMovement::class,'work_session_id');
     }
-    public function assignment():HasMany{
-        return $this->HasMany(ProductAssignement::class,'work_session_id');
-    }
+   public function assignment(): HasMany
+{
+    return $this->hasMany(Assignment::class, 'work_session_id');
+}
     
     public function work(): HasMany
     {
