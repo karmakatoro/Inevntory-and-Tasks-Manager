@@ -73,8 +73,6 @@ public function index(User $agent)
         // Filtrage strict par agent
         if (Auth::user()->type !== 'admin') {
             $query->where('recorded_by', Auth::id());
-        } else {
-            $query->where('recorded_by', $agent->id);
         }
 
         $payments = $query->latest()->get();
@@ -121,25 +119,31 @@ public function index(User $agent)
             ->addColumn('recorded_by', function ($row) {
                 return $row->agent->name ?? 'N/A';
             })
-            ->addColumn('action', function ($row) {
-                return '
-                    <div class="dropdown">
-                        <button class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">Action</button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="javascript:void(0);" data-id='.$row->id.'"><i class="mdi mdi-eye-outline me-1"></i>Détails</a>
-                            <a class="dropdown-item text-danger delete-payment" data-id="'.$row->id.'" href="javascript:void(0);">
-                                <i class="mdi mdi-trash-can-outline me-1"></i>Supprimer
-                            </a>
-                        </div>
-                    </div>';
-            })
+          ->addColumn('action', function ($row) {
+    // SOLUTION : getKey() va chercher la vraie clé primaire du modèle 
+    // sans subir les conflits de noms provoqués par les jointures ou Eager Loading
+    $paymentId = $row->getKey(); 
+
+    return '
+        <div class="dropdown">
+            <button class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">Action</button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="javascript:void(0);" data-id="' . $paymentId . '">
+                    <i class="mdi mdi-eye-outline me-1"></i>Détails
+                </a>
+                <a class="dropdown-item text-danger delete-payment" data-id="' . $paymentId . '" href="javascript:void(0);">
+                    <i class="mdi mdi-trash-can-outline me-1"></i>Supprimer
+                </a>
+            </div>
+        </div>';
+})
             ->rawColumns(['checkbox', 'ventes', 'amount', 'status', 'action'])
             ->make(true);
     }
 
     return view('pages.payements.index', compact('agent'));
 }
-    public function getCustomerDebts(User $agent) {
+public function getCustomerDebts(User $agent) {
 
     if (request()->ajax()) {
         $isAdmin = Auth::user()->type==="admin";

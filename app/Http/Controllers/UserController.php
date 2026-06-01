@@ -151,7 +151,7 @@ class UserController extends Controller
             if ($request->gender == 'm') {
                 $photo = 'avatar-male.png';
             }
-            $password = Hash::make(1287635);
+            $password = Hash::make(12345678);
             $data['photo'] = $photo;
             $data['password'] = $password;
         }

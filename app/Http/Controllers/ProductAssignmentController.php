@@ -25,18 +25,20 @@ class ProductAssignmentController extends Controller
                     DB::raw('SUM(quantity) as total_quantity'),
                 ])
                 ->groupBy('reference_bon', 'sender_id', 'receiver_id', 'status', 'created_at');
-            $user = auth()->user();
+                $user = auth()->user();
 
-            if (! $user->hasRole('Admin')) {
+            if (!$user->hasRole('Admin')) {
                 $query->where('receiver_id', $user->id);
             }
             if ($request->filled('status') && $request->status !== 'all') {
                 $query->where('status', $request->status);
+                 
             }
             if ($user->hasRole('Admin') && $request->filled('agent_id')) {
                 $query->where('receiver_id', $request->agent_id);
             }
             $query->orderBy('created_at', 'desc');
+            
 
             return DataTables::of($query)
                 ->addColumn('checkbox', function ($row) {

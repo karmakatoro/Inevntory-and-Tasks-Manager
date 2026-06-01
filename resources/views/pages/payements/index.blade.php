@@ -221,22 +221,34 @@
 $(document).on('click', '.dropdown-item[data-id]', function(e) {
     e.preventDefault();
     
+    // CORRECTION : $(this) ou $(e.currentTarget) ciblent TOUJOURS l'élément portant l'écouteur (.dropdown-item)
+    // même si on a cliqué sur l'icône à l'intérieur.
+    let rawId = $(this).attr('data-id') || $(this).data('id');
+
+    if (!rawId) {
+        console.error("Échec de récupération de l'ID sur l'élément cliqué.");
+        return;
+    }
+
     // Nettoyage de l'ID
-    let paymentId = $(this).attr('data-id').replace(/[/\\%22"']/g, "");
+    let paymentId = String(rawId).replace(/[/\\%22"']/g, "");
+
+    // Si après nettoyage c'est vide, on bloque avant d'appeler l'AJAX
+    if (!paymentId || paymentId === "undefined") {
+        alert("Impossible de charger les détails : L'ID de ce paiement est invalide ou corrompu.");
+        return;
+    }
 
     let modal = $('#details-payment-modal');
     let container = $('#details-content');
 
-    // On ouvre la modale AVANT l'appel pour l'UX
     container.html('<div class="text-center py-4"><div class="spinner-border text-primary"></div><p class="mt-2">Chargement des données...</p></div>');
     modal.modal('show');
 
     $.ajax({
-        url: `/payement/${paymentId}/details`, // Vérifiez bien l'orthographe 'payement' vs 'payment' ici
+        url: `/payement/${paymentId}/details`,
         method: 'GET',
-        // dataType: 'json', <-- SUPPRIMEZ CETTE LIGNE
         success: function(response) {
-            // Puisque le contrôleur renvoie response($html), 'response' est déjà votre tableau HTML
             container.html(response);
         },
         error: function(xhr) {

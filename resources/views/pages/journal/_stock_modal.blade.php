@@ -22,7 +22,7 @@
                                 <span class="fw-medium">{{$assignation->product->name }}</span>
                             </td>
                             <td class="text-center font-monospace fw-bold text-primary">
-                                {{ $assignation->quantity }}
+                                {{ $assignation->quantity_returned }}
                             </td>
                             <td>
                                 <div class="input-group input-group-sm">

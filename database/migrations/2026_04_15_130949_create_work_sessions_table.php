@@ -16,13 +16,13 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->dateTime('opened_at');
             $table->dateTime('closed_at')->nullable();
-            $table->enum('status', ['open', 'closed'])->default('open');
-            
+            $table->enum('status', ['open', 'en_attente_cloture', 'stock_valide', 'closed'])->default('open');
+            $table->decimal('total_loss_value', 10, 2)->default(0.00);
             // Pour le contrôle de caisse physique
             $table->decimal('opening_cash', 15, 2)->default(0); 
             $table->decimal('closing_cash', 15, 2)->nullable();
-        $table->text('note')->nullable();
-         $table->decimal('difference', 15, 2)->default(0);
+          $table->text('note')->nullable();
+          $table->decimal('difference', 15, 2)->default(0);
             $table->timestamps();
 
 
