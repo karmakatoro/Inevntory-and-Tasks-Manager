@@ -16,7 +16,9 @@ return new class extends Migration
             $table->foreignId('payment_id')->constrained('payements')->onDelete('cascade');
             $table->foreignId('sale_id')->constrained('sales')->onDelete('cascade');
             $table->decimal('amount_allocated', 10, 2);
-            $table->foreignId('user_id')->constrained('users'); // Qui a fait l'allocation
+            $table->foreignId('user_id')->constrained('users');
+             $table->string('note')->nullable();
+            $table->index(['payment_id', 'sale_id']); 
             $table->timestamps();
 
         });

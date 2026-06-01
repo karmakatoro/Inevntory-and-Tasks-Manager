@@ -10,6 +10,7 @@ use App\Models\Sale;
 use App\Models\Payement;
 use App\Jobs\ProcessStockReturn;
 use App\Models\AgentStock;
+use Illuminate\Support\Facades\DB;
 class WorkSessionController extends Controller
 {
     /**
@@ -90,8 +91,51 @@ public function loadStockModal(WorkSession $session)
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
-public function validateCash(Request $request, WorkSession $session){
+public function validateCash(Request $request, $id)
+{
+    $session = WorkSession::findOrFail($id);
 
+    $request->validate([
+        'actual_amount' => 'required|numeric|min:0'
+    ]);
+
+    try {
+        DB::beginTransaction();
+
+        // 🛠️ Alignement sur ta nouvelle logique de flux de trésorerie
+        $totalCashIn = Payement::where('work_session_id', $session->id)->sum('amount');
+        
+        // Attendu = Ouverture + Tous les paiements encaissés aujourd'hui (Ventes + Dettes)
+        $expectedAmount = $session->opening_cash + $totalCashIn;
+        $actualAmountReceived = $request->actual_amount;
+
+        // Écart final
+        $finalDifference = $expectedAmount - $actualAmountReceived;
+
+        $session->update([
+            'closing_cash' => $actualAmountReceived,
+            'difference'   => $finalDifference,
+            'status'       => 'closed',
+            'closed_at'    => now(),
+        ]);
+
+        DB::commit();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'status'  => true,
+                'message' => 'Encaissement validé et journal scellé avec succès.',
+                'redirect'=> route('journal.show')
+            ]);
+        }
+
+        return redirect()->route('journal.show')->with('success', 'Journal scellé !');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error("Erreur validation Cash Journal : " . $e->getMessage());
+        return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
+    }
 }
 public function loadCashModal($id)
 {
@@ -99,20 +143,50 @@ public function loadCashModal($id)
     $workSession = WorkSession::findOrFail($id);
     $idSession = $workSession->id;
 
-    // 2. Calculs financiers (identiques à la clôture agent)
+    // --- SECTION A : LES VENTES DU JOUR ---
     $totalSales = Sale::where('work_session_id', $idSession)->sum('total_amount');
-    $totalPayment = Payement::where('work_session_id', $idSession)->sum('amount');
+    $cashSales  = Sale::where('work_session_id', $idSession)->sum('amount_paid');
+    $creditSales = Sale::where('work_session_id', $idSession)->sum('balance');
+  
 
-    // Le système attend théoriquement : Fonds initial + Ventes réalisées
-    $expectedAmount = $workSession->opening_cash + $totalSales;
+    // --- SECTION B : RECOUVREMENT (Flux de trésorerie entrant) ---
+    // Paiements pour les ventes faites AUJOUR'HUI
+    $payToday = Payement::where('work_session_id', $idSession)
+        ->whereHas('allocations.sale', function($q) use ($idSession) {
+            $q->where('work_session_id', $idSession);
+        })->sum('amount');
+
+    // Paiements pour des dettes ANCIENNES (Recouvrement pur)
+    $payOldDebt = Payement::where('work_session_id', $idSession)
+        ->whereHas('allocations.sale', function($q) use ($idSession) {
+            $q->where('work_session_id', '!=', $idSession);
+        })->sum('amount');
+
+    // --- SECTION C : LA CAISSE (Ce que je dois avoir en main) ---
+    $totalCashIn = Payement::where('work_session_id', $idSession)->sum('amount');
+    
+    // 🛠️ FIX 1 : Remplacement de $session->opening_cash par $workSession->opening_cash (faute de variable)
+    $expectedInHand = $workSession->opening_cash + $totalCashIn;
 
     // 3. Envoyer les variables à ton modal Blade
-    return view('pages.journal._cash_modal', compact(
-        'workSession', 
-        'totalSales', 
-        'totalPayment', 
-        'expectedAmount'
-    ));
+    return view('pages.journal._cash_modal', [
+        'workSession'    => $workSession,
+        'session'        => $workSession, 
+        'cashTodaySale'  => $cashSales,
+        'debtToSale'     => $creditSales,
+        'toPay'          => $payToday,
+        'debtOldPay'     => $payOldDebt,
+        
+        // 🛠️ FIX 2 : $totalCashIn doit recevoir $totalCashIn (et non pas $payOldDebt comme tu avais écrit)
+        'totalCashIn'    => $totalCashIn, 
+        
+        'totalSales'     => $totalSales,
+        
+        // 🛠️ FIX 3 : Définition de $totalPayment qui n'existait pas (cumul des encaissements)
+        'totalPayment'   => $totalCashIn, 
+        
+        'expectedAmount' => $expectedInHand
+    ]);
 }
 public function validateStock(Request $request, WorkSession $session)
 {
@@ -144,6 +218,7 @@ public function validateStock(Request $request, WorkSession $session)
         ]);
     }
 }
+
     /**
      * Show the form for creating a new resource.
      */
